@@ -17,20 +17,20 @@ model Users {
   creation_date         DateTime              @default(now())
   role                  Roles                 @relation(fields: [id_role], references: [id])
   id_role               Int
-  email                 String                @db.VarChar(150)
+  email                 String                @unique @db.VarChar(150)
   password              String?               @db.VarChar(250)
   facebook_token        String?               @db.VarChar(250)
-  username              String?               @db.VarChar(150)
+  username              String?               @unique @db.VarChar(150)
   firstname             String?               @db.VarChar(150)
   lastname              String?               @db.VarChar(150)
   phone_number          String?               @db.VarChar(20)
-  adoptionRequests      AdoptionRequests[]
+  adoption_requests     Adoption_requests[]
   messages              Messages[]
 }
 
 model Roles {
   id                    Int                   @id @default(autoincrement())
-  name                  String                @db.VarChar(100)
+  name                  String                @unique @db.VarChar(100)
   users                 Users[]
 }
 
@@ -38,13 +38,13 @@ model Offers {
   id                    Int                   @id @default(autoincrement())
   creation_date         DateTime              @default(now())
   adoption_date         DateTime?             @db.Timestamp()
-  status                OfferStatus           @relation(fields: [id_status], references: [id])
+  status                Offer_status          @relation(fields: [id_status], references: [id])
   id_status             Int
   animal_name           String?               @db.VarChar(150)
   age                   Int
   category              Categories            @relation(fields: [id_category], references: [id])
   id_category           Int
-  race                  Races?                 @relation(fields: [id_race], references: [id])
+  race                  Races?                @relation(fields: [id_race], references: [id])
   id_race               Int?
   zipcode               Int
   city                  String                @db.VarChar(150)
@@ -54,18 +54,18 @@ model Offers {
   disability            String?               @db.VarChar(250)
   description           String?               @db.LongText
   photos                Photos[]
-  adoptionRequests      AdoptionRequests[]
+  adoption_requests     Adoption_requests[]
 }
 
-model OfferStatus {
+model Offer_status {
   id                    Int                   @id @default(autoincrement())
-  name                  String                @db.VarChar(100)
+  name                  String                @unique @db.VarChar(100)
   offers                Offers[]
 }
 
 model Categories {
   id                    Int                   @id @default(autoincrement())
-  name                  String                @db.VarChar(100)
+  name                  String                @unique @db.VarChar(100)
   parent_category       Categories?           @relation("ParentCategory", fields: [id_parent_category], references: [id])
   id_parent_category    Int?
   offers                Offers[]
@@ -77,7 +77,7 @@ model Races {
   id                    Int                   @id @default(autoincrement())
   category              Categories            @relation(fields: [id_category], references: [id])
   id_category           Int
-  name                  String                @db.VarChar(100)
+  name                  String                @unique @db.VarChar(100)
   offers                Offers[]
 }
 
@@ -89,7 +89,7 @@ model Photos {
   path                  String                @db.VarChar(250)
 }
 
-model AdoptionRequests {
+model Adoption_requests {
   id                    Int                   @id @default(autoincrement())
   offer                 Offers                @relation(fields: [id_offer], references: [id])
   id_offer              Int
@@ -97,21 +97,21 @@ model AdoptionRequests {
   candidate_contact     String                @db.VarChar(150)
   candidate             Users?                @relation(fields: [id_candidate], references: [id])
   id_candidate          Int?
-  status                AdoptionStatus?       @relation(fields: [id_adoption_status], references: [id])
+  status                Adoption_status?      @relation(fields: [id_adoption_status], references: [id])
   id_adoption_status    Int
   messages              Messages[]
 }
 
-model AdoptionStatus {
+model Adoption_status {
   id                    Int                   @id @default(autoincrement())
-  name                  String                @db.VarChar(100)
-  adoptionRequests      AdoptionRequests[]
+  name                  String                @unique @db.VarChar(100)
+  adoption_requests     Adoption_requests[]
 }
 
 model Messages {
   id                    Int                   @id @default(autoincrement())
-  adoption_request       AdoptionRequests      @relation(fields: [id_adoption_request], references: [id])
-  id_adoption_request    Int
+  adoption_request      Adoption_requests     @relation(fields: [id_adoption_request], references: [id])
+  id_adoption_request   Int
   creation_date         DateTime              @default(now())
   author                Users?                @relation(fields: [id_author], references: [id])
   id_author             Int?
