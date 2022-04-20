@@ -1,4 +1,4 @@
-import type { FastifyInstance, FastifyReply } from "fastify";
+import type { FastifyInstance } from "fastify";
 import { paramsIdType } from "../commons/types";
 import {
 	findAllRoles,
@@ -11,7 +11,7 @@ import {
 import { Role, RoleType } from "./types";
 
 const roleRouter = async (server: FastifyInstance) => {
-	server.get("/", async (request, reply) => {
+	server.get("/", async (_request, reply) => {
 		const allRoles = await findAllRoles();
 		reply.status(200).send(allRoles);
 	});
