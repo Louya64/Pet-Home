@@ -13,13 +13,13 @@ export const findRoleById = async (id: number) => {
 	});
 };
 
-// export const findRoleByName = async (name: string) => {
-// 	return await prisma.roles.findUnique({
-// 		where: {
-//       name: name,
-//     }
-// 	});
-// };
+export const findRoleByName = async (name: string) => {
+	return await prisma.roles.findUnique({
+		where: {
+			name: name,
+		},
+	});
+};
 
 export const createRole = async (data: RoleType) => {
 	return await prisma.roles.create({ data });

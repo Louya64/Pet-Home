@@ -1,11 +1,12 @@
 import type { FastifyInstance, FastifyReply } from "fastify";
-import { paramsIdType } from "../paramsIdModel";
+import { paramsIdType } from "../commons/types";
 import {
 	findAllRoles,
 	findRoleById,
 	createRole,
 	updateRole,
 	deleteRole,
+	findRoleByName,
 } from "./dao";
 import { Role, RoleType } from "./types";
 
@@ -29,7 +30,7 @@ const roleRouter = async (server: FastifyInstance) => {
 		}
 	);
 
-	server.post<{ Body: RoleType; Reply: RoleType }>(
+	server.post<{ Body: RoleType; Reply: RoleType | string }>(
 		"/",
 		{
 			schema: {
@@ -41,12 +42,21 @@ const roleRouter = async (server: FastifyInstance) => {
 		},
 		async (request, reply) => {
 			const { body: role } = request;
-			const roleCreated = await createRole(role);
-			reply.status(200).send(roleCreated);
+			const roleNameAlreadyExists = await findRoleByName(role.name);
+			if (!roleNameAlreadyExists) {
+				const roleCreated = await createRole(role);
+				reply.status(200).send(roleCreated);
+			} else {
+				reply.status(400).send("Ce rôle existe déjà");
+			}
 		}
 	);
 
-	server.put<{ Params: paramsIdType; Body: RoleType; Reply: RoleType }>(
+	server.put<{
+		Params: paramsIdType;
+		Body: RoleType;
+		Reply: RoleType | string;
+	}>(
 		"/:id",
 		{
 			schema: {
@@ -58,8 +68,13 @@ const roleRouter = async (server: FastifyInstance) => {
 		},
 		async (request, reply) => {
 			const { body: role } = request;
-			const roleUpdated = await updateRole(Number(request.params.id), role);
-			reply.status(200).send(roleUpdated);
+			const roleNameAlreadyExists = await findRoleByName(role.name);
+			if (!roleNameAlreadyExists) {
+				const roleUpdated = await updateRole(Number(request.params.id), role);
+				reply.status(200).send(roleUpdated);
+			} else {
+				reply.status(400).send("Ce rôle existe déjà");
+			}
 		}
 	);
 
