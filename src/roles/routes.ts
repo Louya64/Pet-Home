@@ -1,5 +1,6 @@
 import type { FastifyInstance } from "fastify";
-import { paramsIdType } from "../commons/types";
+import { ParamsIdType, ErrorType } from "../commons/types";
+import { notFoundError, duplicateDataError } from "../commons/errorHelpers";
 import {
 	findAllRoles,
 	findRoleById,
@@ -16,7 +17,7 @@ const roleRouter = async (server: FastifyInstance) => {
 		reply.status(200).send(allRoles);
 	});
 
-	server.get<{ Params: paramsIdType; Reply: RoleType | string }>(
+	server.get<{ Params: ParamsIdType; Reply: RoleType | ErrorType }>(
 		"/:id",
 		async (request, reply) => {
 			const role = await findRoleById(Number(request.params.id));
@@ -25,12 +26,16 @@ const roleRouter = async (server: FastifyInstance) => {
 			} else {
 				reply
 					.status(404)
-					.send(`id: ${request.params.id} ne correspond à aucun rôle existant`);
+					.send(
+						notFoundError(
+							`id: ${request.params.id} ne correspond à aucun rôle existant`
+						)
+					);
 			}
 		}
 	);
 
-	server.post<{ Body: RoleType; Reply: RoleType | string }>(
+	server.post<{ Body: RoleType; Reply: RoleType | ErrorType }>(
 		"/",
 		{
 			schema: {
@@ -47,15 +52,20 @@ const roleRouter = async (server: FastifyInstance) => {
 				const roleCreated = await createRole(role);
 				reply.status(200).send(roleCreated);
 			} else {
-				reply.status(400).send("Ce rôle existe déjà");
+				const duplicateData = {
+					statusCode: 409,
+					error: "Conflict",
+					message: `Ce rôle existe déjà`,
+				};
+				reply.status(409).send(duplicateData);
 			}
 		}
 	);
 
 	server.put<{
-		Params: paramsIdType;
+		Params: ParamsIdType;
 		Body: RoleType;
-		Reply: RoleType | string;
+		Reply: RoleType | ErrorType;
 	}>(
 		"/:id",
 		{
@@ -73,12 +83,17 @@ const roleRouter = async (server: FastifyInstance) => {
 				const roleUpdated = await updateRole(Number(request.params.id), role);
 				reply.status(200).send(roleUpdated);
 			} else {
-				reply.status(400).send("Ce rôle existe déjà");
+				const duplicateData = {
+					statusCode: 409,
+					error: "Conflict",
+					message: `Ce rôle existe déjà`,
+				};
+				reply.status(409).send(duplicateData);
 			}
 		}
 	);
 
-	server.delete<{ Params: paramsIdType; Reply: string }>(
+	server.delete<{ Params: ParamsIdType; Reply: string }>(
 		"/:id",
 		async (request, reply) => {
 			await deleteRole(Number(request.params.id));

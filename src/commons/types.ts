@@ -1,8 +1,23 @@
-import { Static, Type } from "@sinclair/typebox";
+import { FromSchema } from "json-schema-to-ts";
 
-const paramsId = Type.Object({
-	id: Type.Number(),
-});
-type paramsIdType = Static<typeof paramsId>;
+const ParamsId = {
+	type: "object",
+	properties: {
+		id: { type: "number" },
+	},
+	required: ["id"],
+} as const;
+type ParamsIdType = FromSchema<typeof ParamsId>;
 
-export { paramsId, paramsIdType };
+const Error = {
+	type: "object",
+	properties: {
+		statusCode: { type: "number" },
+		error: { type: "string" },
+		message: { type: "string" },
+	},
+	required: ["statusCode", "error", "message"],
+} as const;
+type ErrorType = FromSchema<typeof Error>;
+
+export { ParamsId, ParamsIdType, Error, ErrorType };

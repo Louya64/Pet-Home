@@ -1,15 +1,34 @@
-import { isDataView } from "util/types";
 import prisma from "../database";
-import { UserUpdateType, type UserType } from "./types";
+import { UserUpdateType } from "./types";
+// import { UserCreateType } from "../auth/types";
 
 export const findAllUsers = async () => {
-	return await prisma.users.findMany();
+	return await prisma.users.findMany({
+		select: {
+			id: true,
+			id_role: true,
+			email: true,
+			username: true,
+			firstname: true,
+			lastname: true,
+			phone_number: true,
+		},
+	});
 };
 
 export const findUserById = async (id: number) => {
 	return await prisma.users.findUnique({
 		where: {
 			id: Number(id),
+		},
+		select: {
+			id: true,
+			id_role: true,
+			email: true,
+			username: true,
+			firstname: true,
+			lastname: true,
+			phone_number: true,
 		},
 	});
 };
@@ -30,9 +49,9 @@ export const findUserByUsername = async (username: string) => {
 	});
 };
 
-export const createUser = async (data: UserType) => {
-	return await prisma.users.create({ data });
-};
+// export const createUser = async (data: UserCreateType) => {
+// 	return await prisma.users.create({ data });
+// };
 
 export const updateUser = async (id: number, data: UserUpdateType) => {
 	return await prisma.users.update({

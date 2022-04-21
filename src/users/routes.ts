@@ -1,9 +1,9 @@
 import type { FastifyInstance } from "fastify";
-import { paramsIdType } from "../commons/types";
+import { ParamsIdType, ErrorType } from "../commons/types";
+import { notFoundError, duplicateDataError } from "../commons/errorHelpers";
 import {
 	findAllUsers,
 	findUserById,
-	createUser,
 	updateUser,
 	deleteUser,
 	findUserByEmail,
@@ -12,62 +12,37 @@ import {
 import { User, UserType, UserUpdate, UserUpdateType } from "./types";
 
 const userRouter = async (server: FastifyInstance) => {
-	server.get("/", async (_request, reply) => {
+	//ajout middlware verif adminAccessOnly
+	server.get<{ Reply: UserType[] }>("/", async (_request, reply) => {
 		const allUsers = await findAllUsers();
 		reply.status(200).send(allUsers);
 	});
 
-	server.get<{ Params: paramsIdType; Reply: UserType | string }>(
+	//ajout middlware verif adminOrOwnerAccessOnly
+	server.get<{ Params: ParamsIdType; Reply: UserType | ErrorType }>(
 		"/:id",
 		async (request, reply) => {
 			const user = await findUserById(Number(request.params.id));
+
 			if (user) {
 				reply.status(200).send(user);
 			} else {
 				reply
 					.status(404)
 					.send(
-						`id: ${request.params.id} ne correspond à aucun utilisateur existant`
+						notFoundError(
+							`id: ${request.params.id} ne correspond à aucun utilisateur existant`
+						)
 					);
 			}
 		}
 	);
 
-	server.post<{ Body: UserType; Reply: UserType | string }>(
-		"/",
-		{
-			schema: {
-				body: User,
-				response: {
-					201: User,
-				},
-			},
-		},
-		async (request, reply) => {
-			const { body: user } = request;
-			const userEmailAlreadyExists = await findUserByEmail(user.email);
-			let usernameAlreadyExists;
-			if (user.username) {
-				usernameAlreadyExists = await findUserByUsername(user.username);
-			}
-
-			if (userEmailAlreadyExists && usernameAlreadyExists) {
-				reply.status(400).send("Cet email et ce pseudonyme existent déjà");
-			} else if (userEmailAlreadyExists) {
-				reply.status(400).send("Cet email existe déjà");
-			} else if (usernameAlreadyExists) {
-				reply.status(400).send("Ce pseudonyme existe déjà");
-			} else {
-				const userCreated = await createUser(user);
-				reply.status(201).send(userCreated);
-			}
-		}
-	);
-
+	//ajout middlware verif adminOrOwnerAccessOnly
 	server.put<{
-		Params: paramsIdType;
+		Params: ParamsIdType;
 		Body: UserUpdateType;
-		Reply: UserType | string;
+		Reply: UserType | ErrorType;
 	}>(
 		"/:id",
 		{
@@ -95,25 +70,29 @@ const userRouter = async (server: FastifyInstance) => {
 				usernameAlreadyExists &&
 				usernameAlreadyExists.id !== request.params.id
 			) {
-				reply.status(400).send("Cet email et ce pseudonyme existent déjà");
+				reply
+					.status(409)
+					.send(duplicateDataError(`Cet email et ce pseudonyme existent déjà`));
 			} else if (
 				userEmailAlreadyExists &&
 				userEmailAlreadyExists.id !== request.params.id
 			) {
-				reply.status(400).send("Cet email existe déjà");
+				reply.status(409).send(duplicateDataError(`Cet email existe déjà`));
 			} else if (
 				usernameAlreadyExists &&
 				usernameAlreadyExists.id !== request.params.id
 			) {
-				reply.status(400).send("Ce pseudonyme existe déjà");
+				reply.status(409).send(duplicateDataError(`Ce pseudonyme existe déjà`));
 			} else {
+				// if user.password -> hash
 				const userUpdated = await updateUser(Number(request.params.id), user);
 				reply.status(200).send(userUpdated);
 			}
 		}
 	);
 
-	server.delete<{ Params: paramsIdType; Reply: string }>(
+	//ajout middlware verif adminOrOwnerAccessOnly
+	server.delete<{ Params: ParamsIdType; Reply: string }>(
 		"/:id",
 		async (request, reply) => {
 			await deleteUser(Number(request.params.id));
