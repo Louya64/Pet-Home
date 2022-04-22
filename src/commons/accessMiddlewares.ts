@@ -9,3 +9,5 @@ const adminOrOwnerAccessOnly = () => {
 	// check token role admin | id token = request.params.id
 	// next?
 };
+
+export { adminAccessOnly, adminOrOwnerAccessOnly };

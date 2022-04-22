@@ -1,9 +1,14 @@
 import fastify from "fastify";
+import fastifyJwt from "fastify-jwt";
 import roleRouter from "./roles/routes";
 import userRouter from "./users/routes";
 import authRouter from "./auth/routes";
 
 const server = fastify();
+
+server.register(fastifyJwt, {
+	secret: "secret",
+});
 
 server.register(roleRouter, { prefix: "/roles" });
 server.register(userRouter, { prefix: "/users" });

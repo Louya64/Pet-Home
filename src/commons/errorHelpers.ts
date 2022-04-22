@@ -14,11 +14,26 @@ const duplicateDataError = (message: string) => {
 	};
 };
 
-// const invalidData = { erreurs de longueur, de type etc ...
-// 	statusCode: 422,
-// 	error: "Unprocessable Entity",
-// 	message: `à personnaliser`,
-// }
-// unauthorized 401, forbidden 403, bad request 400
+const unauthorizedError = (message: string) => {
+	return {
+		statusCode: 401,
+		error: "Unauthorized",
+		message: message,
+	};
+};
 
-export { notFoundError, duplicateDataError };
+const invalidDataError = (message: string) => {
+	return {
+		statusCode: 422,
+		error: "Unprocessable Entity",
+		message: message,
+	};
+};
+//  forbidden 403, bad request 400
+
+export {
+	notFoundError,
+	duplicateDataError,
+	unauthorizedError,
+	invalidDataError,
+};

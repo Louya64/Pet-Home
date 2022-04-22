@@ -1,9 +1,9 @@
 import prisma from "../database";
 import { UserUpdateType } from "./types";
-// import { UserCreateType } from "../auth/types";
 
-export const findAllUsers = async () => {
+export const findAllUsers = async (filter: any, orderBy: any) => {
 	return await prisma.users.findMany({
+		where: filter,
 		select: {
 			id: true,
 			id_role: true,
@@ -13,6 +13,7 @@ export const findAllUsers = async () => {
 			lastname: true,
 			phone_number: true,
 		},
+		orderBy: orderBy,
 	});
 };
 
@@ -48,10 +49,6 @@ export const findUserByUsername = async (username: string) => {
 		},
 	});
 };
-
-// export const createUser = async (data: UserCreateType) => {
-// 	return await prisma.users.create({ data });
-// };
 
 export const updateUser = async (id: number, data: UserUpdateType) => {
 	return await prisma.users.update({

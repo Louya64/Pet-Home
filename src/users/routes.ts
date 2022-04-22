@@ -1,4 +1,4 @@
-import type { FastifyInstance } from "fastify";
+import type { FastifyInstance, FastifyRequest } from "fastify";
 import { ParamsIdType, ErrorType } from "../commons/types";
 import { notFoundError, duplicateDataError } from "../commons/errorHelpers";
 import {
@@ -11,12 +11,91 @@ import {
 } from "./dao";
 import { User, UserType, UserUpdate, UserUpdateType } from "./types";
 
+declare module "fastify" {
+	interface FastifyRequest {
+		Querystring: {
+			id_role: number;
+			email: string;
+			username: string;
+			firstname: string;
+			lastname: string;
+			phone_number: string;
+			order: string;
+			desc: boolean;
+		};
+	}
+}
+
 const userRouter = async (server: FastifyInstance) => {
 	//ajout middlware verif adminAccessOnly
-	server.get<{ Reply: UserType[] }>("/", async (_request, reply) => {
-		const allUsers = await findAllUsers();
-		reply.status(200).send(allUsers);
-	});
+	// scroll infini
+	server.get<{ Querystring: FastifyRequest["Querystring"]; Reply: UserType[] }>(
+		"/",
+		async (request, reply) => {
+			let filter = {};
+			let orderBy = {};
+
+			// filters
+			const id_role = Number(request.query.id_role);
+			const email = Number(request.query.email);
+			const username = Number(request.query.username);
+			const firstname = Number(request.query.firstname);
+			const lastname = Number(request.query.lastname);
+			const phone_number = Number(request.query.phone_number);
+			if (id_role) {
+				filter = {
+					id_role: id_role,
+				};
+			}
+			if (email) {
+				filter = {
+					email: email,
+				};
+			}
+			if (username) {
+				filter = {
+					username: username,
+				};
+			}
+			if (firstname) {
+				filter = {
+					firstname: firstname,
+				};
+			}
+			if (lastname) {
+				filter = {
+					lastname: lastname,
+				};
+			}
+			if (phone_number) {
+				filter = {
+					phone_number: phone_number,
+				};
+			}
+
+			// orderBy
+			const order = request.query.order;
+			console.log(order);
+
+			const desc = request.query.desc;
+			if (order && desc) {
+				orderBy = {
+					[order]: "desc",
+				};
+			} else if (order) {
+				orderBy = {
+					[order]: "asc",
+				};
+			} else {
+				orderBy = {
+					id: "asc",
+				};
+			}
+
+			const allUsers = await findAllUsers(filter, orderBy);
+			reply.status(200).send(allUsers);
+		}
+	);
 
 	//ajout middlware verif adminOrOwnerAccessOnly
 	server.get<{ Params: ParamsIdType; Reply: UserType | ErrorType }>(
