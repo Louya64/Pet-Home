@@ -1,5 +1,5 @@
 import type { FastifyInstance, FastifyReply } from "fastify";
-import { paramsIdType } from "../commons/types";
+import { ParamsIdType } from "../commons/types";
 import {
 	findAllRoles,
 	findRoleById,
@@ -16,7 +16,7 @@ const roleRouter = async (server: FastifyInstance) => {
 		reply.status(200).send(allRoles);
 	});
 
-	server.get<{ Params: paramsIdType; Reply: RoleType | string }>(
+	server.get<{ Params: ParamsIdType; Reply: RoleType | string }>(
 		"/:id",
 		async (request, reply) => {
 			const role = await findRoleById(Number(request.params.id));
@@ -53,7 +53,7 @@ const roleRouter = async (server: FastifyInstance) => {
 	);
 
 	server.put<{
-		Params: paramsIdType;
+		Params: ParamsIdType;
 		Body: RoleType;
 		Reply: RoleType | string;
 	}>(
@@ -78,7 +78,7 @@ const roleRouter = async (server: FastifyInstance) => {
 		}
 	);
 
-	server.delete<{ Params: paramsIdType; Reply: string }>(
+	server.delete<{ Params: ParamsIdType; Reply: string }>(
 		"/:id",
 		async (request, reply) => {
 			await deleteRole(Number(request.params.id));
