@@ -52,12 +52,7 @@ const roleRouter = async (server: FastifyInstance) => {
 				const roleCreated = await createRole(role);
 				reply.status(200).send(roleCreated);
 			} else {
-				const duplicateData = {
-					statusCode: 409,
-					error: "Conflict",
-					message: `Ce rôle existe déjà`,
-				};
-				reply.status(409).send(duplicateData);
+				reply.status(409).send(duplicateDataError(`Ce rôle existe déjà`));
 			}
 		}
 	);
@@ -83,12 +78,7 @@ const roleRouter = async (server: FastifyInstance) => {
 				const roleUpdated = await updateRole(Number(request.params.id), role);
 				reply.status(200).send(roleUpdated);
 			} else {
-				const duplicateData = {
-					statusCode: 409,
-					error: "Conflict",
-					message: `Ce rôle existe déjà`,
-				};
-				reply.status(409).send(duplicateData);
+				reply.status(409).send(duplicateDataError(`Ce rôle existe déjà`));
 			}
 		}
 	);
