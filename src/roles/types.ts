@@ -1,9 +1,13 @@
-import { Static, Type } from "@sinclair/typebox";
+import { FromSchema } from "json-schema-to-ts";
 
-const Role = Type.Object({
-	id: Type.Optional(Type.Number()),
-	name: Type.String(),
-});
-type RoleType = Static<typeof Role>;
+const Role = {
+	type: "object",
+	properties: {
+		id: { type: "number" },
+		name: { type: "string" },
+	},
+	required: ["name"],
+} as const;
+type RoleType = FromSchema<typeof Role>;
 
 export { Role, RoleType };
