@@ -3,6 +3,7 @@ import { ErrorType } from "../commons/types";
 import {
 	duplicateDataError,
 	unauthorizedError,
+	forbiddenError,
 	invalidDataError,
 } from "../commons/errorHelpers";
 import { findUserByEmail, findUserByUsername } from "../users/dao";
