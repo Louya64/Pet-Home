@@ -75,7 +75,6 @@ const userRouter = async (server: FastifyInstance) => {
 
 			// orderBy
 			const order = request.query.order;
-			console.log(order);
 
 			const desc = request.query.desc;
 			if (order && desc) {

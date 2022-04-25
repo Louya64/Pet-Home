@@ -4,6 +4,7 @@ import {
 	notFoundError,
 	duplicateDataError,
 	unauthorizedError,
+	forbiddenError,
 	invalidDataError,
 } from "../commons/errorHelpers";
 import { findUserByEmail, findUserByUsername } from "../users/dao";
@@ -124,48 +125,92 @@ const authRouter = async (server: FastifyInstance) => {
 	);
 
 	// login with email / password from site
-	// server.post<{ Body: UserLoginType; Reply: TokenType | ErrorType }>(
-	// 	"/auth/login",
-	// 	{
-	// 		schema: {
-	// 			body: UserLogin,
-	// 			response: {
-	// 				200: Token,
-	// 			},
-	// 		},
-	// 	},
-	// 	async (request, reply) => {
-	// 		const { body: credentials } = request;
-	// 		const userFound = await findUserByEmail(credentials.email);
-	// 		if (!userFound) {
-	// 			reply
-	// 				.status(401)
-	// 				.send(
-	// 					unauthorizedError(
-	// 						`Email ou mot de passe incorrect (si vous avez crée un compte avec facebook, il faut vous connecter avec facebook)`
-	// 					)
-	// 				);
-	// 		} else {
-	// 			const passwordOk = await verifyPassword(
-	// 				server,
-	// 				credentials.password,
-	// 				userFound.password as string
-	// 			);
-	// 			if (!passwordOk) {
-	// 				reply
-	// 					.status(401)
-	// 					.send(
-	// 						unauthorizedError(
-	// 							`Email ou mot de passe incorrect (si vous avez crée un compte avec facebook, il faut vous connecter avec facebook)`
-	// 						)
-	// 					);
-	// 			} else {
-	// 				const token = createToken(server, userFound);
-	// 				reply.status(200).send(token);
-	// 			}
-	// 		}
-	// 	}
-	// );
+	server.post<{ Body: UserLoginType; Reply: TokenType | ErrorType }>(
+		"/auth/login",
+		{
+			schema: {
+				body: UserLogin,
+				response: {
+					200: Token,
+				},
+			},
+		},
+		async (request, reply) => {
+			const { body: credentials } = request;
+			const userFound = await findUserByEmail(credentials.email);
+			if (!userFound) {
+				reply
+					.status(401)
+					.send(
+						unauthorizedError(
+							`Email ou mot de passe incorrect (si vous avez crée un compte avec facebook, il faut vous connecter avec facebook)`
+						)
+					);
+			} else {
+				const passwordOk = await verifyPassword(
+					server,
+					credentials.password,
+					userFound.password as string
+				);
+				if (!passwordOk) {
+					reply
+						.status(401)
+						.send(
+							unauthorizedError(
+								`Email ou mot de passe incorrect (si vous avez crée un compte avec facebook, il faut vous connecter avec facebook)`
+							)
+						);
+				} else {
+					const token = createToken(server, userFound);
+					reply.status(200).send(token);
+				}
+			}
+		}
+	);
+
+	// login with email / password from dashboard
+	server.post<{ Body: UserLoginType; Reply: TokenType | ErrorType }>(
+		"/dashboard/auth/login",
+		{
+			schema: {
+				body: UserLogin,
+				response: {
+					200: Token,
+				},
+			},
+		},
+		async (request, reply) => {
+			const { body: credentials } = request;
+			const userFound = await findUserByEmail(credentials.email);
+			if (!userFound) {
+				reply
+					.status(401)
+					.send(
+						unauthorizedError(
+							`Email ou mot de passe incorrect (si vous avez crée un compte avec facebook, il faut vous connecter avec facebook)`
+						)
+					);
+			} else {
+				const passwordOk = await verifyPassword(
+					server,
+					credentials.password,
+					userFound.password as string
+				);
+				if (!passwordOk) {
+					reply
+						.status(401)
+						.send(unauthorizedError(`Email ou mot de passe incorrect`));
+				} else {
+					if (userFound.id_role !== 1 && userFound.id_role !== 2) {
+						reply.status(403).send(forbiddenError(`Acces interdit`));
+					} else {
+						const token = createToken(server, userFound);
+						reply.status(200).send(token);
+					}
+				}
+			}
+		}
+	);
 };
 
 export default authRouter;

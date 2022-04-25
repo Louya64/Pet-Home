@@ -3,7 +3,7 @@ import { FastifyInstance } from "fastify";
 // password regex
 const checkPasswordFormat = (password: string) => {
 	const regex = new RegExp(
-		"^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[*.!@#$%^&(){}[:;<>,.?/~_+-=|])[0-9a-zA-Z!@#$%^&]{8,}$"
+		"^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[*.!@#$%^&(){}[:;<>,.?/~_+-=|])[0-9a-zA-Z*.!@#$%^&(){}[:;<>,.?/~_+-=|]{8,}$"
 	);
 	return regex.test(password);
 };

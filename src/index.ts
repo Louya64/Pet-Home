@@ -1,4 +1,5 @@
 import fastify from "fastify";
+import fasityCors from "fastify-cors";
 import fastifyJwt from "fastify-jwt";
 import roleRouter from "./roles/routes";
 import userRouter from "./users/routes";
@@ -8,6 +9,9 @@ const server = fastify();
 
 server.register(fastifyJwt, {
 	secret: "secret",
+});
+server.register(fasityCors, {
+	origin: "*",
 });
 
 server.register(roleRouter, { prefix: "/roles" });
