@@ -1,6 +1,6 @@
 <template>
 	<header v-if="isAuthenticate">
-		<div class="wrapper">
+		<div class="bg-slate-600 w-96 h-screen fixed top-0 text-white p-10">
 			<button @click="logout">Logout</button>
 			<nav>
 				<RouterLink to="/dashboard">Home</RouterLink>
