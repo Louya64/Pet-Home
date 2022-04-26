@@ -43,9 +43,11 @@ declare module "fastify" {
 	}
 }
 
+// login(site, bo, facebook) + register(site, bo, facebook)
 const authRouter = async (server: FastifyInstance) => {
 	server.register(bcrypt);
 	server.register(nodemailer, {
+		// defautls: { rom: "John Doe <john.doe@example.tld>" },
 		transport: {
 			host: server.config.SMTP_HOST,
 			port: server.config.SMTP_PORT,
