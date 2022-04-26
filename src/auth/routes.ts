@@ -1,5 +1,6 @@
 import type { FastifyInstance } from "fastify";
 import { ParamsIdType, ErrorType } from "../commons/types";
+import { ParamsEmailType } from "./types";
 import {
 	notFoundError,
 	duplicateDataError,
@@ -20,8 +21,11 @@ import {
 	UserLoginType,
 	Token,
 	TokenType,
+	UserEmailType,
 } from "./types";
 import bcrypt from "fastify-bcrypt";
+import nodemailer from "fastify-mailer";
+import { Transporter } from "nodemailer";
 import {
 	hashPassword,
 	verifyPassword,
@@ -29,9 +33,31 @@ import {
 	checkPasswordFormat,
 } from "./authHelpers";
 
+export interface FastifyMailerNamedInstance {
+	[namespace: string]: Transporter;
+}
+export type FastifyMailer = FastifyMailerNamedInstance & Transporter;
+
+declare module "fastify" {
+	interface FastifyInstance {
+		mailer: FastifyMailer;
+	}
+}
+
 // login(site, bo, facebook) + register(site, bo, facebook)
 const authRouter = async (server: FastifyInstance) => {
 	server.register(bcrypt);
+	server.register(nodemailer, {
+		// defautls: { rom: "John Doe <john.doe@example.tld>" },
+		transport: {
+			host: server.config.SMTP_HOST,
+			port: server.config.SMTP_PORT,
+			auth: {
+				user: server.config.SMTP_USERNAME,
+				pass: server.config.SMTP_PASSWORD,
+			},
+		},
+	});
 
 	// register from site (role auto "utilisateur")
 	server.post<{ Body: UserCreateFromAppType; Reply: TokenType | ErrorType }>(
@@ -185,11 +211,7 @@ const authRouter = async (server: FastifyInstance) => {
 			if (!userFound) {
 				reply
 					.status(401)
-					.send(
-						unauthorizedError(
-							`Email ou mot de passe incorrect (si vous avez crée un compte avec facebook, il faut vous connecter avec facebook)`
-						)
-					);
+					.send(unauthorizedError(`Email ou mot de passe incorrect`));
 			} else {
 				const passwordOk = await verifyPassword(
 					server,
@@ -208,6 +230,37 @@ const authRouter = async (server: FastifyInstance) => {
 						reply.status(200).send(token);
 					}
 				}
+			}
+		}
+	);
+
+	// forgot password
+	server.post<{ Body: UserEmailType }>(
+		"/forgotPassword",
+		async (request, reply) => {
+			const userFound = await findUserByEmail(request.body.email);
+			if (!userFound) {
+				reply.status(404).send(notFoundError(`Utilisateur non trouvé`));
+			} else {
+				const token = createToken(server, userFound);
+				const { mailer } = server;
+				mailer.sendMail(
+					{
+						from: server.config.SMTP_EMAIL,
+						to: userFound.email,
+						subject: "Pet'Home - Mot de pass oublié",
+						text: "cliquez sur le lien",
+						html: `<a href=${server.config.URL_DASHBOARD}/changePassword?&token=${token}>lien pour changer le mot de passe</a>`,
+					},
+					(err: any, info: any) => {
+						if (err) {
+							console.log(err);
+						} else {
+							console.log(info);
+						}
+					}
+				);
+				reply.status(200).send("mail envoyé");
 			}
 		}
 	);

@@ -23,8 +23,11 @@
 					id="password"
 					v-model="password"
 				/>
-				<p class="self-end">Mot de passe oublié?</p>
+				<p @click="forgotPassword" class="self-end hover:cursor-pointer">
+					Mot de passe oublié?
+				</p>
 			</div>
+			<div class="pb-10 text-center" id="requestResul"></div>
 			<div class="flex justify-end">
 				<button class="btn btn-green">Se connecter</button>
 			</div>
@@ -33,7 +36,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue";
+import { ref, onMounted, watch } from "vue";
 import { useRouter } from "vue-router";
 import axios from "axios";
 
@@ -41,19 +44,47 @@ const router = useRouter();
 
 const email = ref("");
 const password = ref("");
+let requestResul = document.getElementById("requestResul");
+
+onMounted(() => {
+	requestResul = document.getElementById("requestResul");
+});
+
+watch(email, () => {
+	if (requestResul) {
+		requestResul.textContent = "";
+	}
+});
+
+watch(password, () => {
+	if (requestResul) {
+		requestResul.textContent = "";
+	}
+});
 
 const login = async (credentials: any) => {
 	const userAuthenticated = await axios
 		.request({
 			method: "post",
-			url: `http://localhost:8080/dashboard/auth/login`,
+			url: `${import.meta.env.VITE_URL_BACK}/dashboard/auth/login`,
 			data: credentials,
 		})
-		.then((res) => res.data);
+		.then((res) => res.data)
+		.catch((err) => {
+			if (requestResul) {
+				requestResul?.classList.remove("text-green-400");
+				requestResul?.classList.add("text-red-400");
+				requestResul.textContent = err.response.data.message;
+			}
+		});
 	if (userAuthenticated) {
 		localStorage.setItem("token", userAuthenticated);
 		window.dispatchEvent(new Event("storage"));
 		router.push("/dashboard");
 	}
+};
+
+const forgotPassword = () => {
+	router.push("forgotPasswordConfirm");
 };
 </script>

@@ -1,6 +1,12 @@
 import type { FastifyInstance, FastifyRequest } from "fastify";
+import bcrypt from "fastify-bcrypt";
 import { ParamsIdType, ErrorType } from "../commons/types";
-import { notFoundError, duplicateDataError } from "../commons/errorHelpers";
+import {
+	notFoundError,
+	duplicateDataError,
+	invalidDataError,
+} from "../commons/errorHelpers";
+import { hashPassword, checkPasswordFormat } from "../auth/authHelpers";
 import {
 	findAllUsers,
 	findUserById,
@@ -27,6 +33,7 @@ declare module "fastify" {
 }
 
 const userRouter = async (server: FastifyInstance) => {
+	server.register(bcrypt);
 	//ajout middlware verif adminAccessOnly
 	// scroll infini
 	server.get<{ Querystring: FastifyRequest["Querystring"]; Reply: UserType[] }>(
@@ -161,8 +168,28 @@ const userRouter = async (server: FastifyInstance) => {
 			) {
 				reply.status(409).send(duplicateDataError(`Ce pseudonyme existe déjà`));
 			} else {
-				// if user.password -> hash
-				const userUpdated = await updateUser(Number(request.params.id), user);
+				let userToUpdate = user;
+				if (user.password) {
+					if (!checkPasswordFormat(user.password)) {
+						reply
+							.status(422)
+							.send(
+								invalidDataError(
+									`Le mot de passe ne respecte pas le modèle(au moins 8 caractères dont 1 nombre, 1 minuscule, 1 majuscule, et 1 caractère spécial parmis *.!@#$%^&(){}[:;<>,.?/~_+-=|)`
+								)
+							);
+					} else {
+						const hashedPassword = await hashPassword(server, user.password);
+						userToUpdate = {
+							...user,
+							password: hashedPassword,
+						};
+					}
+				}
+				const userUpdated = await updateUser(
+					Number(request.params.id),
+					userToUpdate
+				);
 				reply.status(200).send(userUpdated);
 			}
 		}

@@ -66,6 +66,24 @@ const Token = {
 } as const;
 type TokenType = FromSchema<typeof Token>;
 
+const ParamsEmail = {
+	type: "object",
+	properties: {
+		id: { type: "number" },
+	},
+	required: ["id"],
+} as const;
+type ParamsEmailType = FromSchema<typeof ParamsEmail>;
+
+const UserEmail = {
+	type: "object",
+	properties: {
+		email: { type: "string" },
+	},
+	required: ["email"],
+} as const;
+type UserEmailType = FromSchema<typeof UserEmail>;
+
 export {
 	UserCreate,
 	UserCreateType,
@@ -77,4 +95,8 @@ export {
 	UserLoginType,
 	Token,
 	TokenType,
+	ParamsEmail,
+	ParamsEmailType,
+	UserEmail,
+	UserEmailType,
 };
