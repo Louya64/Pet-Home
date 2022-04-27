@@ -22,8 +22,12 @@ const UserCreateFromApp = {
 	properties: {
 		email: { type: "string" },
 		password: { type: "string" },
+		username: { type: "string" },
+		firstname: { type: "string" },
+		lastname: { type: "string" },
+		phone_number: { type: "string" },
 	},
-	required: ["email", "password"],
+	required: ["email", "password", "username", "firstname"],
 } as const;
 type UserCreateFromAppType = FromSchema<typeof UserCreateFromApp>;
 
@@ -66,15 +70,6 @@ const Token = {
 } as const;
 type TokenType = FromSchema<typeof Token>;
 
-const ParamsEmail = {
-	type: "object",
-	properties: {
-		id: { type: "number" },
-	},
-	required: ["id"],
-} as const;
-type ParamsEmailType = FromSchema<typeof ParamsEmail>;
-
 const UserEmail = {
 	type: "object",
 	properties: {
@@ -95,8 +90,6 @@ export {
 	UserLoginType,
 	Token,
 	TokenType,
-	ParamsEmail,
-	ParamsEmailType,
 	UserEmail,
 	UserEmailType,
 };

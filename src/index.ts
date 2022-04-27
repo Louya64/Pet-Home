@@ -17,6 +17,7 @@ import adoptionRequestRouter from "./adoptionRequests/routes";
 declare module "fastify" {
 	interface FastifyInstance {
 		config: {
+			URL_SITE: string;
 			URL_DASHBOARD: string;
 			URL_BACK: string;
 			SMTP_EMAIL: string;
@@ -34,6 +35,7 @@ declare module "fastify" {
 const schema = {
 	type: "object",
 	required: [
+		"URL_SITE",
 		"URL_DASHBOARD",
 		"URL_BACK",
 		"SMTP_EMAIL",
@@ -46,6 +48,9 @@ const schema = {
 		"FACEBOOK_SECRET",
 	],
 	properties: {
+		URL_SITE: {
+			type: "string",
+		},
 		URL_DASHBOARD: {
 			type: "string",
 		},

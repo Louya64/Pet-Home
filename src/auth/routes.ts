@@ -1,6 +1,5 @@
 import type { FastifyInstance } from "fastify";
-import { ParamsIdType, ErrorType } from "../commons/types";
-import { ParamsEmailType } from "./types";
+import { ErrorType } from "../commons/types";
 import {
 	notFoundError,
 	duplicateDataError,
@@ -11,7 +10,6 @@ import {
 import { findUserByEmail, findUserByUsername } from "../users/dao";
 import { createUser } from "./dao";
 import {
-	UserCreate,
 	UserCreateType,
 	UserCreateFromApp,
 	UserCreateFromAppType,
@@ -44,11 +42,9 @@ declare module "fastify" {
 	}
 }
 
-// login(site, bo, facebook) + register(site, bo, facebook)
 const authRouter = async (server: FastifyInstance) => {
 	server.register(bcrypt);
 	server.register(nodemailer, {
-		// defautls: { rom: "John Doe <john.doe@example.tld>" },
 		transport: {
 			host: server.config.SMTP_HOST,
 			port: server.config.SMTP_PORT,
@@ -74,9 +70,19 @@ const authRouter = async (server: FastifyInstance) => {
 			const { body: user } = request;
 
 			const userEmailAlreadyExists = await findUserByEmail(user.email);
+			let usernameAlreadyExists;
+			if (user.username) {
+				usernameAlreadyExists = await findUserByUsername(user.username);
+			}
 
-			if (userEmailAlreadyExists) {
+			if (userEmailAlreadyExists && usernameAlreadyExists) {
+				reply
+					.status(409)
+					.send(duplicateDataError(`Cet email et ce pseudonyme existent déjà`));
+			} else if (userEmailAlreadyExists) {
 				reply.status(409).send(duplicateDataError(`Cet email existe déjà`));
+			} else if (usernameAlreadyExists) {
+				reply.status(409).send(duplicateDataError(`Ce pseudonyme existe déjà`));
 			} else {
 				if (!checkPasswordFormat(user.password)) {
 					reply
@@ -234,7 +240,38 @@ const authRouter = async (server: FastifyInstance) => {
 		}
 	);
 
-	// forgot password
+	// forgot password from dashboard
+	server.post<{ Body: UserEmailType }>(
+		"/dashboard/forgotPassword",
+		async (request, reply) => {
+			const userFound = await findUserByEmail(request.body.email);
+			if (!userFound) {
+				reply.status(404).send(notFoundError(`Utilisateur non trouvé`));
+			} else {
+				const token = createToken(server, userFound);
+				const { mailer } = server;
+				mailer.sendMail(
+					{
+						from: server.config.SMTP_EMAIL,
+						to: userFound.email,
+						subject: "Pet'Home - Mot de pass oublié",
+						text: "cliquez sur le lien",
+						html: `<a href=${server.config.URL_DASHBOARD}/changePassword?&token=${token}>lien pour changer le mot de passe</a>`,
+					},
+					(err: any, info: any) => {
+						if (err) {
+							console.log(err);
+						} else {
+							console.log(info);
+						}
+					}
+				);
+				reply.status(200).send("mail envoyé");
+			}
+		}
+	);
+
+	// forgot password from site
 	server.post<{ Body: UserEmailType }>(
 		"/forgotPassword",
 		async (request, reply) => {
@@ -250,7 +287,7 @@ const authRouter = async (server: FastifyInstance) => {
 						to: userFound.email,
 						subject: "Pet'Home - Mot de pass oublié",
 						text: "cliquez sur le lien",
-						html: `<a href=${server.config.URL_DASHBOARD}/changePassword?&token=${token}>lien pour changer le mot de passe</a>`,
+						html: `<a href=${server.config.URL_SITE}/changePassword?&token=${token}>lien pour changer le mot de passe</a>`,
 					},
 					(err: any, info: any) => {
 						if (err) {

@@ -1,0 +1,44 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+	.main-bg-color {
+		@apply bg-green-300;
+	}
+	.main-bg-color-darker {
+		@apply bg-green-500;
+	}
+	.main-color {
+		@apply text-black;
+	}
+	.main-font {
+	}
+	.special-font {
+	}
+}
+
+@layer components {
+	.btn {
+		@apply py-2 px-4  text-white font-semibold rounded-lg shadow-md  focus:outline-none focus:ring-2  focus:ring-opacity-75;
+	}
+	.btn-green {
+		@apply bg-green-500 hover:bg-green-700 focus:ring-green-400;
+	}
+	.btn-blue {
+		@apply bg-blue-500 hover:bg-blue-700 focus:ring-blue-400;
+	}
+	.btn-red {
+		@apply bg-red-500 hover:bg-red-700 focus:ring-red-400;
+	}
+
+	.form {
+		@apply lg:p-20 pt-0 sm:px-20 sm:pb-10 px-10 pb-5;
+	}
+	.form-item {
+		@apply my-10 flex flex-col;
+	}
+	.form-item-input {
+		@apply my-3 text-lg p-1 border-2 dark:text-black;
+	}
+}
