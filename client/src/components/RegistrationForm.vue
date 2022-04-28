@@ -220,6 +220,17 @@ watch(confirmedPassword, (newVal) => {
 	}
 });
 
+watch(confirmedPassword, (newVal) => {
+	if (requestResult) {
+		requestResult.textContent = "";
+	}
+	if (newVal === password.value && password.value !== "") {
+		passwordIsConfirmed.value = true;
+	} else {
+		passwordIsConfirmed.value = false;
+	}
+});
+
 watch(username, () => {
 	if (requestResult) {
 		requestResult.textContent = "";
@@ -300,6 +311,10 @@ const register = async (userData: IUserData) => {
 				}
 			});
 	}
+};
+
+const alreadyRegistered = () => {
+	emit("alreadyRegistered");
 };
 
 const alreadyRegistered = () => {
