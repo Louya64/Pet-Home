@@ -22,6 +22,10 @@ const verifyPassword = async (
 	return await server.bcrypt.compare(credentialPassword, hashedPassword);
 };
 
+const confirmPassword = (password: string, confirmedPassword: string) => {
+	return password === confirmedPassword;
+};
+
 //jwt -> create token
 const createToken = (server: FastifyInstance, user: any) => {
 	return server.jwt.sign({
@@ -32,4 +36,10 @@ const createToken = (server: FastifyInstance, user: any) => {
 
 // jwt verify dans commons/accessMiddlewares ?
 
-export { hashPassword, verifyPassword, createToken, checkPasswordFormat };
+export {
+	hashPassword,
+	verifyPassword,
+	createToken,
+	checkPasswordFormat,
+	confirmPassword,
+};

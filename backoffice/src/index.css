@@ -23,6 +23,6 @@
 		@apply my-10 flex flex-col;
 	}
 	.form-item-input {
-		@apply my-3 text-lg p-1 border-2;
+		@apply my-3 text-lg p-1 border-2 dark:text-black;
 	}
 }

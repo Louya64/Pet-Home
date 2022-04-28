@@ -1,10 +1,12 @@
+@import url("https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&family=Water+Brush&display=swap");
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
 	.main-bg-color {
-		@apply bg-green-300;
+		@apply bg-main-bg-color;
 	}
 	.main-bg-color-darker {
 		@apply bg-green-500;
@@ -12,9 +14,11 @@
 	.main-color {
 		@apply text-black;
 	}
-	.main-font {
+	.normal-font {
+		@apply font-Roboto;
 	}
 	.special-font {
+		@apply font-WaterBrush;
 	}
 }
 

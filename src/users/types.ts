@@ -29,6 +29,7 @@ const UserUpdate = {
 		id_role: { type: "number" },
 		email: { type: "string" },
 		password: { type: "string" },
+		confirmedPassword: { type: "string" },
 		facebook_token: { type: "string" },
 		username: { type: "string" },
 		firstname: { type: "string" },

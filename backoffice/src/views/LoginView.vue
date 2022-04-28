@@ -19,7 +19,7 @@
 				<label for="password">Mot de passe</label>
 				<input
 					class="form-item-input"
-					type="text"
+					type="password"
 					id="password"
 					v-model="password"
 				/>

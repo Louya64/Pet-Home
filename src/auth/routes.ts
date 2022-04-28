@@ -22,6 +22,7 @@ import {
 	UserEmailType,
 } from "./types";
 import bcrypt from "fastify-bcrypt";
+// @ts-ignore
 import nodemailer from "fastify-mailer";
 import { Transporter } from "nodemailer";
 import {
@@ -29,6 +30,7 @@ import {
 	verifyPassword,
 	createToken,
 	checkPasswordFormat,
+	confirmPassword,
 } from "./authHelpers";
 
 export interface FastifyMailerNamedInstance {
@@ -93,15 +95,30 @@ const authRouter = async (server: FastifyInstance) => {
 							)
 						);
 				} else {
-					const hashedPassword = await hashPassword(server, user.password);
-					const userToCreate: UserCreateType = {
-						...user,
-						id_role: 3,
-						password: hashedPassword,
-					};
-					const userCreated = await createUser(userToCreate);
-					const token = createToken(server, userCreated);
-					reply.status(201).send(token);
+					if (!confirmPassword(user.password, user.confirmedPassword)) {
+						reply
+							.status(422)
+							.send(
+								invalidDataError(
+									`Le mot de passe n'a pas été confirmé correctement`
+								)
+							);
+					} else {
+						const hashedPassword = await hashPassword(server, user.password);
+						const userToCreate: UserCreateType = {
+							// ...user,
+							id_role: 3,
+							email: user.email,
+							password: hashedPassword,
+							username: user.username,
+							firstname: user.firstname,
+							lastname: user.lastname,
+							phone_number: user.phone_number,
+						};
+						const userCreated = await createUser(userToCreate);
+						const token = createToken(server, userCreated);
+						reply.status(201).send(token);
+					}
 				}
 			}
 		}

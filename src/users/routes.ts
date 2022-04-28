@@ -6,7 +6,11 @@ import {
 	duplicateDataError,
 	invalidDataError,
 } from "../commons/errorHelpers";
-import { hashPassword, checkPasswordFormat } from "../auth/authHelpers";
+import {
+	hashPassword,
+	checkPasswordFormat,
+	confirmPassword,
+} from "../auth/authHelpers";
 import {
 	findAllUsers,
 	findUserById,
@@ -170,20 +174,34 @@ const userRouter = async (server: FastifyInstance) => {
 			} else {
 				let userToUpdate = user;
 				if (user.password) {
-					if (!checkPasswordFormat(user.password)) {
+					if (
+						!user.confirmedPassword ||
+						!confirmPassword(user.password, user.confirmedPassword)
+					) {
 						reply
 							.status(422)
 							.send(
 								invalidDataError(
-									`Le mot de passe ne respecte pas le modèle(au moins 8 caractères dont 1 nombre, 1 minuscule, 1 majuscule, et 1 caractère spécial parmis *.!@#$%^&(){}[:;<>,.?/~_+-=|)`
+									`Le mot de passe n'a pas été confirmé correctement`
 								)
 							);
 					} else {
-						const hashedPassword = await hashPassword(server, user.password);
-						userToUpdate = {
-							...user,
-							password: hashedPassword,
-						};
+						if (!checkPasswordFormat(user.password)) {
+							reply
+								.status(422)
+								.send(
+									invalidDataError(
+										`Le mot de passe ne respecte pas le modèle(au moins 8 caractères dont 1 nombre, 1 minuscule, 1 majuscule, et 1 caractère spécial parmis *.!@#$%^&(){}[:;<>,.?/~_+-=|)`
+									)
+								);
+						} else {
+							const hashedPassword = await hashPassword(server, user.password);
+							userToUpdate = {
+								...user,
+								password: hashedPassword,
+							};
+							delete userToUpdate.confirmedPassword;
+						}
 					}
 				}
 				const userUpdated = await updateUser(

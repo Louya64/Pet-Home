@@ -1,6 +1,12 @@
 <template>
 	<div v-if="registered" class="pt-[15vh] min-h-screen">
-		<h1 class="text-center sm:text-2xl mb-20">Déjà inscrit ? Connectez-vous</h1>
+		<h1 class="text-center sm:text-2xl mb-10">Connection</h1>
+		<p class="text-center mb-10">
+			Pas encore inscrit?
+			<button class="btn btn-green" @click="() => (registered = false)">
+				Créer un compte
+			</button>
+		</p>
 		<div class="lg:flex lg:flex-row-reverse px-20">
 			<div
 				class="lg:w-1/2 text-white text-center lg:p-20 sm:px-20 sm:py-10 px-10 py-5"
@@ -20,7 +26,7 @@
 						v-model="email"
 					/>
 				</div>
-				<div class="form-item">
+				<div class="form-item relative">
 					<label for="password">Mot de passe</label>
 					<input
 						class="form-item-input"
@@ -28,6 +34,11 @@
 						required
 						id="password"
 						v-model="password"
+					/>
+					<font-awesome-icon
+						@click="toggleShowPassword('password')"
+						class="absolute bottom-11 right-5 dark:text-black text-lg hover:cursor-pointer"
+						icon="eye-slash"
 					/>
 					<p @click="forgotPassword" class="self-end hover:cursor-pointer">
 						Mot de passe oublié?
@@ -39,16 +50,10 @@
 				</div>
 			</form>
 		</div>
-		<div class="sm:text-2xl text-center">
-			Pas encore inscrit?
-			<button class="btn btn-green" @click="() => (registered = false)">
-				Créez un compte
-			</button>
-		</div>
 	</div>
 
 	<div v-else>
-		<RegistrationForm />
+		<RegistrationForm @alreadyRegistered="() => (registered = true)" />
 	</div>
 </template>
 
@@ -79,6 +84,15 @@ watch(password, () => {
 		requestResul.textContent = "";
 	}
 });
+
+const toggleShowPassword = (elem: string) => {
+	const inputToToggle = document.getElementById(elem);
+	if (inputToToggle && inputToToggle.getAttribute("type") === "password") {
+		inputToToggle.setAttribute("type", "text");
+	} else {
+		inputToToggle?.setAttribute("type", "password");
+	}
+};
 
 const login = async (credentials: any) => {
 	await axios
