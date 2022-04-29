@@ -17,16 +17,23 @@
 					title="au moins 8 caractères dont 1 nombre, 1 minuscule, 1 majuscule, et 1 caractère spécial"
 				/>
 				<font-awesome-icon
+					v-if="showPassword"
 					@click="toggleShowPassword('password')"
 					class="absolute bottom-6 right-5 dark:text-black text-lg hover:cursor-pointer"
 					icon="eye-slash"
+				/>
+				<font-awesome-icon
+					v-else
+					@click="toggleShowPassword('password')"
+					class="absolute bottom-6 right-5 dark:text-black text-lg hover:cursor-pointer"
+					icon="eye"
 				/>
 			</div>
 			<div class="form-item relative">
 				<label for="confirmedPassword">
 					Confirmer le mot de passe
 					<font-awesome-icon
-						v-if="passwordConfirmed"
+						v-if="passwordIsConfirmed"
 						class="text-green-500 text-2xl -mb-1"
 						icon="check" />
 					<font-awesome-icon
@@ -43,9 +50,16 @@
 					v-model="confirmedPassword"
 				/>
 				<font-awesome-icon
+					v-if="showConfirmedPassword"
 					@click="toggleShowPassword('confirmedPassword')"
 					class="absolute bottom-6 right-5 dark:text-black text-lg hover:cursor-pointer"
 					icon="eye-slash"
+				/>
+				<font-awesome-icon
+					v-else
+					@click="toggleShowPassword('confirmedPassword')"
+					class="absolute bottom-6 right-5 dark:text-black text-lg hover:cursor-pointer"
+					icon="eye"
 				/>
 			</div>
 			<div class="pb-10 text-center" id="requestResult"></div>
@@ -64,17 +78,24 @@ const emit = defineEmits<{
 }>();
 
 const password = ref("");
+const showPassword = ref(false);
 const confirmedPassword = ref("");
-const passwordConfirmed = ref(false);
+const showConfirmedPassword = ref(false);
+const passwordIsConfirmed = ref(false);
 let requestResult = document.getElementById("requestResult");
 
 onMounted(() => {
 	requestResult = document.getElementById("requestResult");
 });
 
-watch(password, () => {
+watch(password, (newVal) => {
 	if (requestResult) {
 		requestResult.textContent = "";
+	}
+	if (newVal === confirmedPassword.value && confirmedPassword.value !== "") {
+		passwordIsConfirmed.value = true;
+	} else {
+		passwordIsConfirmed.value = false;
 	}
 });
 
@@ -83,9 +104,9 @@ watch(confirmedPassword, (newVal) => {
 		requestResult.textContent = "";
 	}
 	if (newVal === password.value && password.value !== "") {
-		passwordConfirmed.value = true;
+		passwordIsConfirmed.value = true;
 	} else {
-		passwordConfirmed.value = false;
+		passwordIsConfirmed.value = false;
 	}
 });
 
@@ -93,8 +114,20 @@ const toggleShowPassword = (elem: string) => {
 	const inputToToggle = document.getElementById(elem);
 	if (inputToToggle && inputToToggle.getAttribute("type") === "password") {
 		inputToToggle.setAttribute("type", "text");
+		if (elem === "password") {
+			showPassword.value = true;
+		}
+		if (elem === "confirmedPassword") {
+			showConfirmedPassword.value = true;
+		}
 	} else {
 		inputToToggle?.setAttribute("type", "password");
+		if (elem === "password") {
+			showPassword.value = false;
+		}
+		if (elem === "confirmedPassword") {
+			showConfirmedPassword.value = false;
+		}
 	}
 };
 
