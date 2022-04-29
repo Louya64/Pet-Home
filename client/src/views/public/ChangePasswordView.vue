@@ -66,7 +66,7 @@ import jwt_decode from "jwt-decode";
 
 interface ITokenDecoded {
 	id: number;
-	id_role: number;
+	role: number;
 	iat: number;
 }
 
