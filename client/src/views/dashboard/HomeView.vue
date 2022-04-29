@@ -18,10 +18,7 @@
 			accusantium quibusdam rerum laborum atque dolores eos veniam, aperiam
 			itaque deserunt, alias voluptate enim voluptatibus?
 		</p>
-<<<<<<< HEAD
 		<br /><br /><br />
-=======
->>>>>>> 8828e18 (move dashboard into client folder)
 		<p>
 			Lorem ipsum dolor sit amet consectetur adipisicing elit. A vitae nulla
 			dolorem tempora! Minima natus porro dolor alias exercitationem adipisci
@@ -37,10 +34,7 @@
 			accusantium quibusdam rerum laborum atque dolores eos veniam, aperiam
 			itaque deserunt, alias voluptate enim voluptatibus?
 		</p>
-<<<<<<< HEAD
 		<br /><br /><br />
-=======
->>>>>>> 8828e18 (move dashboard into client folder)
 		<p>
 			Lorem ipsum dolor sit amet consectetur adipisicing elit. A vitae nulla
 			dolorem tempora! Minima natus porro dolor alias exercitationem adipisci
@@ -56,10 +50,7 @@
 			accusantium quibusdam rerum laborum atque dolores eos veniam, aperiam
 			itaque deserunt, alias voluptate enim voluptatibus?
 		</p>
-<<<<<<< HEAD
 		<br /><br /><br />
-=======
->>>>>>> 8828e18 (move dashboard into client folder)
 		<p>
 			Lorem ipsum dolor sit amet consectetur adipisicing elit. A vitae nulla
 			dolorem tempora! Minima natus porro dolor alias exercitationem adipisci
@@ -75,10 +66,7 @@
 			accusantium quibusdam rerum laborum atque dolores eos veniam, aperiam
 			itaque deserunt, alias voluptate enim voluptatibus?
 		</p>
-<<<<<<< HEAD
 		<br /><br /><br />
-=======
->>>>>>> 8828e18 (move dashboard into client folder)
 		<p>
 			Lorem ipsum dolor sit amet consectetur adipisicing elit. A vitae nulla
 			dolorem tempora! Minima natus porro dolor alias exercitationem adipisci
@@ -94,10 +82,7 @@
 			accusantium quibusdam rerum laborum atque dolores eos veniam, aperiam
 			itaque deserunt, alias voluptate enim voluptatibus?
 		</p>
-<<<<<<< HEAD
 		<br /><br /><br />
-=======
->>>>>>> 8828e18 (move dashboard into client folder)
 		<p>
 			Lorem ipsum dolor sit amet consectetur adipisicing elit. A vitae nulla
 			dolorem tempora! Minima natus porro dolor alias exercitationem adipisci
@@ -113,10 +98,7 @@
 			accusantium quibusdam rerum laborum atque dolores eos veniam, aperiam
 			itaque deserunt, alias voluptate enim voluptatibus?
 		</p>
-<<<<<<< HEAD
 		<br /><br /><br />
-=======
->>>>>>> 8828e18 (move dashboard into client folder)
 		<p>
 			Lorem ipsum dolor sit amet consectetur adipisicing elit. A vitae nulla
 			dolorem tempora! Minima natus porro dolor alias exercitationem adipisci
@@ -132,10 +114,7 @@
 			accusantium quibusdam rerum laborum atque dolores eos veniam, aperiam
 			itaque deserunt, alias voluptate enim voluptatibus?
 		</p>
-<<<<<<< HEAD
 		<br /><br /><br />
-=======
->>>>>>> 8828e18 (move dashboard into client folder)
 		<p>
 			Lorem ipsum dolor sit amet consectetur adipisicing elit. A vitae nulla
 			dolorem tempora! Minima natus porro dolor alias exercitationem adipisci
@@ -151,10 +130,7 @@
 			accusantium quibusdam rerum laborum atque dolores eos veniam, aperiam
 			itaque deserunt, alias voluptate enim voluptatibus?
 		</p>
-<<<<<<< HEAD
 		<br /><br /><br />
-=======
->>>>>>> 8828e18 (move dashboard into client folder)
 		<p>
 			Lorem ipsum dolor sit amet consectetur adipisicing elit. A vitae nulla
 			dolorem tempora! Minima natus porro dolor alias exercitationem adipisci
@@ -170,10 +146,7 @@
 			accusantium quibusdam rerum laborum atque dolores eos veniam, aperiam
 			itaque deserunt, alias voluptate enim voluptatibus?
 		</p>
-<<<<<<< HEAD
 		<br /><br /><br />
-=======
->>>>>>> 8828e18 (move dashboard into client folder)
 		<p>
 			Lorem ipsum dolor sit amet consectetur adipisicing elit. A vitae nulla
 			dolorem tempora! Minima natus porro dolor alias exercitationem adipisci
@@ -189,10 +162,7 @@
 			accusantium quibusdam rerum laborum atque dolores eos veniam, aperiam
 			itaque deserunt, alias voluptate enim voluptatibus?
 		</p>
-<<<<<<< HEAD
 		<br /><br /><br />
-=======
->>>>>>> 8828e18 (move dashboard into client folder)
 		<p>
 			Lorem ipsum dolor sit amet consectetur adipisicing elit. A vitae nulla
 			dolorem tempora! Minima natus porro dolor alias exercitationem adipisci
@@ -208,10 +178,7 @@
 			accusantium quibusdam rerum laborum atque dolores eos veniam, aperiam
 			itaque deserunt, alias voluptate enim voluptatibus?
 		</p>
-<<<<<<< HEAD
 		<br /><br /><br />
-=======
->>>>>>> 8828e18 (move dashboard into client folder)
 		<p>
 			Lorem ipsum dolor sit amet consectetur adipisicing elit. A vitae nulla
 			dolorem tempora! Minima natus porro dolor alias exercitationem adipisci
@@ -227,9 +194,6 @@
 			accusantium quibusdam rerum laborum atque dolores eos veniam, aperiam
 			itaque deserunt, alias voluptate enim voluptatibus?
 		</p>
-<<<<<<< HEAD
 		<br /><br /><br />
-=======
->>>>>>> 8828e18 (move dashboard into client folder)
 	</main>
 </template>

@@ -21,16 +21,9 @@
 					v-model="password"
 				/>
 				<font-awesome-icon
-					v-if="showPassword"
+					@click="toggleShowPassword('password')"
+					class="absolute bottom-11 right-5 dark:text-black text-lg hover:cursor-pointer"
 					icon="eye-slash"
-					class="absolute bottom-11 right-5 dark:text-black text-lg hover:cursor-pointer"
-					@click="toggleShowPassword('password')"
-				/>
-				<font-awesome-icon
-					v-else
-					icon="eye"
-					class="absolute bottom-11 right-5 dark:text-black text-lg hover:cursor-pointer"
-					@click="toggleShowPassword('password')"
 				/>
 				<p @click="forgotPassword" class="self-end hover:cursor-pointer">
 					Mot de passe oublié?
@@ -46,16 +39,11 @@
 
 <script setup lang="ts">
 import { ref, onMounted, watch } from "vue";
-// import { useRouter } from "vue-router";
+import { useRouter } from "vue-router";
 
-// const click = (e) => {
-// 	console.log(e);
-// };
-
-// const router = useRouter();
+const router = useRouter();
 const email = ref("");
 const password = ref("");
-const showPassword = ref(false);
 let requestResult = document.getElementById("requestResult");
 
 onMounted(() => {
@@ -78,10 +66,8 @@ const toggleShowPassword = (elem: string) => {
 	const inputToToggle = document.getElementById(elem);
 	if (inputToToggle && inputToToggle.getAttribute("type") === "password") {
 		inputToToggle.setAttribute("type", "text");
-		showPassword.value = true;
 	} else {
 		inputToToggle?.setAttribute("type", "password");
-		showPassword.value = false;
 	}
 };
 

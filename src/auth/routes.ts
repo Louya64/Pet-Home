@@ -182,7 +182,7 @@ const authRouter = async (server: FastifyInstance) => {
 
 	// forgot password
 	server.post<{ Body: UserEmailType }>(
-		"/dashboard/forgotPassword",
+		"/forgotPassword",
 		async (request, reply) => {
 			const userFound = await findUserByEmail(request.body.email);
 			if (!userFound) {
