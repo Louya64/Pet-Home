@@ -27,7 +27,7 @@ window.addEventListener("storage", () => {
 const logout = () => {
 	localStorage.removeItem("token");
 	window.dispatchEvent(new Event("storage"));
-	router.push("/dashboard/login");
+	router.push("/auth");
 };
 </script>
 

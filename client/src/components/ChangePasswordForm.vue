@@ -1,5 +1,5 @@
 <template>
-	<h1 class="text-center sm:text-2xl my-20">Changez votre mot de passe</h1>
+	<h1 class="text-center sm:text-2xl mb-10">Changez votre mot de passe</h1>
 	<div class="px-20">
 		<form
 			class="form lg:w-1/2 mx-auto"
@@ -58,28 +58,17 @@
 
 <script setup lang="ts">
 import { onMounted, ref, watch } from "vue";
-import { useRoute, useRouter } from "vue-router";
-import axios from "axios";
-import jwt_decode from "jwt-decode";
 
-interface ITokenDecoded {
-	id: number;
-	role: number;
-	iat: number;
-}
+const emit = defineEmits<{
+	(e: "changePassword", password: string, confirmedPassword: string): void;
+}>();
 
-const route = useRoute();
-const router = useRouter();
 const password = ref("");
 const confirmedPassword = ref("");
 const passwordConfirmed = ref(false);
-let userId: number;
 let requestResult = document.getElementById("requestResult");
 
 onMounted(() => {
-	const token = route.query.token as string;
-	const tokenDecoded: ITokenDecoded = jwt_decode(token);
-	userId = tokenDecoded.id;
 	requestResult = document.getElementById("requestResult");
 });
 
@@ -110,28 +99,6 @@ const toggleShowPassword = (elem: string) => {
 };
 
 const changePassword = (password: string, confirmedPassword: string) => {
-	axios
-		.request({
-			method: "put",
-			url: `${import.meta.env.VITE_URL_BACK}/users/${userId}`,
-			data: { password: password, confirmedPassword: confirmedPassword },
-		})
-		.then(() => {
-			if (requestResult) {
-				requestResult?.classList.remove("text-red-400");
-				requestResult?.classList.add("text-green-400");
-				requestResult.textContent = "Redirection vers la page de connection...";
-			}
-			setTimeout(() => {
-				router.push("/dashboard/login");
-			}, 3000);
-		})
-		.catch((err) => {
-			if (requestResult) {
-				requestResult?.classList.remove("text-green-400");
-				requestResult?.classList.add("text-red-400");
-				requestResult.textContent = err.response.data.message;
-			}
-		});
+	emit("changePassword", password, confirmedPassword);
 };
 </script>

@@ -1,14 +1,11 @@
 import { createRouter, createWebHistory } from "vue-router";
 import HomeView from "../views/public/HomeView.vue";
-import LoginViewVue from "@/views/public/LoginView.vue";
-import ForgotPasswordConfirmView from "../views/public/ForgotPasswordConfirmView.vue";
-import ChangePasswordView from "../views/public/ChangePasswordView.vue";
 import OffersView from "../views/public/OffersView.vue";
 import ContactView from "../views/public/ContactView.vue";
 import DashboardHome from "../views/dashboard/HomeView.vue";
-import DashboardLogin from "../views/dashboard/LoginView.vue";
-import DashboardForgotPassword from "../views/dashboard/ForgotPasswordConfirmView.vue";
-import DashboardChangePassword from "../views/dashboard/ChangePasswordView.vue";
+import LoginViewVue from "@/views/commons/LoginView.vue";
+import ForgotPasswordConfirmViewVue from "@/views/commons/ForgotPasswordConfirmView.vue";
+import ChangePasswordViewVue from "@/views/commons/ChangePasswordView.vue";
 import jwt_decode from "jwt-decode";
 
 interface ITokenDecoded {
@@ -33,12 +30,12 @@ const router = createRouter({
 		{
 			path: "/forgotPasswordConfirm",
 			name: "forgotPasswordConfirm",
-			component: ForgotPasswordConfirmView,
+			component: ForgotPasswordConfirmViewVue,
 		},
 		{
 			path: "/changePassword",
 			name: "changePassword",
-			component: ChangePasswordView,
+			component: ChangePasswordViewVue,
 		},
 		{
 			path: "/offers",
@@ -56,25 +53,10 @@ const router = createRouter({
 			name: "dashboard",
 			component: DashboardHome,
 		},
-		{
-			path: "/dashboard/login",
-			name: "login",
-			component: DashboardLogin,
-		},
-		{
-			path: "/dashboard/forgotPasswordConfirm",
-			name: "dashboardForgotPasswordConfirm",
-			component: DashboardForgotPassword,
-		},
-		{
-			path: "/dashboard/changePassword",
-			name: "dashboardChangePassword",
-			component: DashboardChangePassword,
-		},
 	],
 });
 
-router.beforeEach(async (to, from) => {
+router.beforeEach(async (to, _from) => {
 	const token = localStorage.getItem("token");
 	console.log("token", token);
 
@@ -86,23 +68,15 @@ router.beforeEach(async (to, from) => {
 	const isAdmin = userRole === 1 || userRole === 2;
 
 	if (!isAdmin) {
+		// lister les routes interdites sauf isAdmin
 		if (to.name === "dashboard") {
-			return { name: "login" };
+			return { name: "auth" };
 		}
 	}
 
-	// if (
-	// 	!isAdmin &&
-	// 	// liste des routes dispo sans être authentifié en tant qu'admin
-	// 	to.name !== "login" &&
-	// 	to.name !== "forgotPasswordConfirm" &&
-	// 	to.name !== "changePassword" &&
-	// 	to.name !== "facebookLoading"
-	// ) {
-	// 	return { name: "login" };
-	// }
-	// if (isAdmin && to.name === "login") {
-	// 	return { name: "home" };
+	// if (to.name === "auth") {
+	// 	if (isAdmin) return { name: "dashboard" };
+	// 	else if (token) return { name: "home" };
 	// }
 });
 
