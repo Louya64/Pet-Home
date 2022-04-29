@@ -57,9 +57,16 @@
 						title="au moins 8 caractères dont 1 nombre, 1 minuscule, 1 majuscule, et 1 caractère spécial"
 					/>
 					<font-awesome-icon
+						v-if="showPassword"
 						@click="toggleShowPassword('password')"
 						class="absolute bottom-6 right-5 dark:text-black text-lg hover:cursor-pointer"
 						icon="eye-slash"
+					/>
+					<font-awesome-icon
+						v-else
+						@click="toggleShowPassword('password')"
+						class="absolute bottom-6 right-5 dark:text-black text-lg hover:cursor-pointer"
+						icon="eye"
 					/>
 				</div>
 				<div class="form-item relative">
@@ -84,9 +91,16 @@
 						v-model="confirmedPassword"
 					/>
 					<font-awesome-icon
+						v-if="showConfirmedPassword"
 						@click="toggleShowPassword('confirmedPassword')"
 						class="absolute bottom-6 right-5 dark:text-black text-lg hover:cursor-pointer"
 						icon="eye-slash"
+					/>
+					<font-awesome-icon
+						v-else
+						@click="toggleShowPassword('confirmedPassword')"
+						class="absolute bottom-6 right-5 dark:text-black text-lg hover:cursor-pointer"
+						icon="eye"
 					/>
 				</div>
 				<div class="form-item">
@@ -163,7 +177,9 @@ const emit = defineEmits<{
 const router = useRouter();
 const email = ref("");
 const password = ref("");
+const showPassword = ref(false);
 const confirmedPassword = ref("");
+const showConfirmedPassword = ref(false);
 const passwordIsConfirmed = ref(false);
 const username = ref("");
 const firstname = ref("");
@@ -181,9 +197,14 @@ watch(email, () => {
 	}
 });
 
-watch(password, () => {
+watch(password, (newVal) => {
 	if (requestResult) {
 		requestResult.textContent = "";
+	}
+	if (newVal === confirmedPassword.value && confirmedPassword.value !== "") {
+		passwordIsConfirmed.value = true;
+	} else {
+		passwordIsConfirmed.value = false;
 	}
 });
 
@@ -223,11 +244,25 @@ watch(phone_number, () => {
 });
 
 const toggleShowPassword = (elem: string) => {
+	console.log(elem);
+
 	const inputToToggle = document.getElementById(elem);
 	if (inputToToggle && inputToToggle.getAttribute("type") === "password") {
 		inputToToggle.setAttribute("type", "text");
+		if (elem === "password") {
+			showPassword.value = true;
+		}
+		if (elem === "confirmedPassword") {
+			showConfirmedPassword.value = true;
+		}
 	} else {
 		inputToToggle?.setAttribute("type", "password");
+		if (elem === "password") {
+			showPassword.value = false;
+		}
+		if (elem === "confirmedPassword") {
+			showConfirmedPassword.value = false;
+		}
 	}
 };
 

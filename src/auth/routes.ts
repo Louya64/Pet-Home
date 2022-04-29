@@ -124,7 +124,7 @@ const authRouter = async (server: FastifyInstance) => {
 		}
 	);
 
-	// register from dashboard
+	// create a user (admin or not) from dashboard
 	server.post<{ Body: UserCreateFromDashboardType; Reply: string | ErrorType }>(
 		"/dashboard/auth/register",
 		{
@@ -173,7 +173,7 @@ const authRouter = async (server: FastifyInstance) => {
 		}
 	);
 
-	// login with email / password from site
+	// login with email / password
 	server.post<{ Body: UserLoginType; Reply: TokenType | ErrorType }>(
 		"/auth/login",
 		{
@@ -217,78 +217,7 @@ const authRouter = async (server: FastifyInstance) => {
 		}
 	);
 
-	// login with email / password from dashboard
-	server.post<{ Body: UserLoginType; Reply: TokenType | ErrorType }>(
-		"/dashboard/auth/login",
-		{
-			schema: {
-				body: UserLogin,
-				response: {
-					200: Token,
-				},
-			},
-		},
-		async (request, reply) => {
-			const { body: credentials } = request;
-			const userFound = await findUserByEmail(credentials.email);
-			if (!userFound) {
-				reply
-					.status(401)
-					.send(unauthorizedError(`Email ou mot de passe incorrect`));
-			} else {
-				const passwordOk = await verifyPassword(
-					server,
-					credentials.password,
-					userFound.password as string
-				);
-				if (!passwordOk) {
-					reply
-						.status(401)
-						.send(unauthorizedError(`Email ou mot de passe incorrect`));
-				} else {
-					if (userFound.id_role !== 1 && userFound.id_role !== 2) {
-						reply.status(403).send(forbiddenError(`Acces interdit`));
-					} else {
-						const token = createToken(server, userFound);
-						reply.status(200).send(token);
-					}
-				}
-			}
-		}
-	);
-
-	// forgot password from dashboard
-	server.post<{ Body: UserEmailType }>(
-		"/dashboard/forgotPassword",
-		async (request, reply) => {
-			const userFound = await findUserByEmail(request.body.email);
-			if (!userFound) {
-				reply.status(404).send(notFoundError(`Utilisateur non trouvé`));
-			} else {
-				const token = createToken(server, userFound);
-				const { mailer } = server;
-				mailer.sendMail(
-					{
-						from: server.config.SMTP_EMAIL,
-						to: userFound.email,
-						subject: "Pet'Home - Mot de pass oublié",
-						text: "cliquez sur le lien",
-						html: `<a href=${server.config.URL_DASHBOARD}/changePassword?&token=${token}>lien pour changer le mot de passe</a>`,
-					},
-					(err: any, info: any) => {
-						if (err) {
-							console.log(err);
-						} else {
-							console.log(info);
-						}
-					}
-				);
-				reply.status(200).send("mail envoyé");
-			}
-		}
-	);
-
-	// forgot password from site
+	// forgot password
 	server.post<{ Body: UserEmailType }>(
 		"/forgotPassword",
 		async (request, reply) => {
