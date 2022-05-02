@@ -13,6 +13,8 @@ import adoptionStatusRouter from "./adoptionStatus/routes";
 import offerRouter from "./offers/routes";
 import adoptionRequestRouter from "./adoptionRequests/routes";
 
+console.log(__dirname);
+
 // dotenv
 declare module "fastify" {
 	interface FastifyInstance {

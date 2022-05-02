@@ -1,7 +1,7 @@
 <script setup lang="ts"></script>
 
 <template>
-	<main class="bg-slate-200 min-h-screen ml-96">
+	<main class="dashboardContainer">
 		<h1>Home</h1>
 		<p>
 			Lorem ipsum dolor sit amet consectetur adipisicing elit. A vitae nulla

@@ -1,11 +1,19 @@
-import { createRouter, createWebHistory } from "vue-router";
+// site
 import HomeView from "../views/public/HomeView.vue";
 import OffersView from "../views/public/OffersView.vue";
 import ContactView from "../views/public/ContactView.vue";
+
+// commons
+import LoginView from "@/views/commons/LoginView.vue";
+import ForgotPasswordConfirmView from "@/views/commons/ForgotPasswordConfirmView.vue";
+import ChangePasswordView from "@/views/commons/ChangePasswordView.vue";
+
+// dashboard
 import DashboardHome from "../views/dashboard/HomeView.vue";
-import LoginViewVue from "@/views/commons/LoginView.vue";
-import ForgotPasswordConfirmViewVue from "@/views/commons/ForgotPasswordConfirmView.vue";
-import ChangePasswordViewVue from "@/views/commons/ChangePasswordView.vue";
+import DashboardOffersList from "../views/dashboard/OffersListView.vue";
+import DashboardOfferCreate from "@/views/dashboard/OfferCreateView.vue";
+
+import { createRouter, createWebHistory } from "vue-router";
 import jwt_decode from "jwt-decode";
 
 interface ITokenDecoded {
@@ -25,17 +33,17 @@ const router = createRouter({
 		{
 			path: "/auth",
 			name: "auth",
-			component: LoginViewVue,
+			component: LoginView,
 		},
 		{
 			path: "/forgotPasswordConfirm",
 			name: "forgotPasswordConfirm",
-			component: ForgotPasswordConfirmViewVue,
+			component: ForgotPasswordConfirmView,
 		},
 		{
 			path: "/changePassword",
 			name: "changePassword",
-			component: ChangePasswordViewVue,
+			component: ChangePasswordView,
 		},
 		{
 			path: "/offers",
@@ -53,13 +61,21 @@ const router = createRouter({
 			name: "dashboard",
 			component: DashboardHome,
 		},
+		{
+			path: "/dashboard/offersList",
+			name: "dashboardOffersList",
+			component: DashboardOffersList,
+		},
+		{
+			path: "/dashboard/offerCreate",
+			name: "dashboardOfferCreate",
+			component: DashboardOfferCreate,
+		},
 	],
 });
 
 router.beforeEach(async (to, _from) => {
 	const token = localStorage.getItem("token");
-	console.log("token", token);
-
 	let userRole = 0;
 	if (token) {
 		const tokenDecoded: ITokenDecoded = jwt_decode(token);
@@ -69,7 +85,7 @@ router.beforeEach(async (to, _from) => {
 
 	if (!isAdmin) {
 		// lister les routes interdites sauf isAdmin
-		if (to.name === "dashboard") {
+		if (to.name === "dashboard" || to.name === "dashboardOffersList") {
 			return { name: "auth" };
 		}
 	}

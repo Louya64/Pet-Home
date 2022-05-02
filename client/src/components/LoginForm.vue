@@ -46,13 +46,7 @@
 
 <script setup lang="ts">
 import { ref, onMounted, watch } from "vue";
-// import { useRouter } from "vue-router";
 
-// const click = (e) => {
-// 	console.log(e);
-// };
-
-// const router = useRouter();
 const email = ref("");
 const password = ref("");
 const showPassword = ref(false);
