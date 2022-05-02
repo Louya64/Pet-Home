@@ -34,6 +34,52 @@ const Offer = {
 } as const;
 type OfferType = FromSchema<typeof Offer>;
 
+const OfferReply = {
+	type: "object",
+	properties: {
+		id: { type: "number" },
+		// creation_date
+		// adoption_date
+		status: {
+			type: "object",
+			properties: {
+				name: { type: "string" },
+			},
+		},
+		animal_name: { type: ["string", "null"] },
+		age: { type: "number" },
+		category: {
+			type: "object",
+			properties: {
+				name: { type: "string" },
+			},
+		},
+		race: {
+			type: ["object", "null"],
+		},
+		zipcode: { type: "number" },
+		city: { type: "string" },
+		identified: { type: "boolean" },
+		vaccinated: { type: "boolean" },
+		disabled: { type: "boolean" },
+		disability: { type: ["string", "null"] },
+		description: { type: ["string", "null"] },
+	},
+	// creation_date
+	// adoption_date
+	required: [
+		"id_status",
+		"age",
+		"id_category",
+		"zipcode",
+		"city",
+		"identified",
+		"vaccinated",
+		"disabled",
+	],
+} as const;
+type OfferReplyType = FromSchema<typeof OfferReply>;
+
 const OfferUpdate = {
 	type: "object",
 	properties: {
@@ -55,4 +101,11 @@ const OfferUpdate = {
 } as const;
 type OfferUpdateType = FromSchema<typeof OfferUpdate>;
 
-export { Offer, OfferType, OfferUpdate, OfferUpdateType };
+export {
+	Offer,
+	OfferType,
+	OfferUpdate,
+	OfferUpdateType,
+	OfferReply,
+	OfferReplyType,
+};

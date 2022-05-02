@@ -8,10 +8,17 @@ import {
 	updateOffer,
 	deleteOffer,
 } from "./dao";
-import { Offer, OfferType, OfferUpdate, OfferUpdateType } from "./types";
+import {
+	Offer,
+	OfferType,
+	OfferUpdate,
+	OfferUpdateType,
+	OfferReply,
+	OfferReplyType,
+} from "./types";
 
 const offerRouter = async (server: FastifyInstance) => {
-	server.get<{ Reply: OfferType[] }>("/", async (_request, reply) => {
+	server.get<{ Reply: OfferReplyType[] }>("/", async (_request, reply) => {
 		const allOffers = await findAllOffers();
 		reply.status(200).send(allOffers);
 	});

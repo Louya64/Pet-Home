@@ -32,6 +32,7 @@ declare module "fastify" {
 			phone_number: string;
 			order: string;
 			desc: boolean;
+			id_category: number;
 		};
 	}
 }
