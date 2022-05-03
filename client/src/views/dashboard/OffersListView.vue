@@ -161,8 +161,6 @@ let offersList: Ref<IOffer[]> = ref([]);
 
 onMounted(() => {
 	axios.get(`${import.meta.env.VITE_URL_BACK}/offers`).then((res) => {
-		console.log(res.data);
-
 		offersList.value = res.data;
 	});
 });

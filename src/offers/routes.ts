@@ -45,8 +45,8 @@ const offerRouter = async (server: FastifyInstance) => {
 		},
 		async (request, reply) => {
 			const { body: offer } = request;
-
-			const offerCreated = await createOffer(offer);
+			// auto set status to "En recherche"
+			const offerCreated = await createOffer({ ...offer, id_status: 3 });
 			reply.status(200).send(offerCreated);
 		}
 	);
