@@ -43,13 +43,13 @@
 		@apply my-10 flex flex-col;
 	}
 	.form-item-input {
-		@apply my-3 text-lg p-1 border-2 dark:text-black;
+		@apply my-3 text-lg p-1 border-2 dark:text-black h-[40px];
 	}
 
 	.dashboardContainer {
 		@apply min-h-screen ml-60;
 	}
 	.dashboardContainer h1 {
-		@apply text-center text-2xl my-10;
+		@apply text-center text-2xl py-10;
 	}
 }
