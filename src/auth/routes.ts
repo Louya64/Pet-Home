@@ -1,10 +1,8 @@
 import type { FastifyInstance } from "fastify";
 import { ErrorType } from "../commons/types";
 import {
-	notFoundError,
 	duplicateDataError,
 	unauthorizedError,
-	forbiddenError,
 	invalidDataError,
 } from "../commons/errorHelpers";
 import { findUserByEmail, findUserByUsername } from "../users/dao";
@@ -30,8 +28,8 @@ import {
 	verifyPassword,
 	createToken,
 	checkPasswordFormat,
-	confirmPassword,
-} from "./authHelpers";
+} from "./helpers";
+import { userCreateValidateData } from "./middlewares";
 
 export interface FastifyMailerNamedInstance {
 	[namespace: string]: Transporter;
@@ -57,7 +55,7 @@ const authRouter = async (server: FastifyInstance) => {
 		},
 	});
 
-	// register from site (role auto "utilisateur")
+	// register from site (role auto = utilisateur)
 	server.post<{ Body: UserCreateFromAppType; Reply: TokenType | ErrorType }>(
 		"/auth/register",
 		{
@@ -67,60 +65,24 @@ const authRouter = async (server: FastifyInstance) => {
 					201: Token,
 				},
 			},
+			preHandler: [userCreateValidateData],
 		},
 		async (request, reply) => {
 			const { body: user } = request;
 
-			const userEmailAlreadyExists = await findUserByEmail(user.email);
-			let usernameAlreadyExists;
-			if (user.username) {
-				usernameAlreadyExists = await findUserByUsername(user.username);
-			}
-
-			if (userEmailAlreadyExists && usernameAlreadyExists) {
-				reply
-					.status(409)
-					.send(duplicateDataError(`Cet email et ce pseudonyme existent déjà`));
-			} else if (userEmailAlreadyExists) {
-				reply.status(409).send(duplicateDataError(`Cet email existe déjà`));
-			} else if (usernameAlreadyExists) {
-				reply.status(409).send(duplicateDataError(`Ce pseudonyme existe déjà`));
-			} else {
-				if (!checkPasswordFormat(user.password)) {
-					reply
-						.status(422)
-						.send(
-							invalidDataError(
-								`Le mot de passe ne respecte pas le modèle(au moins 8 caractères dont 1 nombre, 1 minuscule, 1 majuscule, et 1 caractère spécial parmis *.!@#$%^&(){}[:;<>,.?/~_+-=|)`
-							)
-						);
-				} else {
-					if (!confirmPassword(user.password, user.confirmedPassword)) {
-						reply
-							.status(422)
-							.send(
-								invalidDataError(
-									`Le mot de passe n'a pas été confirmé correctement`
-								)
-							);
-					} else {
-						const hashedPassword = await hashPassword(server, user.password);
-						const userToCreate: UserCreateType = {
-							// ...user,
-							id_role: 3,
-							email: user.email,
-							password: hashedPassword,
-							username: user.username,
-							firstname: user.firstname,
-							lastname: user.lastname,
-							phone_number: user.phone_number,
-						};
-						const userCreated = await createUser(userToCreate);
-						const token = createToken(server, userCreated);
-						reply.status(201).send(token);
-					}
-				}
-			}
+			const hashedPassword = await hashPassword(server, user.password);
+			const userToCreate: UserCreateType = {
+				id_role: 3,
+				email: user.email,
+				password: hashedPassword,
+				username: user.username,
+				firstname: user.firstname,
+				lastname: user.lastname,
+				phone_number: user.phone_number,
+			};
+			const userCreated = await createUser(userToCreate);
+			const token = createToken(server, userCreated);
+			reply.status(201).send(token);
 		}
 	);
 
@@ -223,7 +185,7 @@ const authRouter = async (server: FastifyInstance) => {
 		async (request, reply) => {
 			const userFound = await findUserByEmail(request.body.email);
 			if (!userFound) {
-				reply.status(404).send(notFoundError(`Utilisateur non trouvé`));
+				reply.status(200).send("mail envoyé");
 			} else {
 				const token = createToken(server, userFound);
 				const { mailer } = server;

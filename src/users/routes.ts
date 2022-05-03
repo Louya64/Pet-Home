@@ -10,7 +10,7 @@ import {
 	hashPassword,
 	checkPasswordFormat,
 	confirmPassword,
-} from "../auth/authHelpers";
+} from "../auth/helpers";
 import {
 	findAllUsers,
 	findUserById,
