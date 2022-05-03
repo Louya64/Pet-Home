@@ -22,8 +22,13 @@ const UserCreateFromApp = {
 	properties: {
 		email: { type: "string" },
 		password: { type: "string" },
+		confirmedPassword: { type: "string" },
+		username: { type: "string" },
+		firstname: { type: "string" },
+		lastname: { type: "string" },
+		phone_number: { type: "string" },
 	},
-	required: ["email", "password"],
+	required: ["email", "password", "confirmedPassword", "username", "firstname"],
 } as const;
 type UserCreateFromAppType = FromSchema<typeof UserCreateFromApp>;
 
@@ -34,6 +39,7 @@ const UserCreateFromDashboard = {
 		id_role: { type: "number" },
 		email: { type: "string" },
 		password: { type: "string" },
+		confirmedPassword: { type: "string" },
 		username: { type: "string" },
 		firstname: { type: "string" },
 		lastname: { type: "string" },
@@ -43,6 +49,7 @@ const UserCreateFromDashboard = {
 		"id_role",
 		"email",
 		"password",
+		"confirmedPassword",
 		"username",
 		"firstname",
 		"lastname",
@@ -66,6 +73,15 @@ const Token = {
 } as const;
 type TokenType = FromSchema<typeof Token>;
 
+const UserEmail = {
+	type: "object",
+	properties: {
+		email: { type: "string" },
+	},
+	required: ["email"],
+} as const;
+type UserEmailType = FromSchema<typeof UserEmail>;
+
 export {
 	UserCreate,
 	UserCreateType,
@@ -77,4 +93,6 @@ export {
 	UserLoginType,
 	Token,
 	TokenType,
+	UserEmail,
+	UserEmailType,
 };

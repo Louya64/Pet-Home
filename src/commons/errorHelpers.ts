@@ -22,6 +22,14 @@ const unauthorizedError = (message: string) => {
 	};
 };
 
+const forbiddenError = (message: string) => {
+	return {
+		statusCode: 403,
+		error: "Forbidden",
+		message: message,
+	};
+};
+
 const invalidDataError = (message: string) => {
 	return {
 		statusCode: 422,
@@ -35,5 +43,6 @@ export {
 	notFoundError,
 	duplicateDataError,
 	unauthorizedError,
+	forbiddenError,
 	invalidDataError,
 };
