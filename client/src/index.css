@@ -20,6 +20,10 @@
 	.special-font {
 		@apply font-WaterBrush;
 	}
+
+	h1 {
+		@apply text-center text-2xl py-10;
+	}
 }
 
 @layer components {
@@ -49,7 +53,8 @@
 	.dashboardContainer {
 		@apply min-h-screen ml-60;
 	}
-	.dashboardContainer h1 {
-		@apply text-center text-2xl py-10;
+
+	.siteContainer {
+		@apply pt-[15vh] min-h-screen;
 	}
 }

@@ -1,5 +1,5 @@
 <template>
-	<div class="pt-[15vh] min-h-screen">
+	<div class="siteContainer">
 		<ForgotPasswordForm @send-link="sendLink" />
 	</div>
 </template>

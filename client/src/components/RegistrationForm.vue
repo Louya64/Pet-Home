@@ -314,8 +314,4 @@ const register = async (userData: IUserData) => {
 const alreadyRegistered = () => {
 	emit("alreadyRegistered");
 };
-
-const alreadyRegistered = () => {
-	emit("alreadyRegistered");
-};
 </script>

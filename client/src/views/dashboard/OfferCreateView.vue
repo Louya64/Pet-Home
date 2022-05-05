@@ -6,5 +6,5 @@
 </template>
 
 <script setup lang="ts">
-import OfferForm from "@/components/OfferForm.vue";
+import OfferForm from "@/components/offers/OfferForm.vue";
 </script>

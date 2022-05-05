@@ -1,5 +1,5 @@
 <template>
-	<div v-if="registered" class="pt-[15vh] min-h-screen">
+	<div v-if="registered" class="siteContainer">
 		<h1 class="text-center sm:text-2xl mb-10">Connection</h1>
 		<p class="text-center mb-10">
 			Pas encore inscrit?

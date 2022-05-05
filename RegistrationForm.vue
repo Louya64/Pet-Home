@@ -245,8 +245,6 @@ watch(phone_number, () => {
 });
 
 const toggleShowPassword = (elem: string) => {
-	console.log(elem);
-
 	const inputToToggle = document.getElementById(elem);
 	if (inputToToggle && inputToToggle.getAttribute("type") === "password") {
 		inputToToggle.setAttribute("type", "text");

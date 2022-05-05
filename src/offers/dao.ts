@@ -1,8 +1,21 @@
 import prisma from "../database";
 import { type OfferType, OfferUpdateType } from "./types";
 
-export const findAllOffers = async () => {
+export const findAllOffers = async (filterArray: any) => {
+	const entries = new Map(filterArray);
+	const obj = Object.fromEntries(entries);
+
+	let filters = {};
+	if (filterArray.length === 1) {
+		filters = obj;
+	} else if (filterArray.length > 1) {
+		filters = {
+			AND: obj,
+		};
+	}
+
 	return await prisma.offers.findMany({
+		where: filters,
 		select: {
 			id: true,
 			creation_date: true,

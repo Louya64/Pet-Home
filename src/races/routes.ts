@@ -11,29 +11,18 @@ import {
 } from "./dao";
 import { Race, RaceType, RaceUpdate, RaceUpdateType } from "./types";
 
-// declare module "fastify" {
-// 	interface FastifyRequest {
-// 		Querystring: {
-// 			id_category: number;
-// 		};
-// 	}
-// }
-
 const raceRouter = async (server: FastifyInstance) => {
 	server.get<{ Querystring: FastifyRequest["Querystring"]; Reply: RaceType[] }>(
 		"/",
 		async (request, reply) => {
-			let filter = {};
-
+			let filterArray = [];
 			const id_category = Number(request.query.id_category);
 
 			if (id_category) {
-				filter = {
-					id_category: id_category,
-				};
+				filterArray.push(["id_category", id_category]);
 			}
 
-			const allRaces = await findAllRaces(filter);
+			const allRaces = await findAllRaces(filterArray);
 			reply.status(200).send(allRaces);
 		}
 	);

@@ -21,22 +21,6 @@ import {
 } from "./dao";
 import { User, UserType, UserUpdate, UserUpdateType } from "./types";
 
-declare module "fastify" {
-	interface FastifyRequest {
-		Querystring: {
-			id_role: number;
-			email: string;
-			username: string;
-			firstname: string;
-			lastname: string;
-			phone_number: string;
-			order: string;
-			desc: boolean;
-			id_category: number;
-		};
-	}
-}
-
 const userRouter = async (server: FastifyInstance) => {
 	server.register(bcrypt);
 	//ajout middlware verif adminAccessOnly

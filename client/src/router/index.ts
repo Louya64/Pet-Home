@@ -2,6 +2,7 @@
 import HomeView from "../views/public/HomeView.vue";
 import OffersView from "../views/public/OffersView.vue";
 import ContactView from "../views/public/ContactView.vue";
+import OfferDetails from "@/components/offers/OfferDetails.vue";
 
 // commons
 import LoginView from "@/views/commons/LoginView.vue";
@@ -49,6 +50,11 @@ const router = createRouter({
 			path: "/offers",
 			name: "offers",
 			component: OffersView,
+		},
+		{
+			path: "/offers/:id",
+			name: "offerDetails",
+			component: OfferDetails,
 		},
 		{
 			path: "/contact",

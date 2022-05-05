@@ -2,6 +2,9 @@ import fastify from "fastify";
 import fasityCors from "fastify-cors";
 import fastifyJwt from "fastify-jwt";
 import fastifyEnv from "fastify-env";
+import multer from "fastify-multer";
+import path from "path";
+import fastifyStatic from "@fastify/static";
 
 import roleRouter from "./roles/routes";
 import userRouter from "./users/routes";
@@ -11,9 +14,8 @@ import raceRouter from "./races/routes";
 import offerStatusRouter from "./offerStatus/routes";
 import adoptionStatusRouter from "./adoptionStatus/routes";
 import offerRouter from "./offers/routes";
+import uploadsRouter from "./uploads/routes";
 import adoptionRequestRouter from "./adoptionRequests/routes";
-
-console.log(__dirname);
 
 // dotenv
 declare module "fastify" {
@@ -30,6 +32,24 @@ declare module "fastify" {
 			PRIVATE_KEY: string;
 			FACEBOOK_ID: string;
 			FACEBOOK_SECRET: string;
+		};
+	}
+	interface FastifyRequest {
+		Querystring: {
+			id_role: number;
+			email: string;
+			username: string;
+			firstname: string;
+			lastname: string;
+			phone_number: string;
+			order: string;
+			desc: boolean;
+			id_category: number;
+			animal_name: string;
+			id_offer: number;
+			id_race: number;
+			zipcode: number;
+			city: string;
 		};
 	}
 }
@@ -102,6 +122,12 @@ async function createServer() {
 	server.register(fasityCors, {
 		origin: "*",
 	});
+	// multer
+	server.register(multer.contentParser);
+	server.register(fastifyStatic, {
+		root: path.join(__dirname.slice(0, -8), "public/assets"),
+		prefix: "/image/",
+	});
 
 	server.register(roleRouter, { prefix: "/roles" });
 	server.register(userRouter, { prefix: "/users" });
@@ -111,6 +137,7 @@ async function createServer() {
 	server.register(offerStatusRouter, { prefix: "/offerStatus" });
 	server.register(adoptionStatusRouter, { prefix: "/adoptionStatus" });
 	server.register(offerRouter, { prefix: "/offers" });
+	server.register(uploadsRouter, { prefix: "/uploads" });
 	server.register(adoptionRequestRouter, { prefix: "/adoptionRequests" });
 
 	server.listen(8080, (err, address) => {

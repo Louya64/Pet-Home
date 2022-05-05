@@ -1,6 +1,7 @@
 <template>
 	<form
 		class="form"
+		enctype="multipart/form-data"
 		@submit.prevent="
 			submit({
 				animal_name,
@@ -135,8 +136,6 @@
 					</select>
 				</div>
 
-				<!-- parent catégorie -->
-
 				<div class="form-item">
 					<label for="race">Race</label>
 					<select class="form-item-input" id="race" v-model="id_race">
@@ -199,8 +198,14 @@
 			></textarea>
 		</div>
 		<div class="form-item">
-			<label for="photos">Ajouter des photos</label>
-			<input class="form-item-input" type="file" id="photos" />
+			<label for="images">Ajouter des photos</label>
+			<input
+				multiple
+				v-on:change="(e) => updateImages(e)"
+				class="form-item-input"
+				type="file"
+				id="images"
+			/>
 		</div>
 		<div class="pb-10 text-center" id="requestResult"></div>
 		<div class="flex justify-end">
@@ -251,6 +256,7 @@ const disabled = ref(false);
 const disability = ref("");
 const description = ref("");
 let requestResult = document.getElementById("requestResult");
+const images = ref();
 
 onMounted(() => {
 	requestResult = document.getElementById("requestResult");
@@ -295,14 +301,32 @@ const resetRace = () => {
 	id_race.value = null;
 };
 
-const submit = (data: IOffer) => {
-	axios
+const updateImages = (e: any) => {
+	images.value = e.target.files;
+};
+
+const submit = async (data: IOffer) => {
+	let id_offer = 0;
+	let imagesPath: string[] = [];
+	const formData = new FormData();
+	const arrayFiles = Array.from(images.value);
+	arrayFiles.map((file: any) => {
+		formData.append("photos", file);
+	});
+
+	await axios.post(`http://localhost:8080/uploads`, formData).then((res) => {
+		imagesPath = res.data;
+	});
+
+	await axios
 		.request({
 			method: "post",
 			url: `${import.meta.env.VITE_URL_BACK}/offers`,
 			data: { ...data, id_status: 1 },
 		})
-		.then(() => {
+		.then((res) => {
+			id_offer = res.data.id;
+
 			if (requestResult) {
 				requestResult?.classList.add("text-green-400");
 				requestResult?.classList.remove("text-red-400");
@@ -316,5 +340,29 @@ const submit = (data: IOffer) => {
 				requestResult.textContent = err.response.data.message;
 			}
 		});
+
+	imagesPath.map((image, index) => {
+		if (index === 0) {
+			axios.request({
+				method: "post",
+				url: `${import.meta.env.VITE_URL_BACK}/uploads/store`,
+				data: {
+					id_offer: id_offer,
+					path: image,
+					main: true,
+				},
+			});
+		} else {
+			axios.request({
+				method: "post",
+				url: `${import.meta.env.VITE_URL_BACK}/uploads/store`,
+				data: {
+					id_offer: id_offer,
+					path: image,
+					main: false,
+				},
+			});
+		}
+	});
 };
 </script>
