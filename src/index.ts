@@ -50,6 +50,7 @@ declare module "fastify" {
 			id_race: number;
 			zipcode: number;
 			city: string;
+			age: string;
 		};
 	}
 }

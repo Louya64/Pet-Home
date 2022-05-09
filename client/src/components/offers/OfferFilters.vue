@@ -62,6 +62,16 @@
 					"
 				/>
 			</div>
+			<div v-if="ageSelected">
+				<SearchTag
+					:selectedValue="ageSelected"
+					@resetFilter="
+						() => {
+							emit('resetOneFilter', 'age');
+						}
+					"
+				/>
+			</div>
 		</div>
 
 		<!-- search by animal_name -->
@@ -195,6 +205,72 @@
 				/>
 			</div>
 		</div>
+
+		<!-- search by age -->
+		<div class="form-item">
+			<SearchFieldHeader
+				title="Age"
+				fieldName="age"
+				:active="searchByAge"
+				:valueSelected="ageSelected"
+				@activeSearch="(active) => (searchByAge = active)"
+			/>
+			<div v-if="searchByAge">
+				<ul class="px-10">
+					<li
+						class="hover:cursor-pointer hover:bg-orange-100"
+						@click="
+							() => {
+								emit('filterByAge', '0-3 mois', 0, 3), (searchByAge = false);
+							}
+						"
+					>
+						0-3 mois
+					</li>
+					<li
+						class="hover:cursor-pointer hover:bg-orange-100"
+						@click="
+							() => {
+								emit('filterByAge', '3-6 mois', 3, 6), (searchByAge = false);
+							}
+						"
+					>
+						3-6 mois
+					</li>
+					<li
+						class="hover:cursor-pointer hover:bg-orange-100"
+						@click="
+							() => {
+								emit('filterByAge', '6-12 mois', 6, 12), (searchByAge = false);
+							}
+						"
+					>
+						6-12 mois
+					</li>
+					<li
+						class="hover:cursor-pointer hover:bg-orange-100"
+						@click="
+							() => {
+								emit('filterByAge', '1-2 ans', 12, 24), (searchByAge = false);
+							}
+						"
+					>
+						1-2 ans
+					</li>
+					<li
+						class="hover:cursor-pointer hover:bg-orange-100"
+						@click="
+							() => {
+								emit('filterByAge', '2 ans et plus', 24, 240),
+									(searchByAge = false);
+							}
+						"
+					>
+						2 ans et plus
+					</li>
+				</ul>
+			</div>
+		</div>
 	</div>
 </template>
 
@@ -211,6 +287,7 @@ interface Props {
 	raceSelected: string;
 	zipcodeSelected: string;
 	citySelected: string;
+	ageSelected: string;
 }
 interface ICategory {
 	id: number;
@@ -231,6 +308,7 @@ const emit = defineEmits<{
 	(e: "filterByRace", raceId: number, raceName: string): void;
 	(e: "filterByZipcode", zipcode: string): void;
 	(e: "filterByCity", city: string): void;
+	(e: "filterByAge", ageName: string, minAge: number, maxAge: number): void;
 }>();
 
 const props = defineProps<Props>();
@@ -271,6 +349,8 @@ watch(zipcode, (newVal) => {
 
 const searchByCity = ref(false);
 const city = ref("");
+
+const searchByAge = ref(false);
 
 onMounted(() => {
 	axios.get(`${import.meta.env.VITE_URL_BACK}/categories`).then((res) => {

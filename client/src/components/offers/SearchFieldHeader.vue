@@ -1,5 +1,8 @@
 <template>
-	<div class="flex justify-between">
+	<div
+		class="flex justify-between hover:cursor-pointer hover:border-b hover:border-current"
+		@click="() => $emit('activeSearch', !active)"
+	>
 		<h3>{{ title }}</h3>
 		<label :for="fieldName"
 			><font-awesome-icon

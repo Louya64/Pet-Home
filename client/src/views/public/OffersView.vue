@@ -1,6 +1,9 @@
 <template>
 	<div class="siteContainer">
-		<h1>Les animaux à adopter</h1>
+		<h1>
+			Les {{ categorySelected.length ? categorySelected + "s" : "animaux" }} à
+			adopter
+		</h1>
 		<div class="flex">
 			<OfferFilters
 				:namesList="namesList"
@@ -9,6 +12,7 @@
 				:raceSelected="raceSelected"
 				:zipcodeSelected="zipcodeSelected"
 				:citySelected="citySelected"
+				:ageSelected="ageSelected"
 				@resetAllFilters="resetAllFilters"
 				@resetOneFilter="resetOneFilter"
 				@filterByName="filterByName"
@@ -16,6 +20,7 @@
 				@filterByRace="filterByRace"
 				@filterByZipcode="filterByZipcode"
 				@filterByCity="filterByCity"
+				@filterByAge="filterByAge"
 			/>
 			<div class="flex-1">
 				<div class="ml-20">{{ offersList.length }} résultats</div>
@@ -33,6 +38,7 @@ import axios from "axios";
 import { onMounted, ref, type Ref } from "vue";
 import OfferCard from "../../components/offers/OfferCard.vue";
 import OfferFilters from "../../components/offers/OfferFilters.vue";
+import { useRoute } from "vue-router";
 
 interface IOffer {
 	id: number;
@@ -57,6 +63,8 @@ interface IOffer {
 	disability: string;
 	description: string;
 }
+
+const route = useRoute();
 let offersList: Ref<IOffer[]> = ref([]);
 let namesList: Ref<string[]> = ref([]);
 let filterSelected: string[] = [];
@@ -65,9 +73,16 @@ const categorySelected = ref("");
 const raceSelected = ref("");
 const zipcodeSelected = ref("");
 const citySelected = ref("");
+const ageSelected = ref("");
 
 const resetAllFilters = () => {
 	filterSelected = [];
+	// nameSelected.value = "";
+	// categorySelected.value = "";
+	// raceSelected.value = "";
+	// zipcodeSelected.value = "";
+	// citySelected.value = "";
+	// ageSelected.value = "";
 	updateOffersList();
 };
 
@@ -86,6 +101,9 @@ const resetOneFilter = (filterToRemove: string) => {
 	}
 	if (filterToRemove === "city") {
 		citySelected.value = "";
+	}
+	if (filterToRemove === "age") {
+		ageSelected.value = "";
 	}
 
 	let indexToRemove: number | null = null;
@@ -135,6 +153,13 @@ const filterByCity = (city: string) => {
 	updateOffersList();
 };
 
+const filterByAge = (ageName: string, minAge: number, maxAge: number) => {
+	resetOneFilter("age");
+	ageSelected.value = ageName;
+	filterSelected.push(`age=${minAge}-${maxAge}`);
+	updateOffersList();
+};
+
 const updateOffersList = async () => {
 	const filters = filterSelected.length ? "?" + filterSelected.join("&") : "";
 	offersList.value = await axios
@@ -144,10 +169,29 @@ const updateOffersList = async () => {
 		});
 };
 
+const checkQueryFromHeader = () => {
+	const categoryId = Number(route.query.categoryId);
+	const categoryName = route.query.categoryName as string;
+	history.replaceState(route.query, "", "offers");
+	filterByCategory(categoryId, categoryName);
+};
+
+// window.addEventListener("categoryIsSelected", () => {
+// 	if (route.query.categoryId && route.query.categoryName) {
+// 		checkQueryFromHeader();
+// 	} else {
+// 		resetAllFilters();
+// 	}
+// });
+
 onMounted(async () => {
 	await updateOffersList();
 	namesList.value = offersList.value
 		.filter((offer: IOffer) => offer.animal_name)
 		.map((offer: IOffer) => offer.animal_name);
+
+	if (route.query.categoryId && route.query.categoryName) {
+		checkQueryFromHeader();
+	}
 });
 </script>
