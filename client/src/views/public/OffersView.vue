@@ -39,6 +39,7 @@ import { onMounted, ref, type Ref } from "vue";
 import OfferCard from "../../components/offers/OfferCard.vue";
 import OfferFilters from "../../components/offers/OfferFilters.vue";
 import { useRoute } from "vue-router";
+import { useCategoryStore } from "../../stores/CategoryStore";
 
 interface IOffer {
 	id: number;
@@ -64,25 +65,46 @@ interface IOffer {
 	description: string;
 }
 
+const categoryStore = useCategoryStore();
 const route = useRoute();
 let offersList: Ref<IOffer[]> = ref([]);
 let namesList: Ref<string[]> = ref([]);
 let filterSelected: string[] = [];
 const nameSelected = ref("");
+
 const categorySelected = ref("");
+categoryStore.$subscribe((_mutation, state) => {
+	const categoryInStore = state.categorySelected;
+
+	if (categoryInStore) {
+		categorySelected.value = categoryStore.categorySelected?.name as string;
+		// categoryStore.categorySelected = categoryInStore;
+		// filterByCategory(categoryInStore.id, categoryInStore.name);
+	}
+	if (state.resetFilters) {
+		resetAllFilters(false);
+		categoryStore.resetFilters = false;
+	}
+});
+
 const raceSelected = ref("");
 const zipcodeSelected = ref("");
 const citySelected = ref("");
 const ageSelected = ref("");
 
-const resetAllFilters = () => {
-	filterSelected = [];
-	// nameSelected.value = "";
-	// categorySelected.value = "";
-	// raceSelected.value = "";
-	// zipcodeSelected.value = "";
-	// citySelected.value = "";
-	// ageSelected.value = "";
+const resetAllFilters = (resetCategory: boolean) => {
+	if (resetCategory) {
+		categoryStore.categorySelected = null;
+		categorySelected.value = "";
+		filterSelected = [];
+	} else {
+		filterSelected = [`id_category=${categoryStore.categorySelected?.id}`];
+	}
+	nameSelected.value = "";
+	raceSelected.value = "";
+	zipcodeSelected.value = "";
+	citySelected.value = "";
+	ageSelected.value = "";
 	updateOffersList();
 };
 

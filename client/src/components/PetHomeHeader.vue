@@ -10,7 +10,7 @@
 			/></RouterLink>
 			<div class="relative">
 				<div class="flex">
-					<div @click="categoryIsSelected">
+					<div @click="categoryIsSelected(null)">
 						<RouterLink to="/offers">Les animaux à adopter</RouterLink>
 					</div>
 
@@ -36,13 +36,9 @@
 					<li
 						class="hover:cursor-pointer hover:bg-orange-100"
 						v-for="category in categoriesList"
-						@click="categoryIsSelected"
+						@click="categoryIsSelected(category)"
 					>
-						<RouterLink
-							:key="category.name"
-							:to="`/offers?categoryId=${category.id}&categoryName=${category.name}`"
-							>{{ category.name }}</RouterLink
-						>
+						<RouterLink to="/offers">{{ category.name }}</RouterLink>
 					</li>
 				</ul>
 			</div>
@@ -94,18 +90,19 @@
 		</div>
 	</header>
 
-	<!-- <RouterView /> -->
-	<router-view v-slot="{ Component, route }">
+	<RouterView />
+	<!-- <router-view v-slot="{ Component, route }">
 		<transition name="fade">
 			<component :is="Component" :key="route.query" />
 		</transition>
-	</router-view>
+	</router-view> -->
 </template>
 
 <script setup lang="ts">
 import { ref, type Ref, onMounted } from "vue";
 import { RouterLink, RouterView, useRouter } from "vue-router";
 import axios from "axios";
+import { useCategoryStore } from "../stores/CategoryStore";
 
 interface ICategory {
 	id: number;
@@ -123,6 +120,7 @@ if (
 	document.documentElement.classList.remove("dark");
 }
 
+const categoryStore = useCategoryStore();
 const newMessage = ref(false);
 const router = useRouter();
 const isAuthenticate: Ref<string | null> = ref(
@@ -146,9 +144,10 @@ onMounted(() => {
 		categoriesList.value = res.data;
 	});
 });
-const categoryIsSelected = () => {
+const categoryIsSelected = (category: ICategory | null) => {
 	showCategories.value = false;
-	// window.dispatchEvent(new Event("categoryIsSelected"));
+	categoryStore.categorySelected = category;
+	categoryStore.resetFilters = true;
 };
 </script>
 

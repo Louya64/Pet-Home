@@ -50,9 +50,9 @@ const router = createRouter({
 			path: "/offers",
 			name: "offers",
 			component: OffersView,
-			props: (route) => ({
-				query: [route.query.categoryId, route.query.categoryName],
-			}),
+			// props: (route) => ({
+			// 	query: [route.query.categoryId, route.query.categoryName],
+			// }),
 		},
 		{
 			path: "/offers/:id",

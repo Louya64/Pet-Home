@@ -4,7 +4,7 @@
 			<h2 class="text-center text-2xl">Filtres</h2>
 			<font-awesome-icon
 				title="remettre les filtres à 0"
-				@click="() => emit('resetAllFilters')"
+				@click="() => emit('resetAllFilters', true)"
 				class="text-2xl -mb-1 hover:cursor-pointer"
 				icon="xmark"
 			/>
@@ -27,7 +27,8 @@
 					:selectedValue="categorySelected"
 					@resetFilter="
 						() => {
-							emit('resetOneFilter', 'id_category'), updateRaces(null);
+							emit('resetOneFilter', 'id_category'),
+								(categoryStore.categorySelected = null);
 						}
 					"
 				/>
@@ -124,9 +125,13 @@
 						v-for="category in categoriesList"
 						@click="
 							() => {
-								emit('filterByCategory', category.id, category.name),
-									updateRaces(category.id),
-									(searchByCategory = false);
+								(categoryStore.categorySelected = category),
+									(searchByCategory = false),
+									emit(
+										'filterByCategory',
+										categoryStore.categorySelected.id,
+										categoryStore.categorySelected.name
+									);
 							}
 						"
 					>
@@ -279,6 +284,7 @@ import { ref, type Ref, computed, onMounted, watch } from "vue";
 import axios from "axios";
 import SearchTag from "./SearchTag.vue";
 import SearchFieldHeader from "./SearchFieldHeader.vue";
+import { useCategoryStore } from "../../stores/CategoryStore";
 
 interface Props {
 	namesList: string[];
@@ -301,7 +307,7 @@ interface IRace {
 }
 
 const emit = defineEmits<{
-	(e: "resetAllFilters"): void;
+	(e: "resetAllFilters", resetCategory: boolean): void;
 	(e: "resetOneFilter", filterToRemove: string): void;
 	(e: "filterByName", name: string): void;
 	(e: "filterByCategory", categoryId: number, categoryName: string): void;
@@ -328,15 +334,21 @@ let categoriesList: Ref<ICategory[]> = ref([]);
 const searchByRace = ref(false);
 let racesList: Ref<IRace[]> = ref([]);
 let racesListFitered: Ref<IRace[]> = ref([]);
-const updateRaces = (categoryId: number | null) => {
-	if (categoryId !== null) {
+const categoryStore = useCategoryStore();
+categoryStore.$subscribe(async (_mutation, state) => {
+	// const sleep = (delay: number) =>
+	// 	new Promise((resolve) => setTimeout(resolve, delay));
+	// if (!racesList.value.length) await sleep(1000);
+	if (state.categorySelected) {
+		const categoryId = state.categorySelected.id;
 		racesListFitered.value = racesList.value.filter(
 			(race) => race.id_category === categoryId
 		);
 	} else {
 		racesListFitered.value = racesList.value;
 	}
-};
+	emit("resetOneFilter", "id_race");
+});
 
 const searchByZipcode = ref(false);
 const zipcode = ref("");
@@ -352,13 +364,26 @@ const city = ref("");
 
 const searchByAge = ref(false);
 
-onMounted(() => {
+onMounted(async () => {
 	axios.get(`${import.meta.env.VITE_URL_BACK}/categories`).then((res) => {
 		categoriesList.value = res.data;
 	});
 
-	axios.get(`${import.meta.env.VITE_URL_BACK}/races`).then((res) => {
-		racesList.value = racesListFitered.value = res.data;
+	await axios.get(`${import.meta.env.VITE_URL_BACK}/races`).then((res) => {
+		racesList.value = res.data;
 	});
+
+	console.log(
+		"dans onmounted categorySelected ",
+		categoryStore.categorySelected
+	);
+
+	if (categoryStore.categorySelected) {
+		racesListFitered.value = racesList.value.filter(
+			(race) => race.id_category === categoryStore.categorySelected?.id
+		);
+	} else {
+		racesListFitered.value = racesList.value;
+	}
 });
 </script>
