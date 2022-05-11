@@ -13,6 +13,7 @@ import ChangePasswordView from "@/views/commons/ChangePasswordView.vue";
 import DashboardHome from "../views/dashboard/HomeView.vue";
 import DashboardOffersList from "../views/dashboard/OffersListView.vue";
 import DashboardOfferCreate from "@/views/dashboard/OfferCreateView.vue";
+import DashboardOfferUpdate from "@/views/dashboard/OfferUpdateView.vue";
 
 import { createRouter, createWebHistory } from "vue-router";
 import jwt_decode from "jwt-decode";
@@ -74,6 +75,11 @@ const router = createRouter({
 			path: "/dashboard/offersList",
 			name: "dashboardOffersList",
 			component: DashboardOffersList,
+		},
+		{
+			path: "/dashboard/offersList/:id",
+			name: "dashboardOfferUpdate",
+			component: DashboardOfferUpdate,
 		},
 		{
 			path: "/dashboard/offerCreate",

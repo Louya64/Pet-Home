@@ -1,8 +1,8 @@
 import type { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
 import multer from "fastify-multer";
 import { File, FilesObject } from "fastify-multer/lib/interfaces";
-import { createPhoto, findAllPhotos } from "./dao";
-import { PhotoType, Photo } from "./types";
+import { createPhoto, findAllPhotos, updatePhoto, deletePhoto } from "./dao";
+import { PhotoType, Photo, PhotoUpdateType, PhotoUpdate } from "./types";
 import { ParamsIdType, ErrorType } from "../commons/types";
 
 type FilesInRequest = FilesObject | Partial<File>[];
@@ -48,7 +48,6 @@ const uploadsRouter = async (server: FastifyInstance) => {
 		async (request, reply) => {
 			const photos = request.files as Partial<File>[];
 			const photosPath: string[] = [];
-
 			photos.map((photo: any) => {
 				photosPath.push(photo.filename);
 			});
@@ -70,6 +69,35 @@ const uploadsRouter = async (server: FastifyInstance) => {
 			const { body: photo } = request;
 			const photoCreated = await createPhoto(photo);
 			reply.status(200).send(photoCreated);
+		}
+	);
+
+	server.put<{
+		Params: ParamsIdType;
+		Body: PhotoUpdateType;
+		Reply: PhotoType | ErrorType;
+	}>(
+		"/:id",
+		{
+			schema: {
+				body: PhotoUpdate,
+				response: {
+					200: Photo,
+				},
+			},
+		},
+		async (request, reply) => {
+			const { body: photo } = request;
+			const photoUpdated = await updatePhoto(Number(request.params.id), photo);
+			reply.status(200).send(photoUpdated);
+		}
+	);
+
+	server.delete<{ Params: ParamsIdType; Reply: string }>(
+		"/:id",
+		async (request, reply) => {
+			await deletePhoto(Number(request.params.id));
+			reply.status(200).send(`Photo ${request.params.id} supprimée`);
 		}
 	);
 };

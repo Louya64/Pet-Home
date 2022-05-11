@@ -100,7 +100,6 @@ const offerRouter = async (server: FastifyInstance) => {
 		},
 		async (request, reply) => {
 			const { body: offer } = request;
-
 			const offerUpdated = await updateOffer(Number(request.params.id), offer);
 			reply.status(200).send(offerUpdated);
 		}

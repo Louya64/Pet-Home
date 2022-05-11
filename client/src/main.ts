@@ -15,6 +15,8 @@ import {
 	faRightFromBracket,
 	faChevronDown,
 	faChevronUp,
+	faChevronRight,
+	faChevronLeft,
 	faMagnifyingGlass,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
@@ -31,6 +33,8 @@ library.add(
 	faRightFromBracket,
 	faChevronDown,
 	faChevronUp,
+	faChevronRight,
+	faChevronLeft,
 	faMagnifyingGlass
 );
 

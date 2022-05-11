@@ -12,4 +12,16 @@ const Photo = {
 } as const;
 type PhotoType = FromSchema<typeof Photo>;
 
-export { PhotoType, Photo };
+const PhotoUpdate = {
+	type: "object",
+	properties: {
+		id: { type: "number" },
+		id_offer: { type: "number" },
+		path: { type: "string" },
+		main: { type: "boolean" },
+	},
+	required: [],
+} as const;
+type PhotoUpdateType = FromSchema<typeof PhotoUpdate>;
+
+export { PhotoType, Photo, PhotoUpdateType, PhotoUpdate };

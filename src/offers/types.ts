@@ -88,7 +88,7 @@ const OfferUpdate = {
 		animal_name: { type: "string" },
 		age: { type: "number" },
 		id_category: { type: "number" },
-		id_race: { type: "number" },
+		id_race: { type: ["number", "null"] },
 		zipcode: { type: "number" },
 		city: { type: "string" },
 		identified: { type: "boolean" },

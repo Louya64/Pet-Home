@@ -29,13 +29,17 @@
 					<td title="handicapé ?">Hand ?</td>
 					<td title="type de handicap">Handicap</td>
 					<td>description</td>
+					<td></td>
+					<td></td>
 				</tr>
 			</thead>
 			<tbody>
-				<tr v-for="offer in offersList">
+				<tr v-for="offer in offersList" class="hover:cursor-pointer">
 					<td>{{ offer.id }}</td>
 					<td class="flex justify-center items-center">
-						<div class="w-10 h-5 bg-purple-700"></div>
+						<div class="overflow-hidden">
+							<Thumnail :id_offer="offer.id" :alt="offer.category.name" />
+						</div>
 					</td>
 					<td>
 						{{
@@ -124,6 +128,14 @@
 								: ""
 						}}
 					</td>
+
+					<td>
+						<button @click="linkToOfferUpdate(offer.id)" class="btn btn-green">
+							Voir / Modifier
+						</button>
+					</td>
+
+					<td><button class="btn btn-red">Supprimer</button></td>
 				</tr>
 			</tbody>
 		</table>
@@ -133,6 +145,8 @@
 <script setup lang="ts">
 import axios from "axios";
 import { onMounted, ref, type Ref } from "vue";
+import Thumnail from "../../components/Thumbnail.vue";
+import { useRouter } from "vue-router";
 
 interface IOffer {
 	id: number;
@@ -164,4 +178,10 @@ onMounted(() => {
 		offersList.value = res.data;
 	});
 });
+
+const router = useRouter();
+
+const linkToOfferUpdate = (offerId: number) => {
+	router.push(`/dashboard/offersList/${offerId}`);
+};
 </script>

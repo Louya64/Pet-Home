@@ -148,7 +148,6 @@ onMounted(() => {
 });
 const categoryIsSelected = () => {
 	showCategories.value = false;
-	// window.dispatchEvent(new Event("categoryIsSelected"));
 };
 </script>
 

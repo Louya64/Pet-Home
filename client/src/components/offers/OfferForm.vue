@@ -15,9 +15,28 @@
 				disabled,
 				disability,
 				description,
+				id_status,
 			})
 		"
 	>
+		<div class="w-1/4 px-10 mx-auto" v-if="id_status">
+			<div class="form-item" v-if="offerStatusList">
+				<label for="id_status">Changer le statut</label>
+				<select
+					required
+					class="form-item-input"
+					id="id_status"
+					v-model="id_status"
+				>
+					<option
+						v-for="offerStatus in offerStatusList"
+						:value="offerStatus.id"
+					>
+						{{ offerStatus.name }}
+					</option>
+				</select>
+			</div>
+		</div>
 		<div class="flex">
 			<div class="w-1/2 p-10">
 				<div class="form-item">
@@ -197,6 +216,42 @@
 				rows="10"
 			></textarea>
 		</div>
+
+		<div v-if="photosDisplayed" class="overflow-hidden relative px-10">
+			<div class="flex h-[150px]">
+				<div
+					v-for="photo in photosDisplayed"
+					class="max-w-[250px] flex justify-center items-center p-5 relative"
+					:class="[photo.main ? 'border-amber-300 border-8' : '']"
+					@click="updateMainPhoto(photo.id)"
+				>
+					<img
+						class="hover:cursor-pointer hover:scale-105"
+						width="250"
+						:src="`${urlBack}/image/${photo.path}`"
+						:alt="props.offer.category.name"
+						title="Choisir comme photo principale"
+					/>
+					<font-awesome-icon
+						class="mt-1 bg-red-500/75 rounded-full px-1 hover:cursor-pointer absolute right-2 top-2 text-white text-sm"
+						icon="xmark"
+						@click="deletePhoto(photo.id)"
+						title="Supprimer la photo"
+					/>
+				</div>
+			</div>
+			<font-awesome-icon
+				class="mt-1 bg-slate-500/75 rounded-full py-3 px-4 hover:cursor-pointer absolute right-0 top-[50px] text-white text-2xl"
+				icon="chevron-right"
+				@click="scrollPhotos(1)"
+			/>
+			<font-awesome-icon
+				class="mt-1 bg-slate-500/75 rounded-full py-3 px-4 hover:cursor-pointer absolute left-0 top-[50px] text-white text-2xl"
+				icon="chevron-left"
+				@click="scrollPhotos(-1)"
+			/>
+		</div>
+
 		<div class="form-item">
 			<label for="images">Ajouter des photos</label>
 			<input
@@ -219,11 +274,42 @@ import { onMounted, ref, watch, type Ref } from "vue";
 import axios from "axios";
 import Switch from "./Switch.vue";
 
+interface Props {
+	offer: IOfferUpdate;
+	photos: IPhoto[];
+}
 interface IOffer {
+	id_status: number;
 	animal_name: string;
 	age: number;
 	id_category: number;
 	id_race: number | null;
+	zipcode: number;
+	city: string;
+	identified: boolean;
+	vaccinated: boolean;
+	disabled: boolean;
+	disability: string;
+	description: string;
+}
+interface IOfferUpdate {
+	id: number;
+	creation_date: string;
+	adoption_date: string | null;
+	id_status: number;
+	status: {
+		name: string;
+	};
+	animal_name: string;
+	age: number;
+	id_category: number;
+	category: {
+		name: string;
+	};
+	id_race: number | null;
+	race: {
+		name: string;
+	} | null;
 	zipcode: number;
 	city: string;
 	identified: boolean;
@@ -242,8 +328,26 @@ interface IRace {
 	name: string;
 	id_category: number;
 }
+interface IOfferStatus {
+	id: number;
+	name: string;
+}
+interface IPhoto {
+	id: number;
+	id_offer: number;
+	main: boolean;
+	path: string;
+}
+
+const emit = defineEmits<{
+	(e: "updatePhotos"): void;
+}>();
+
+const urlBack = import.meta.env.VITE_URL_BACK;
+const props = defineProps<Props>();
 let categoriesList: Ref<ICategory[]> = ref([]);
 let racesList: Ref<IRace[]> = ref([]);
+let offerStatusList: Ref<IOfferStatus[]> = ref([]);
 const animal_name = ref("");
 const age = ref(0);
 const id_category = ref(0);
@@ -257,6 +361,86 @@ const disability = ref("");
 const description = ref("");
 let requestResult = document.getElementById("requestResult");
 const images = ref();
+const photos = ref();
+const photosDisplayed = ref();
+const id_status = ref();
+let firstPhotoIndex = 0;
+let mainPhotoId: null | number = null;
+
+if (props.offer) {
+	animal_name.value = props.offer.animal_name;
+	age.value = props.offer.age;
+	id_category.value = props.offer.id_category;
+	id_race.value = props.offer.id_race;
+	zipcode.value = props.offer.zipcode;
+	city.value = props.offer.city;
+	identified.value = props.offer.identified;
+	vaccinated.value = props.offer.vaccinated;
+	disabled.value = props.offer.disabled;
+	disability.value = props.offer.disability;
+	description.value = props.offer.description;
+	photos.value = props.photos;
+	photosDisplayed.value = photos.value.slice(
+		firstPhotoIndex,
+		firstPhotoIndex + 6
+	);
+	id_status.value = props.offer.id_status;
+	mainPhotoId = photos.value.filter((photo: IPhoto) => photo.main)[0].id;
+}
+
+const scrollPhotos = (nb: number) => {
+	if (
+		firstPhotoIndex + nb + 6 > photos.value.length ||
+		firstPhotoIndex + nb < 0
+	) {
+		return;
+	}
+	firstPhotoIndex += nb;
+	photosDisplayed.value = photos.value.slice(
+		firstPhotoIndex,
+		firstPhotoIndex + 6
+	);
+};
+
+const updatePhoto = async (id: number, main: boolean) => {
+	await axios
+		.request({
+			method: "put",
+			url: `${import.meta.env.VITE_URL_BACK}/uploads/${id}`,
+			data: { main: main },
+		})
+		.then((res) => {});
+};
+
+const updateMainPhoto = async (id: number) => {
+	if (mainPhotoId) {
+		await updatePhoto(mainPhotoId, false);
+	}
+	await updatePhoto(id, true);
+	emit("updatePhotos");
+};
+
+const deletePhoto = (id: number) => {
+	axios
+		.delete(`${import.meta.env.VITE_URL_BACK}/uploads/${id}`)
+		.then(() => {
+			if (requestResult) {
+				requestResult?.classList.add("text-green-400");
+				requestResult?.classList.remove("text-red-400");
+				requestResult.textContent = "La photo a bien été supprimée";
+			}
+		})
+		.catch((err) => {
+			if (requestResult) {
+				requestResult?.classList.remove("text-green-400");
+				requestResult?.classList.add("text-red-400");
+				requestResult.textContent = err.response.data.message;
+			}
+		});
+
+	photos.value = photos.value.filter((photo: IPhoto) => photo.id !== id);
+	scrollPhotos(0);
+};
 
 onMounted(() => {
 	requestResult = document.getElementById("requestResult");
@@ -268,6 +452,12 @@ onMounted(() => {
 	axios.get(`${import.meta.env.VITE_URL_BACK}/races`).then((res) => {
 		racesList.value = res.data;
 	});
+
+	if (props.offer) {
+		axios.get(`${import.meta.env.VITE_URL_BACK}/offerStatus`).then((res) => {
+			offerStatusList.value = res.data;
+		});
+	}
 });
 
 watch(id_category, (newVal) => {
@@ -309,60 +499,118 @@ const submit = async (data: IOffer) => {
 	let id_offer = 0;
 	let imagesPath: string[] = [];
 	const formData = new FormData();
-	const arrayFiles = Array.from(images.value);
-	arrayFiles.map((file: any) => {
-		formData.append("photos", file);
-	});
 
-	await axios.post(`http://localhost:8080/uploads`, formData).then((res) => {
-		imagesPath = res.data;
-	});
+	if (images.value) {
+		const arrayFiles = Array.from(images.value);
+		arrayFiles.map((file: any) => {
+			formData.append("photos", file);
+		});
+	}
 
 	await axios
-		.request({
-			method: "post",
-			url: `${import.meta.env.VITE_URL_BACK}/offers`,
-			data: { ...data, id_status: 1 },
-		})
+		.post(`${import.meta.env.VITE_URL_BACK}/uploads`, formData)
 		.then((res) => {
-			id_offer = res.data.id;
-
-			if (requestResult) {
-				requestResult?.classList.add("text-green-400");
-				requestResult?.classList.remove("text-red-400");
-				requestResult.textContent = "L'offre d'adoption a bien été enregistrée";
-			}
-		})
-		.catch((err) => {
-			if (requestResult) {
-				requestResult?.classList.remove("text-green-400");
-				requestResult?.classList.add("text-red-400");
-				requestResult.textContent = err.response.data.message;
-			}
+			imagesPath = res.data;
 		});
 
-	imagesPath.map((image, index) => {
-		if (index === 0) {
-			axios.request({
-				method: "post",
-				url: `${import.meta.env.VITE_URL_BACK}/uploads/store`,
-				data: {
-					id_offer: id_offer,
-					path: image,
-					main: true,
-				},
+	if (props.offer) {
+		await axios
+			.request({
+				method: "put",
+				url: `${import.meta.env.VITE_URL_BACK}/offers/${props.offer.id}`,
+				data:
+					data.id_status !== 2 ? data : { ...data, adoption_date: new Date() },
+			})
+			.then(() => {
+				if (requestResult) {
+					requestResult?.classList.add("text-green-400");
+					requestResult?.classList.remove("text-red-400");
+					requestResult.textContent =
+						"L'offre d'adoption a bien été enregistrée";
+				}
+			})
+			.catch((err) => {
+				if (requestResult) {
+					requestResult?.classList.remove("text-green-400");
+					requestResult?.classList.add("text-red-400");
+					requestResult.textContent = err.response.data.message;
+				}
 			});
-		} else {
-			axios.request({
-				method: "post",
-				url: `${import.meta.env.VITE_URL_BACK}/uploads/store`,
-				data: {
-					id_offer: id_offer,
-					path: image,
-					main: false,
-				},
+		if (imagesPath.length) {
+			imagesPath.map((image) => {
+				axios.request({
+					method: "post",
+					url: `${import.meta.env.VITE_URL_BACK}/uploads/store`,
+					data: {
+						id_offer: props.offer.id,
+						path: image,
+						main: false,
+					},
+				});
 			});
 		}
-	});
+	} else {
+		await axios
+			.request({
+				method: "post",
+				url: `${import.meta.env.VITE_URL_BACK}/offers`,
+				data: { ...data, id_status: 1 },
+			})
+			.then((res) => {
+				id_offer = res.data.id;
+
+				if (requestResult) {
+					requestResult?.classList.add("text-green-400");
+					requestResult?.classList.remove("text-red-400");
+					requestResult.textContent =
+						"L'offre d'adoption a bien été enregistrée";
+				}
+			})
+			.catch((err) => {
+				if (requestResult) {
+					requestResult?.classList.remove("text-green-400");
+					requestResult?.classList.add("text-red-400");
+					requestResult.textContent = err.response.data.message;
+				}
+			});
+
+		imagesPath.map((image, index) => {
+			if (index === 0) {
+				axios.request({
+					method: "post",
+					url: `${import.meta.env.VITE_URL_BACK}/uploads/store`,
+					data: {
+						id_offer: id_offer,
+						path: image,
+						main: true,
+					},
+				});
+			} else {
+				axios.request({
+					method: "post",
+					url: `${import.meta.env.VITE_URL_BACK}/uploads/store`,
+					data: {
+						id_offer: id_offer,
+						path: image,
+						main: false,
+					},
+				});
+			}
+		});
+	}
 };
 </script>
+
+<style>
+.form {
+	overflow: hidden;
+}
+.photosContainer {
+	display: flex;
+	flex-wrap: nowrap;
+	width: 500vw;
+}
+.photosContainer > div {
+	width: 35vw !important;
+}
+</style>

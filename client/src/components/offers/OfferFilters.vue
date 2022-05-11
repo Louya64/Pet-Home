@@ -126,6 +126,7 @@
 							() => {
 								emit('filterByCategory', category.id, category.name),
 									updateRaces(category.id),
+									emit('resetOneFilter', 'id_race'),
 									(searchByCategory = false);
 							}
 						"
@@ -279,6 +280,7 @@ import { ref, type Ref, computed, onMounted, watch } from "vue";
 import axios from "axios";
 import SearchTag from "./SearchTag.vue";
 import SearchFieldHeader from "./SearchFieldHeader.vue";
+import { useRoute } from "vue-router";
 
 interface Props {
 	namesList: string[];
@@ -312,6 +314,7 @@ const emit = defineEmits<{
 }>();
 
 const props = defineProps<Props>();
+const route = useRoute();
 
 const searchByName = ref(false);
 const inputNameSearch = ref("");
@@ -357,8 +360,17 @@ onMounted(() => {
 		categoriesList.value = res.data;
 	});
 
-	axios.get(`${import.meta.env.VITE_URL_BACK}/races`).then((res) => {
-		racesList.value = racesListFitered.value = res.data;
-	});
+	if (route.query.categoryId) {
+		axios.get(`${import.meta.env.VITE_URL_BACK}/races`).then((res) => {
+			racesList.value = res.data;
+			racesListFitered.value = res.data.filter(
+				(race: IRace) => race.id_category === Number(route.query.categoryId)
+			);
+		});
+	} else {
+		axios.get(`${import.meta.env.VITE_URL_BACK}/races`).then((res) => {
+			racesList.value = racesListFitered.value = res.data;
+		});
+	}
 });
 </script>

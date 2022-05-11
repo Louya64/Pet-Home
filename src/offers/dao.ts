@@ -56,6 +56,38 @@ export const findOfferById = async (id: number) => {
 		where: {
 			id: Number(id),
 		},
+		select: {
+			id: true,
+			creation_date: true,
+			adoption_date: true,
+			status: {
+				select: {
+					name: true,
+				},
+			},
+			id_status: true,
+			animal_name: true,
+			age: true,
+			category: {
+				select: {
+					name: true,
+				},
+			},
+			id_category: true,
+			race: {
+				select: {
+					name: true,
+				},
+			},
+			id_race: true,
+			zipcode: true,
+			city: true,
+			identified: true,
+			vaccinated: true,
+			disabled: true,
+			disability: true,
+			description: true,
+		},
 	});
 };
 

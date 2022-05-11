@@ -77,12 +77,12 @@ const ageSelected = ref("");
 
 const resetAllFilters = () => {
 	filterSelected = [];
-	// nameSelected.value = "";
-	// categorySelected.value = "";
-	// raceSelected.value = "";
-	// zipcodeSelected.value = "";
-	// citySelected.value = "";
-	// ageSelected.value = "";
+	nameSelected.value = "";
+	categorySelected.value = "";
+	raceSelected.value = "";
+	zipcodeSelected.value = "";
+	citySelected.value = "";
+	ageSelected.value = "";
 	updateOffersList();
 };
 
@@ -169,29 +169,15 @@ const updateOffersList = async () => {
 		});
 };
 
-const checkQueryFromHeader = () => {
-	const categoryId = Number(route.query.categoryId);
-	const categoryName = route.query.categoryName as string;
-	history.replaceState(route.query, "", "offers");
-	filterByCategory(categoryId, categoryName);
-};
-
-// window.addEventListener("categoryIsSelected", () => {
-// 	if (route.query.categoryId && route.query.categoryName) {
-// 		checkQueryFromHeader();
-// 	} else {
-// 		resetAllFilters();
-// 	}
-// });
-
 onMounted(async () => {
+	if (route.query.categoryId && route.query.categoryName) {
+		filterSelected = [`id_category=${route.query.categoryId}`];
+		categorySelected.value = route.query.categoryName as string;
+		history.replaceState(route.query, "", "offers");
+	}
 	await updateOffersList();
 	namesList.value = offersList.value
 		.filter((offer: IOffer) => offer.animal_name)
 		.map((offer: IOffer) => offer.animal_name);
-
-	if (route.query.categoryId && route.query.categoryName) {
-		checkQueryFromHeader();
-	}
 });
 </script>
