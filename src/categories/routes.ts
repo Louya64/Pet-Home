@@ -1,4 +1,4 @@
-import type { FastifyInstance } from "fastify";
+import type { FastifyInstance, FastifyRequest } from "fastify";
 import { ParamsIdType, ErrorType } from "../commons/types";
 import { notFoundError, duplicateDataError } from "../commons/errorHelpers";
 import {
@@ -17,8 +17,23 @@ import {
 } from "./types";
 
 const categoryRouter = async (server: FastifyInstance) => {
-	server.get<{ Reply: CategoryType[] }>("/", async (_request, reply) => {
-		const allCategories = await findAllCategories();
+	server.get<{
+		Querystring: FastifyRequest["Querystring"];
+		Reply: CategoryType[];
+	}>("/", async (request, reply) => {
+		let orderBy = {};
+		if (request.query.orderBy) {
+			orderBy = {
+				[request.query.orderBy.split("-")[0]]:
+					request.query.orderBy.split("-")[1],
+			};
+		} else {
+			orderBy = {
+				id: "asc",
+			};
+		}
+
+		const allCategories = await findAllCategories(orderBy);
 		reply.status(200).send(allCategories);
 	});
 
@@ -72,9 +87,12 @@ const categoryRouter = async (server: FastifyInstance) => {
 		},
 		async (request, reply) => {
 			const { body: category } = request;
-			let categoryNameAlreadyExists;
+			let categoryNameAlreadyExists = false;
 			if (category.name) {
-				categoryNameAlreadyExists = await findCategoryByName(category.name);
+				const categoryFound = await findCategoryByName(category.name);
+				if (categoryFound && categoryFound.id !== category.id) {
+					categoryNameAlreadyExists = true;
+				}
 			}
 			if (!categoryNameAlreadyExists) {
 				const categoryUpdated = await updateCategory(

@@ -15,7 +15,7 @@ const CategoryUpdate = {
 	type: "object",
 	properties: {
 		name: { type: "string" },
-		id_parent_category: { type: "number" },
+		id_parent_category: { type: ["number", "null"] },
 	},
 	required: [],
 } as const;

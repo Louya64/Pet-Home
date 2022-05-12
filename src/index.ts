@@ -51,6 +51,7 @@ declare module "fastify" {
 			zipcode: number;
 			city: string;
 			age: string;
+			orderBy: string;
 		};
 	}
 }
