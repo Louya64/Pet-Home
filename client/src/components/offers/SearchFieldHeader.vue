@@ -4,18 +4,20 @@
 		@click="() => $emit('activeSearch', !active)"
 	>
 		<h3>{{ title }}</h3>
+
+		<!-- @click="() => $emit('activeSearch', true)" -->
 		<label :for="fieldName"
 			><font-awesome-icon
 				class="mt-1 hover:cursor-pointer"
 				icon="chevron-down"
 				v-if="!active"
-				@click="() => $emit('activeSearch', true)"
 		/></label>
+
+		<!-- @click="() => $emit('activeSearch', false)" -->
 		<font-awesome-icon
 			class="mt-1 hover:cursor-pointer"
 			icon="chevron-up"
 			v-if="active"
-			@click="() => $emit('activeSearch', false)"
 		/>
 	</div>
 	<div v-if="valueSelected" class="px-10">

@@ -38,7 +38,7 @@
 					<td>{{ offer.id }}</td>
 					<td class="flex justify-center items-center">
 						<div class="overflow-hidden">
-							<Thumnail :id_offer="offer.id" :alt="offer.category.name" />
+							<Thumbnail :id_offer="offer.id" :alt="offer.category.name" />
 						</div>
 					</td>
 					<td>
@@ -135,7 +135,11 @@
 						</button>
 					</td>
 
-					<td><button class="btn btn-red">Supprimer</button></td>
+					<td>
+						<button @click="confirmDelete(offer.id)" class="btn btn-red">
+							Supprimer
+						</button>
+					</td>
 				</tr>
 			</tbody>
 		</table>
@@ -145,43 +149,41 @@
 <script setup lang="ts">
 import axios from "axios";
 import { onMounted, ref, type Ref } from "vue";
-import Thumnail from "../../components/Thumbnail.vue";
+import Thumbnail from "../../components/offers/Thumbnail.vue";
 import { useRouter } from "vue-router";
+import type { IOfferRes } from "../../interfaces/IOffer";
 
-interface IOffer {
-	id: number;
-	creation_date: string;
-	adoption_date: string | null;
-	status: {
-		name: string;
-	};
-	animal_name: string;
-	age: number;
-	category: {
-		name: string;
-	};
-	race: {
-		name: string;
-	} | null;
-	zipcode: number;
-	city: string;
-	identified: boolean;
-	vaccinated: boolean;
-	disabled: boolean;
-	disability: string;
-	description: string;
-}
-let offersList: Ref<IOffer[]> = ref([]);
+let offersList: Ref<IOfferRes[]> = ref([]);
 
-onMounted(() => {
+const getOffersList = () => {
 	axios.get(`${import.meta.env.VITE_URL_BACK}/offers`).then((res) => {
 		offersList.value = res.data;
 	});
+};
+
+onMounted(() => {
+	getOffersList();
 });
 
 const router = useRouter();
 
 const linkToOfferUpdate = (offerId: number) => {
 	router.push(`/dashboard/offersList/${offerId}`);
+};
+
+const confirmDelete = (id: number) => {
+	const confirmed = confirm(`Voulez-vous vraiment supprimer l'offre ${id} ?`);
+	if (confirmed) {
+		deleteOffer(id);
+	}
+};
+
+const deleteOffer = (id: number) => {
+	axios
+		.delete(`${import.meta.env.VITE_URL_BACK}/offers/${id}`)
+		.then((res) => {
+			getOffersList();
+		})
+		.catch((err) => {});
 };
 </script>

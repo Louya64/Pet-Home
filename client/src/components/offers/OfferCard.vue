@@ -43,41 +43,15 @@
 
 <script setup lang="ts">
 import axios from "axios";
-import { onBeforeMount, ref, computed, onBeforeUpdate } from "vue";
+import { onBeforeMount, ref, onBeforeUpdate } from "vue";
+import type { IOfferRes } from "../../interfaces/IOffer";
+import type { IPhoto } from "../../interfaces/IPhoto";
 import { useRouter } from "vue-router";
 
-interface IOffer {
-	id: number;
-	creation_date: string;
-	adoption_date: string | null;
-	status: {
-		name: string;
-	};
-	animal_name: string;
-	age: number;
-	category: {
-		name: string;
-	};
-	race: {
-		name: string;
-	} | null;
-	zipcode: number;
-	city: string;
-	identified: boolean;
-	vaccinated: boolean;
-	disabled: boolean;
-	disability: string;
-	description: string;
-}
 interface Props {
-	offer: IOffer;
+	offer: IOfferRes;
 }
-interface IUpload {
-	id: number;
-	id_offer: number;
-	path: string;
-	main: boolean;
-}
+
 const props = defineProps<Props>();
 const router = useRouter();
 const urlBack = import.meta.env.VITE_URL_BACK;
@@ -89,7 +63,7 @@ const getMainPhoto = async () => {
 		.get(`${import.meta.env.VITE_URL_BACK}/uploads?id_offer=${props.offer.id}`)
 		.then((res) => {
 			if (res.data) {
-				const mainPhoto = res.data.filter((photo: IUpload) => photo.main);
+				const mainPhoto = res.data.filter((photo: IPhoto) => photo.main);
 				photo.value = mainPhoto[0].path;
 			}
 		})

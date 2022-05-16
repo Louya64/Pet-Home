@@ -21,18 +21,10 @@ import { onMounted, ref } from "vue";
 import { useRouter } from "vue-router";
 import axios from "axios";
 import jwt_decode from "jwt-decode";
-import LoginForm from "@/components/LoginForm.vue";
-import RegistrationForm from "@/components/RegistrationForm.vue";
-
-interface ICredentials {
-	email: string;
-	password: string;
-}
-interface ITokenDecoded {
-	id: number;
-	role: number;
-	iat: number;
-}
+import LoginForm from "@/components/auth/LoginForm.vue";
+import RegistrationForm from "@/components/auth/RegistrationForm.vue";
+import type { ICredentials } from "../../interfaces/ICredentials";
+import type { ITokenDecoded } from "../../interfaces/ITokenDecoded";
 
 const router = useRouter();
 const registered = ref(true);
