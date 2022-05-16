@@ -15,42 +15,11 @@ import OfferForm from "@/components/offers/OfferForm.vue";
 import axios from "axios";
 import { ref, onMounted, type Ref } from "vue";
 import { useRoute } from "vue-router";
-
-interface IOffer {
-	id: number;
-	creation_date: string;
-	adoption_date: string | null;
-	id_status: number;
-	status: {
-		name: string;
-	};
-	animal_name: string;
-	age: number;
-	id_category: number;
-	category: {
-		name: string;
-	};
-	id_race: number | null;
-	race: {
-		name: string;
-	} | null;
-	zipcode: number;
-	city: string;
-	identified: boolean;
-	vaccinated: boolean;
-	disabled: boolean;
-	disability: string;
-	description: string;
-}
-interface IPhoto {
-	id: number;
-	id_offer: number;
-	main: boolean;
-	path: string;
-}
+import type { IOfferRes } from "../../interfaces/IOffer";
+import type { IPhoto } from "../../interfaces/IPhoto";
 
 const route = useRoute();
-const offer: Ref<IOffer | undefined> = ref();
+const offer: Ref<IOfferRes | undefined> = ref();
 const photos: Ref<IPhoto[] | undefined> = ref();
 
 const getPhotos = () => {

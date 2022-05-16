@@ -4,30 +4,28 @@
 			Les {{ categorySelected.length ? categorySelected + "s" : "animaux" }} à
 			adopter
 		</h1>
-		<div class="flex">
-			<OfferFilters
-				:namesList="namesList"
-				:nameSelected="nameSelected"
-				:categorySelected="categorySelected"
-				:raceSelected="raceSelected"
-				:zipcodeSelected="zipcodeSelected"
-				:citySelected="citySelected"
-				:ageSelected="ageSelected"
-				@resetAllFilters="resetAllFilters"
-				@resetOneFilter="resetOneFilter"
-				@filterByName="filterByName"
-				@filterByCategory="filterByCategory"
-				@filterByRace="filterByRace"
-				@filterByZipcode="filterByZipcode"
-				@filterByCity="filterByCity"
-				@filterByAge="filterByAge"
-			/>
-			<div class="flex-1">
-				<div class="ml-20">{{ offersList.length }} résultats</div>
+		<OfferFilters
+			:namesList="namesList"
+			:nameSelected="nameSelected"
+			:categorySelected="categorySelected"
+			:raceSelected="raceSelected"
+			:zipcodeSelected="zipcodeSelected"
+			:citySelected="citySelected"
+			:ageSelected="ageSelected"
+			@resetAllFilters="resetAllFilters"
+			@resetOneFilter="resetOneFilter"
+			@filterByName="filterByName"
+			@filterByCategory="filterByCategory"
+			@filterByRace="filterByRace"
+			@filterByZipcode="filterByZipcode"
+			@filterByCity="filterByCity"
+			@filterByAge="filterByAge"
+		/>
+		<div class="ml-[300px]">
+			<div class="ml-20">{{ offersList.length }} résultats</div>
 
-				<div class="flex flex-wrap justify-around">
-					<OfferCard v-for="offer in offersList" :offer="offer" />
-				</div>
+			<div class="flex flex-wrap justify-around">
+				<OfferCard v-for="offer in offersList" :offer="offer" />
 			</div>
 		</div>
 	</div>
@@ -39,33 +37,10 @@ import { onMounted, ref, type Ref } from "vue";
 import OfferCard from "../../components/offers/OfferCard.vue";
 import OfferFilters from "../../components/offers/OfferFilters.vue";
 import { useRoute } from "vue-router";
-
-interface IOffer {
-	id: number;
-	creation_date: string;
-	adoption_date: string | null;
-	status: {
-		name: string;
-	};
-	animal_name: string;
-	age: number;
-	category: {
-		name: string;
-	};
-	race: {
-		name: string;
-	} | null;
-	zipcode: number;
-	city: string;
-	identified: boolean;
-	vaccinated: boolean;
-	disabled: boolean;
-	disability: string;
-	description: string;
-}
+import type { IOfferRes } from "../../interfaces/IOffer";
 
 const route = useRoute();
-let offersList: Ref<IOffer[]> = ref([]);
+let offersList: Ref<IOfferRes[]> = ref([]);
 let namesList: Ref<string[]> = ref([]);
 let filterSelected: string[] = [];
 const nameSelected = ref("");
@@ -177,7 +152,7 @@ onMounted(async () => {
 	}
 	await updateOffersList();
 	namesList.value = offersList.value
-		.filter((offer: IOffer) => offer.animal_name)
-		.map((offer: IOffer) => offer.animal_name);
+		.filter((offer: IOfferRes) => offer.animal_name)
+		.map((offer: IOfferRes) => offer.animal_name);
 });
 </script>

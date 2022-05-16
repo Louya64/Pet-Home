@@ -17,12 +17,7 @@ import DashboardOfferUpdate from "@/views/dashboard/OfferUpdateView.vue";
 
 import { createRouter, createWebHistory } from "vue-router";
 import jwt_decode from "jwt-decode";
-
-interface ITokenDecoded {
-	id: number;
-	role: number;
-	iat: number;
-}
+import type { ITokenDecoded } from "../interfaces/ITokenDecoded";
 
 const router = createRouter({
 	history: createWebHistory(import.meta.env.BASE_URL),
@@ -99,16 +94,15 @@ router.beforeEach(async (to, _from) => {
 	const isAdmin = userRole === 1 || userRole === 2;
 
 	if (!isAdmin) {
-		// lister les routes interdites sauf isAdmin
-		if (to.name === "dashboard" || to.name === "dashboardOffersList") {
+		if (to.name?.toString().includes("dashboard")) {
 			return { name: "auth" };
 		}
 	}
-
-	// if (to.name === "auth") {
-	// 	if (isAdmin) return { name: "dashboard" };
-	// 	else if (token) return { name: "home" };
-	// }
+	if (isAdmin) {
+		if (!to.name?.toString().includes("dashboard")) {
+			return { name: "dashboard" };
+		}
+	}
 });
 
 export default router;

@@ -46,6 +46,7 @@
 
 <script setup lang="ts">
 import { ref, onMounted, watch } from "vue";
+import type { ICredentials } from "../../interfaces/ICredentials";
 
 const email = ref("");
 const password = ref("");
@@ -78,11 +79,6 @@ const toggleShowPassword = (elem: string) => {
 		showPassword.value = false;
 	}
 };
-
-interface ICredentials {
-	email: string;
-	password: string;
-}
 
 const emit = defineEmits<{
 	(e: "login", credentials: ICredentials): void;

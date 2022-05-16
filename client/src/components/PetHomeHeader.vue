@@ -29,10 +29,7 @@
 						/>
 					</div>
 				</div>
-				<ul
-					v-if="showCategories"
-					class="absolute w-full h-96 p-2 bg-purple-800"
-				>
+				<ul v-if="showCategories" class="absolute w-full p-2 bg-slate-700">
 					<li
 						class="hover:cursor-pointer hover:bg-orange-100"
 						v-for="category in categoriesList"
@@ -105,13 +102,8 @@
 <script setup lang="ts">
 import { ref, type Ref, onMounted } from "vue";
 import { RouterLink, RouterView, useRouter } from "vue-router";
+import type { ICategoryRes } from "../interfaces/ICategory";
 import axios from "axios";
-
-interface ICategory {
-	id: number;
-	name: string;
-	id_parent_category: number | null;
-}
 
 if (
 	localStorage.theme === "dark" ||
@@ -140,7 +132,7 @@ const logout = () => {
 };
 
 const showCategories = ref(false);
-let categoriesList: Ref<ICategory[]> = ref([]);
+let categoriesList: Ref<ICategoryRes[]> = ref([]);
 onMounted(() => {
 	axios.get(`${import.meta.env.VITE_URL_BACK}/categories`).then((res) => {
 		categoriesList.value = res.data;
