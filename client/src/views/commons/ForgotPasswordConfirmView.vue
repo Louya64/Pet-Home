@@ -1,5 +1,5 @@
 <template>
-	<div class="pt-[15vh] min-h-screen">
+	<div class="siteContainer">
 		<ForgotPasswordForm @send-link="sendLink" />
 	</div>
 </template>
@@ -7,7 +7,7 @@
 <script setup lang="ts">
 import { onMounted } from "vue";
 import axios from "axios";
-import ForgotPasswordForm from "@/components/ForgotPasswordForm.vue";
+import ForgotPasswordForm from "@/components/auth/ForgotPasswordForm.vue";
 
 let requestResult = document.getElementById("requestResult");
 

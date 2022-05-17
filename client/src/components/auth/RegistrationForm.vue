@@ -159,17 +159,8 @@
 <script setup lang="ts">
 import { ref, onMounted, watch } from "vue";
 import { useRouter } from "vue-router";
+import type { IUser } from "../../interfaces/IUser";
 import axios from "axios";
-
-interface IUserData {
-	email: string;
-	password: string;
-	confirmedPassword: string;
-	username: string;
-	firstname: string;
-	lastname: string;
-	phone_number: string;
-}
 
 const emit = defineEmits<{
 	(e: "alreadyRegistered"): void;
@@ -220,6 +211,17 @@ watch(confirmedPassword, (newVal) => {
 	}
 });
 
+watch(confirmedPassword, (newVal) => {
+	if (requestResult) {
+		requestResult.textContent = "";
+	}
+	if (newVal === password.value && password.value !== "") {
+		passwordIsConfirmed.value = true;
+	} else {
+		passwordIsConfirmed.value = false;
+	}
+});
+
 watch(username, () => {
 	if (requestResult) {
 		requestResult.textContent = "";
@@ -245,8 +247,6 @@ watch(phone_number, () => {
 });
 
 const toggleShowPassword = (elem: string) => {
-	console.log(elem);
-
 	const inputToToggle = document.getElementById(elem);
 	if (inputToToggle && inputToToggle.getAttribute("type") === "password") {
 		inputToToggle.setAttribute("type", "text");
@@ -267,7 +267,7 @@ const toggleShowPassword = (elem: string) => {
 	}
 };
 
-const register = async (userData: IUserData) => {
+const register = async (userData: IUser) => {
 	if (!passwordIsConfirmed.value) {
 		if (requestResult) {
 			requestResult?.classList.remove("text-green-400");

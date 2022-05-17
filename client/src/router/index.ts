@@ -1,18 +1,23 @@
-import { createRouter, createWebHistory } from "vue-router";
+// site
 import HomeView from "../views/public/HomeView.vue";
 import OffersView from "../views/public/OffersView.vue";
 import ContactView from "../views/public/ContactView.vue";
-import DashboardHome from "../views/dashboard/HomeView.vue";
-import LoginViewVue from "@/views/commons/LoginView.vue";
-import ForgotPasswordConfirmViewVue from "@/views/commons/ForgotPasswordConfirmView.vue";
-import ChangePasswordViewVue from "@/views/commons/ChangePasswordView.vue";
-import jwt_decode from "jwt-decode";
+import OfferDetails from "@/components/offers/OfferDetails.vue";
 
-interface ITokenDecoded {
-	id: number;
-	role: number;
-	iat: number;
-}
+// commons
+import LoginView from "@/views/commons/LoginView.vue";
+import ForgotPasswordConfirmView from "@/views/commons/ForgotPasswordConfirmView.vue";
+import ChangePasswordView from "@/views/commons/ChangePasswordView.vue";
+
+// dashboard
+import DashboardHome from "../views/dashboard/HomeView.vue";
+import DashboardOffersList from "../views/dashboard/OffersListView.vue";
+import DashboardOfferCreate from "@/views/dashboard/OfferCreateView.vue";
+import DashboardOfferUpdate from "@/views/dashboard/OfferUpdateView.vue";
+
+import { createRouter, createWebHistory } from "vue-router";
+import jwt_decode from "jwt-decode";
+import type { ITokenDecoded } from "../interfaces/ITokenDecoded";
 
 const router = createRouter({
 	history: createWebHistory(import.meta.env.BASE_URL),
@@ -25,22 +30,30 @@ const router = createRouter({
 		{
 			path: "/auth",
 			name: "auth",
-			component: LoginViewVue,
+			component: LoginView,
 		},
 		{
 			path: "/forgotPasswordConfirm",
 			name: "forgotPasswordConfirm",
-			component: ForgotPasswordConfirmViewVue,
+			component: ForgotPasswordConfirmView,
 		},
 		{
 			path: "/changePassword",
 			name: "changePassword",
-			component: ChangePasswordViewVue,
+			component: ChangePasswordView,
 		},
 		{
 			path: "/offers",
 			name: "offers",
 			component: OffersView,
+			props: (route) => ({
+				query: [route.query.categoryId, route.query.categoryName],
+			}),
+		},
+		{
+			path: "/offers/:id",
+			name: "offerDetails",
+			component: OfferDetails,
 		},
 		{
 			path: "/contact",
@@ -53,13 +66,26 @@ const router = createRouter({
 			name: "dashboard",
 			component: DashboardHome,
 		},
+		{
+			path: "/dashboard/offersList",
+			name: "dashboardOffersList",
+			component: DashboardOffersList,
+		},
+		{
+			path: "/dashboard/offersList/:id",
+			name: "dashboardOfferUpdate",
+			component: DashboardOfferUpdate,
+		},
+		{
+			path: "/dashboard/offerCreate",
+			name: "dashboardOfferCreate",
+			component: DashboardOfferCreate,
+		},
 	],
 });
 
 router.beforeEach(async (to, _from) => {
 	const token = localStorage.getItem("token");
-	console.log("token", token);
-
 	let userRole = 0;
 	if (token) {
 		const tokenDecoded: ITokenDecoded = jwt_decode(token);
@@ -68,16 +94,15 @@ router.beforeEach(async (to, _from) => {
 	const isAdmin = userRole === 1 || userRole === 2;
 
 	if (!isAdmin) {
-		// lister les routes interdites sauf isAdmin
-		if (to.name === "dashboard") {
+		if (to.name?.toString().includes("dashboard")) {
 			return { name: "auth" };
 		}
 	}
-
-	// if (to.name === "auth") {
-	// 	if (isAdmin) return { name: "dashboard" };
-	// 	else if (token) return { name: "home" };
-	// }
+	if (isAdmin) {
+		if (!to.name?.toString().includes("dashboard")) {
+			return { name: "dashboard" };
+		}
+	}
 });
 
 export default router;

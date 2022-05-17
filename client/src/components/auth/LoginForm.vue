@@ -46,13 +46,8 @@
 
 <script setup lang="ts">
 import { ref, onMounted, watch } from "vue";
-// import { useRouter } from "vue-router";
+import type { ICredentials } from "../../interfaces/ICredentials";
 
-// const click = (e) => {
-// 	console.log(e);
-// };
-
-// const router = useRouter();
 const email = ref("");
 const password = ref("");
 const showPassword = ref(false);
@@ -84,11 +79,6 @@ const toggleShowPassword = (elem: string) => {
 		showPassword.value = false;
 	}
 };
-
-interface ICredentials {
-	email: string;
-	password: string;
-}
 
 const emit = defineEmits<{
 	(e: "login", credentials: ICredentials): void;

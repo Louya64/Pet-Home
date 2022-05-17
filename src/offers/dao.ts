@@ -1,14 +1,92 @@
 import prisma from "../database";
 import { type OfferType, OfferUpdateType } from "./types";
 
-export const findAllOffers = async () => {
-	return await prisma.offers.findMany();
+export const findAllOffers = async (filterArray: any) => {
+	const entries = new Map(filterArray);
+	const obj = Object.fromEntries(entries);
+
+	let filters = {};
+	if (filterArray.length === 1) {
+		filters = obj;
+	} else if (filterArray.length > 1) {
+		filters = {
+			AND: obj,
+		};
+	}
+
+	return await prisma.offers.findMany({
+		where: filters,
+		select: {
+			id: true,
+			creation_date: true,
+			adoption_date: true,
+			status: {
+				select: {
+					name: true,
+				},
+			},
+			id_status: true,
+			animal_name: true,
+			age: true,
+			category: {
+				select: {
+					name: true,
+				},
+			},
+			id_category: true,
+			race: {
+				select: {
+					name: true,
+				},
+			},
+			id_race: true,
+			zipcode: true,
+			city: true,
+			identified: true,
+			vaccinated: true,
+			disabled: true,
+			disability: true,
+			description: true,
+		},
+	});
 };
 
 export const findOfferById = async (id: number) => {
 	return await prisma.offers.findUnique({
 		where: {
 			id: Number(id),
+		},
+		select: {
+			id: true,
+			creation_date: true,
+			adoption_date: true,
+			status: {
+				select: {
+					name: true,
+				},
+			},
+			id_status: true,
+			animal_name: true,
+			age: true,
+			category: {
+				select: {
+					name: true,
+				},
+			},
+			id_category: true,
+			race: {
+				select: {
+					name: true,
+				},
+			},
+			id_race: true,
+			zipcode: true,
+			city: true,
+			identified: true,
+			vaccinated: true,
+			disabled: true,
+			disability: true,
+			description: true,
 		},
 	});
 };

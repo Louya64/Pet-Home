@@ -1,4 +1,4 @@
-import type { FastifyInstance } from "fastify";
+import type { FastifyInstance, FastifyRequest } from "fastify";
 import { ParamsIdType, ErrorType } from "../commons/types";
 import { notFoundError, duplicateDataError } from "../commons/errorHelpers";
 import {
@@ -8,11 +8,52 @@ import {
 	updateOffer,
 	deleteOffer,
 } from "./dao";
-import { Offer, OfferType, OfferUpdate, OfferUpdateType } from "./types";
+import {
+	Offer,
+	OfferType,
+	OfferUpdate,
+	OfferUpdateType,
+	OfferReply,
+	OfferReplyType,
+} from "./types";
 
 const offerRouter = async (server: FastifyInstance) => {
-	server.get<{ Reply: OfferType[] }>("/", async (_request, reply) => {
-		const allOffers = await findAllOffers();
+	server.get<{
+		Querystring: FastifyRequest["Querystring"];
+		Reply: OfferReplyType[];
+	}>("/", async (request, reply) => {
+		let filterArray = [];
+		const animal_name = request.query.animal_name;
+		const id_category = Number(request.query.id_category);
+		const id_race = Number(request.query.id_race);
+		const zipcode = Number(request.query.zipcode);
+		const city = request.query.city;
+		const age = request.query.age;
+
+		filterArray.push(["id_status", { not: 3 }]);
+
+		if (animal_name) {
+			filterArray.push(["animal_name", animal_name]);
+		}
+		if (id_category) {
+			filterArray.push(["id_category", id_category]);
+		}
+		if (id_race) {
+			filterArray.push(["id_race", id_race]);
+		}
+		if (zipcode) {
+			filterArray.push(["zipcode", zipcode]);
+		}
+		if (city) {
+			filterArray.push(["city", city]);
+		}
+		if (age) {
+			const minAge = Number(age.split("-")[0]);
+			const maxAge = Number(age.split("-")[1]);
+			filterArray.push(["age", { gte: minAge, lte: maxAge }]);
+		}
+
+		const allOffers = await findAllOffers(filterArray);
 		reply.status(200).send(allOffers);
 	});
 
@@ -38,7 +79,6 @@ const offerRouter = async (server: FastifyInstance) => {
 		},
 		async (request, reply) => {
 			const { body: offer } = request;
-
 			const offerCreated = await createOffer(offer);
 			reply.status(200).send(offerCreated);
 		}
@@ -60,7 +100,6 @@ const offerRouter = async (server: FastifyInstance) => {
 		},
 		async (request, reply) => {
 			const { body: offer } = request;
-
 			const offerUpdated = await updateOffer(Number(request.params.id), offer);
 			reply.status(200).send(offerUpdated);
 		}

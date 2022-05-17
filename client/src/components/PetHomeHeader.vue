@@ -8,7 +8,42 @@
 			<RouterLink to="/" title="Revenir à l'accueil"
 				><img width="100" src="/dog-1532627.svg" alt=""
 			/></RouterLink>
-			<RouterLink to="/offers">Les animaux à adopter</RouterLink>
+			<div class="relative">
+				<div class="flex">
+					<div @click="categoryIsSelected">
+						<RouterLink to="/offers">Les animaux à adopter</RouterLink>
+					</div>
+
+					<div class="pl-5">
+						<font-awesome-icon
+							v-if="!showCategories"
+							class="mt-1 hover:cursor-pointer"
+							icon="chevron-down"
+							@click="() => (showCategories = true)"
+						/>
+						<font-awesome-icon
+							v-if="showCategories"
+							class="mt-1 hover:cursor-pointer"
+							icon="chevron-up"
+							@click="() => (showCategories = false)"
+						/>
+					</div>
+				</div>
+				<ul v-if="showCategories" class="absolute w-full p-2 bg-slate-700">
+					<li
+						class="hover:cursor-pointer hover:bg-orange-100"
+						v-for="category in categoriesList"
+						@click="categoryIsSelected"
+					>
+						<RouterLink
+							:key="category.name"
+							:to="`/offers?categoryId=${category.id}&categoryName=${category.name}`"
+							>{{ category.name }}</RouterLink
+						>
+					</li>
+				</ul>
+			</div>
+
 			<RouterLink to="/contact">Contactez-nous</RouterLink>
 		</nav>
 		<div class="flex justify-around items-center w-1/5">
@@ -56,12 +91,19 @@
 		</div>
 	</header>
 
-	<RouterView />
+	<!-- <RouterView /> -->
+	<router-view v-slot="{ Component, route }">
+		<transition name="fade">
+			<component :is="Component" :key="route.query" />
+		</transition>
+	</router-view>
 </template>
 
 <script setup lang="ts">
-import { ref, type Ref } from "vue";
+import { ref, type Ref, onMounted } from "vue";
 import { RouterLink, RouterView, useRouter } from "vue-router";
+import type { ICategoryRes } from "../interfaces/ICategory";
+import axios from "axios";
 
 if (
 	localStorage.theme === "dark" ||
@@ -87,6 +129,17 @@ const logout = () => {
 	localStorage.removeItem("token");
 	window.dispatchEvent(new Event("storage"));
 	router.push("/");
+};
+
+const showCategories = ref(false);
+let categoriesList: Ref<ICategoryRes[]> = ref([]);
+onMounted(() => {
+	axios.get(`${import.meta.env.VITE_URL_BACK}/categories`).then((res) => {
+		categoriesList.value = res.data;
+	});
+});
+const categoryIsSelected = () => {
+	showCategories.value = false;
 };
 </script>
 

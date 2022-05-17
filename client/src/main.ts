@@ -13,6 +13,11 @@ import {
 	faMessage,
 	faCircle,
 	faRightFromBracket,
+	faChevronDown,
+	faChevronUp,
+	faChevronRight,
+	faChevronLeft,
+	faMagnifyingGlass,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 
@@ -25,7 +30,12 @@ library.add(
 	faUser,
 	faMessage,
 	faCircle,
-	faRightFromBracket
+	faRightFromBracket,
+	faChevronDown,
+	faChevronUp,
+	faChevronRight,
+	faChevronLeft,
+	faMagnifyingGlass
 );
 
 const app = createApp(App);

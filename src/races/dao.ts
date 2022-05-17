@@ -1,8 +1,22 @@
 import prisma from "../database";
 import { type RaceType, RaceUpdateType } from "./types";
 
-export const findAllRaces = async () => {
-	return await prisma.races.findMany();
+export const findAllRaces = async (filterArray: any) => {
+	const entries = new Map(filterArray);
+	const obj = Object.fromEntries(entries);
+
+	let filters = {};
+	if (filterArray.length === 1) {
+		filters = obj;
+	} else if (filterArray.length > 1) {
+		filters = {
+			AND: obj,
+		};
+	}
+
+	return await prisma.races.findMany({
+		where: filters,
+	});
 };
 
 export const findRaceById = async (id: number) => {

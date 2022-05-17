@@ -1,5 +1,5 @@
 <template>
-	<div class="pt-[15vh] min-h-screen">
+	<div class="siteContainer">
 		<ChangePasswordForm @change-password="changePassword" />
 	</div>
 </template>
@@ -9,13 +9,8 @@ import { onMounted } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import axios from "axios";
 import jwt_decode from "jwt-decode";
-import ChangePasswordForm from "@/components/ChangePasswordForm.vue";
-
-interface ITokenDecoded {
-	id: number;
-	role: number;
-	iat: number;
-}
+import ChangePasswordForm from "@/components/auth/ChangePasswordForm.vue";
+import type { ITokenDecoded } from "../../interfaces/ITokenDecoded";
 
 const route = useRoute();
 const router = useRouter();

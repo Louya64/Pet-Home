@@ -20,6 +20,10 @@
 	.special-font {
 		@apply font-WaterBrush;
 	}
+
+	h1 {
+		@apply text-center text-2xl py-10;
+	}
 }
 
 @layer components {
@@ -37,12 +41,20 @@
 	}
 
 	.form {
-		@apply lg:p-20 pt-0 sm:px-20 sm:pb-10 px-10 pb-5;
+		@apply pt-0 px-10 pb-5 sm:px-20 sm:pb-10 lg:p-20;
 	}
 	.form-item {
 		@apply my-10 flex flex-col;
 	}
 	.form-item-input {
-		@apply my-3 text-lg p-1 border-2 dark:text-black;
+		@apply my-3 text-lg p-1 border-2 dark:text-black h-[40px];
+	}
+
+	.dashboardContainer {
+		@apply min-h-screen ml-60;
+	}
+
+	.siteContainer {
+		@apply pt-[15vh] min-h-screen;
 	}
 }

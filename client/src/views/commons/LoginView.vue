@@ -1,5 +1,5 @@
 <template>
-	<div v-if="registered" class="pt-[15vh] min-h-screen">
+	<div v-if="registered" class="siteContainer">
 		<h1 class="text-center sm:text-2xl mb-10">Connection</h1>
 		<p class="text-center mb-10">
 			Pas encore inscrit?
@@ -21,18 +21,10 @@ import { onMounted, ref } from "vue";
 import { useRouter } from "vue-router";
 import axios from "axios";
 import jwt_decode from "jwt-decode";
-import LoginForm from "@/components/LoginForm.vue";
-import RegistrationForm from "@/components/RegistrationForm.vue";
-
-interface ICredentials {
-	email: string;
-	password: string;
-}
-interface ITokenDecoded {
-	id: number;
-	role: number;
-	iat: number;
-}
+import LoginForm from "@/components/auth/LoginForm.vue";
+import RegistrationForm from "@/components/auth/RegistrationForm.vue";
+import type { ICredentials } from "../../interfaces/ICredentials";
+import type { ITokenDecoded } from "../../interfaces/ITokenDecoded";
 
 const router = useRouter();
 const registered = ref(true);
