@@ -6,28 +6,125 @@
 			class="w-full border-collapse border table-auto border-slate-500 text-center"
 		>
 			<thead>
-				<tr>
-					<td>Id <font-awesome-icon class="text-xs" icon="chevron-down" /></td>
-					<td>Photo</td>
-					<td class="relative" title="date de création">
-						Créat
-						<font-awesome-icon
-							class="text-xs absolute right-2 top-2"
-							icon="chevron-up"
-						/>
+				<tr class="text-xs">
+					<td>
+						<div class="flex justify-between items-center">
+							Id
+							<OrderByArrow fieldName="id" @arrow-clicked="updateOrderBy" />
+						</div>
 					</td>
-					<td title="date d'adoption">Adopt</td>
-					<td>statut</td>
-					<td title="nom de l'animal">Nom</td>
-					<td>age</td>
-					<td title="catégorie">Cat</td>
-					<td>race</td>
-					<td title="code postal">CP</td>
-					<td>ville</td>
-					<td title="identifié ?">Id ?</td>
-					<td title="vacciné ?">Vac ?</td>
-					<td title="handicapé ?">Hand ?</td>
-					<td title="type de handicap">Handicap</td>
+					<td>Photo</td>
+					<td title="date de création">
+						<div class="flex justify-between items-center">
+							Creat
+							<OrderByArrow
+								fieldName="creation_date"
+								@arrow-clicked="updateOrderBy"
+							/>
+						</div>
+					</td>
+					<td title="date d'adoption">
+						<div class="flex justify-between items-center">
+							Adopt
+							<OrderByArrow
+								fieldName="adoption_date"
+								@arrow-clicked="updateOrderBy"
+							/>
+						</div>
+					</td>
+					<td>
+						<div class="flex justify-between items-center">
+							statut
+							<OrderByArrow
+								fieldName="id_status"
+								@arrow-clicked="updateOrderBy"
+							/>
+						</div>
+					</td>
+					<td title="nom de l'animal">
+						<div class="flex justify-between items-center">
+							Nom
+							<OrderByArrow
+								fieldName="animal_name"
+								@arrow-clicked="updateOrderBy"
+							/>
+						</div>
+					</td>
+					<td>
+						<div class="flex justify-between items-center">
+							age
+							<OrderByArrow fieldName="age" @arrow-clicked="updateOrderBy" />
+						</div>
+					</td>
+					<td title="catégorie">
+						<div class="flex justify-between items-center">
+							Cat
+							<OrderByArrow
+								fieldName="id_category"
+								@arrow-clicked="updateOrderBy"
+							/>
+						</div>
+					</td>
+					<td>
+						<div class="flex justify-between items-center">
+							race
+							<OrderByArrow
+								fieldName="id_race"
+								@arrow-clicked="updateOrderBy"
+							/>
+						</div>
+					</td>
+					<td title="code postal">
+						<div class="flex justify-between items-center">
+							CP
+							<OrderByArrow
+								fieldName="zipcode"
+								@arrow-clicked="updateOrderBy"
+							/>
+						</div>
+					</td>
+					<td>
+						<div class="flex justify-between items-center">
+							ville
+							<OrderByArrow fieldName="city" @arrow-clicked="updateOrderBy" />
+						</div>
+					</td>
+					<td title="identifié ?">
+						<div class="flex justify-between items-center">
+							Id ?
+							<OrderByArrow
+								fieldName="identified"
+								@arrow-clicked="updateOrderBy"
+							/>
+						</div>
+					</td>
+					<td title="vacciné ?">
+						<div class="flex justify-between items-center">
+							Vac ?
+							<OrderByArrow
+								fieldName="vaccinated"
+								@arrow-clicked="updateOrderBy"
+							/>
+						</div>
+					</td>
+					<td title="handicapé ?">
+						<div class="flex justify-between items-center">
+							Hand ?
+							<OrderByArrow
+								fieldName="disabled"
+								@arrow-clicked="updateOrderBy"
+							/>
+						</div>
+					</td>
+					<td title="type de handicap">
+						<div class="flex justify-between items-center">
+							Handicap
+							<OrderByArrow
+								fieldName="disability"
+								@arrow-clicked="updateOrderBy"
+							/>
+						</div>
+					</td>
 					<td>description</td>
 					<td></td>
 					<td></td>
@@ -38,7 +135,7 @@
 					<td>{{ offer.id }}</td>
 					<td class="flex justify-center items-center">
 						<div class="overflow-hidden">
-							<Thumnail :id_offer="offer.id" :alt="offer.category.name" />
+							<Thumbnail :id_offer="offer.id" :alt="offer.category.name" />
 						</div>
 					</td>
 					<td>
@@ -77,7 +174,15 @@
 						}}
 					</td>
 					<td>{{ offer.category.name }}</td>
-					<td>{{ offer.race ? offer.race.name : "" }}</td>
+					<td>
+						{{
+							offer.race
+								? offer.race.name.length > 10
+									? offer.race.name.slice(0, 10) + "..."
+									: offer.race.name
+								: ""
+						}}
+					</td>
 					<td>{{ offer.zipcode }}</td>
 					<td>
 						{{
@@ -135,7 +240,11 @@
 						</button>
 					</td>
 
-					<td><button class="btn btn-red">Supprimer</button></td>
+					<td>
+						<button @click="confirmDelete(offer.id)" class="btn btn-red">
+							Supprimer
+						</button>
+					</td>
 				</tr>
 			</tbody>
 		</table>
@@ -145,43 +254,50 @@
 <script setup lang="ts">
 import axios from "axios";
 import { onMounted, ref, type Ref } from "vue";
-import Thumnail from "../../components/Thumbnail.vue";
+import Thumbnail from "@/components/offers/Thumbnail.vue";
 import { useRouter } from "vue-router";
+import type { IOfferRes } from "@/interfaces/IOffer";
+import OrderByArrow from "@/components/commons/OrderByArrow.vue";
 
-interface IOffer {
-	id: number;
-	creation_date: string;
-	adoption_date: string | null;
-	status: {
-		name: string;
-	};
-	animal_name: string;
-	age: number;
-	category: {
-		name: string;
-	};
-	race: {
-		name: string;
-	} | null;
-	zipcode: number;
-	city: string;
-	identified: boolean;
-	vaccinated: boolean;
-	disabled: boolean;
-	disability: string;
-	description: string;
-}
-let offersList: Ref<IOffer[]> = ref([]);
+let offersList: Ref<IOfferRes[]> = ref([]);
+const orderBy = ref("");
+
+const updateOrderBy = (order: string) => {
+	orderBy.value = `?orderBy=${order}`;
+	getOffersList();
+};
+
+const getOffersList = () => {
+	axios
+		.get(`${import.meta.env.VITE_URL_BACK}/offers${orderBy.value}`)
+		.then((res) => {
+			offersList.value = res.data;
+		});
+};
 
 onMounted(() => {
-	axios.get(`${import.meta.env.VITE_URL_BACK}/offers`).then((res) => {
-		offersList.value = res.data;
-	});
+	getOffersList();
 });
 
 const router = useRouter();
 
 const linkToOfferUpdate = (offerId: number) => {
 	router.push(`/dashboard/offersList/${offerId}`);
+};
+
+const confirmDelete = (id: number) => {
+	const confirmed = confirm(`Voulez-vous vraiment supprimer l'offre ${id} ?`);
+	if (confirmed) {
+		deleteOffer(id);
+	}
+};
+
+const deleteOffer = (id: number) => {
+	axios
+		.delete(`${import.meta.env.VITE_URL_BACK}/offers/${id}`)
+		.then((res) => {
+			getOffersList();
+		})
+		.catch((err) => {});
 };
 </script>

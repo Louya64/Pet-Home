@@ -1,32 +1,31 @@
 <template>
 	<div class="siteContainer">
-		<ChangePasswordForm @change-password="changePassword" />
+		<ChangePasswordForm
+			@change-password="changePassword"
+			:resultMessage="resultMessage"
+			:requestSuccess="requestSuccess"
+		/>
 	</div>
 </template>
 
 <script setup lang="ts">
-import { onMounted } from "vue";
+import { onMounted, ref } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import axios from "axios";
 import jwt_decode from "jwt-decode";
-import ChangePasswordForm from "@/components/ChangePasswordForm.vue";
-
-interface ITokenDecoded {
-	id: number;
-	role: number;
-	iat: number;
-}
+import ChangePasswordForm from "@/components/auth/ChangePasswordForm.vue";
+import type { ITokenDecoded } from "../../interfaces/ITokenDecoded";
 
 const route = useRoute();
 const router = useRouter();
 let userId: number;
-let requestResult = document.getElementById("requestResult");
+const resultMessage = ref("");
+const requestSuccess = ref(false);
 
 onMounted(() => {
 	const token = route.query.token as string;
 	const tokenDecoded: ITokenDecoded = jwt_decode(token);
 	userId = tokenDecoded.id;
-	requestResult = document.getElementById("requestResult");
 });
 
 const changePassword = (password: string, confirmedPassword: string) => {
@@ -37,21 +36,15 @@ const changePassword = (password: string, confirmedPassword: string) => {
 			data: { password: password, confirmedPassword: confirmedPassword },
 		})
 		.then(() => {
-			if (requestResult) {
-				requestResult?.classList.remove("text-red-400");
-				requestResult?.classList.add("text-green-400");
-				requestResult.textContent = "Redirection vers la page de connection...";
-			}
+			requestSuccess.value = true;
+			resultMessage.value = "Redirection vers la page de connection...";
 			setTimeout(() => {
 				router.push("/auth");
 			}, 3000);
 		})
 		.catch((err) => {
-			if (requestResult) {
-				requestResult?.classList.remove("text-green-400");
-				requestResult?.classList.add("text-red-400");
-				requestResult.textContent = err.response.data.message;
-			}
+			requestSuccess.value = false;
+			resultMessage.value = err.response.data.message;
 		});
 };
 </script>

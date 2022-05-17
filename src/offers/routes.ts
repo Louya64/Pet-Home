@@ -1,6 +1,5 @@
-import type { FastifyInstance, FastifyRequest } from "fastify";
+import type { FastifyInstance } from "fastify";
 import { ParamsIdType, ErrorType } from "../commons/types";
-import { notFoundError, duplicateDataError } from "../commons/errorHelpers";
 import {
 	findAllOffers,
 	findOfferById,
@@ -13,16 +12,38 @@ import {
 	OfferType,
 	OfferUpdate,
 	OfferUpdateType,
-	OfferReply,
 	OfferReplyType,
 } from "./types";
 
 const offerRouter = async (server: FastifyInstance) => {
+	interface FastifyRequest {
+		Querystring: {
+			id_category: number;
+			animal_name: string;
+			id_offer: number;
+			id_race: number;
+			zipcode: number;
+			city: string;
+			age: string;
+			orderBy: string;
+		};
+	}
 	server.get<{
 		Querystring: FastifyRequest["Querystring"];
 		Reply: OfferReplyType[];
 	}>("/", async (request, reply) => {
 		let filterArray = [];
+		let orderBy = {};
+		if (request.query.orderBy) {
+			orderBy = {
+				[request.query.orderBy.split("-")[0]]:
+					request.query.orderBy.split("-")[1],
+			};
+		} else {
+			orderBy = {
+				id: "asc",
+			};
+		}
 		const animal_name = request.query.animal_name;
 		const id_category = Number(request.query.id_category);
 		const id_race = Number(request.query.id_race);
@@ -53,7 +74,7 @@ const offerRouter = async (server: FastifyInstance) => {
 			filterArray.push(["age", { gte: minAge, lte: maxAge }]);
 		}
 
-		const allOffers = await findAllOffers(filterArray);
+		const allOffers = await findAllOffers(filterArray, orderBy);
 		reply.status(200).send(allOffers);
 	});
 

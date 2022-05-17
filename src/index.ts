@@ -34,26 +34,6 @@ declare module "fastify" {
 			FACEBOOK_SECRET: string;
 		};
 	}
-	interface FastifyRequest {
-		Querystring: {
-			id_role: number;
-			email: string;
-			username: string;
-			firstname: string;
-			lastname: string;
-			phone_number: string;
-			order: string;
-			desc: boolean;
-			id_category: number;
-			animal_name: string;
-			id_offer: number;
-			id_race: number;
-			zipcode: number;
-			city: string;
-			age: string;
-			orderBy: string;
-		};
-	}
 }
 
 const schema = {

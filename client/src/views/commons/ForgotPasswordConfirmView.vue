@@ -1,19 +1,20 @@
 <template>
 	<div class="siteContainer">
-		<ForgotPasswordForm @send-link="sendLink" />
+		<ForgotPasswordForm
+			@send-link="sendLink"
+			:resultMessage="resultMessage"
+			:requestSuccess="requestSuccess"
+		/>
 	</div>
 </template>
 
 <script setup lang="ts">
-import { onMounted } from "vue";
+import { ref } from "vue";
 import axios from "axios";
-import ForgotPasswordForm from "@/components/ForgotPasswordForm.vue";
+import ForgotPasswordForm from "@/components/auth/ForgotPasswordForm.vue";
 
-let requestResult = document.getElementById("requestResult");
-
-onMounted(() => {
-	requestResult = document.getElementById("requestResult");
-});
+const resultMessage = ref("");
+const requestSuccess = ref(false);
 
 const sendLink = (email: string) => {
 	axios
@@ -23,19 +24,13 @@ const sendLink = (email: string) => {
 			data: { email: email },
 		})
 		.then(() => {
-			if (requestResult) {
-				requestResult?.classList.remove("text-red-400");
-				requestResult?.classList.add("text-green-400");
-				requestResult.textContent =
-					"Un email vous a été envoyé avec un lien pour changer de mot de passe (cela peut prendre quelques minutes)";
-			}
+			requestSuccess.value = true;
+			resultMessage.value =
+				"Un email vous a été envoyé avec un lien pour changer de mot de passe (cela peut prendre quelques minutes)";
 		})
 		.catch((err) => {
-			if (requestResult) {
-				requestResult?.classList.remove("text-green-400");
-				requestResult?.classList.add("text-red-400");
-				requestResult.textContent = err.response.data.message;
-			}
+			requestSuccess.value = false;
+			resultMessage.value = err.response.data.message;
 		});
 };
 </script>

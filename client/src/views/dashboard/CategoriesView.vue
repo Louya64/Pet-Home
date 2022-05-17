@@ -5,10 +5,7 @@
 			:categoriesList="categoriesList"
 			@requestResult="displayRequestResult"
 		/>
-		<CategoryRequestResult
-			:resultMessage="resultMessage"
-			:success="requestSuccess"
-		/>
+		<RequestResult :resultMessage="resultMessage" :success="requestSuccess" />
 		<CategoryTable
 			:categoriesList="categoriesList"
 			@requestResult="displayRequestResult"
@@ -21,7 +18,7 @@
 import { onMounted, ref, type Ref } from "vue";
 import axios from "axios";
 import CategoryCreateForm from "../../components/categories/CategoryCreateForm.vue";
-import CategoryRequestResult from "../../components/commons/RequestResult.vue";
+import RequestResult from "../../components/commons/RequestResult.vue";
 import CategoryTable from "../../components/categories/CategoryTable.vue";
 
 interface ICategory {

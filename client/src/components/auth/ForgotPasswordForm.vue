@@ -11,7 +11,7 @@
 				<label for="email">Email</label>
 				<input class="form-item-input" type="text" id="email" v-model="email" />
 			</div>
-			<div class="pb-10 text-center" id="requestResult"></div>
+			<RequestResult :resultMessage="resultMessage" :success="requestSuccess" />
 			<div class="flex justify-end">
 				<button class="btn btn-green">Valider</button>
 			</div>
@@ -20,24 +20,20 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref, watch } from "vue";
+import { ref } from "vue";
+import RequestResult from "../../components/commons/RequestResult.vue";
 
+interface Props {
+	resultMessage: string;
+	requestSuccess: boolean;
+}
+
+defineProps<Props>();
 const emit = defineEmits<{
 	(e: "sendLink", email: string): void;
 }>();
 
 const email = ref("");
-let requestResult = document.getElementById("requestResult");
-
-onMounted(() => {
-	requestResult = document.getElementById("requestResult");
-});
-
-watch(email, () => {
-	if (requestResult) {
-		requestResult.textContent = "";
-	}
-});
 
 const forgotPassword = (email: string) => {
 	emit("sendLink", email);

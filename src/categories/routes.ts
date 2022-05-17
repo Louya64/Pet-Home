@@ -17,6 +17,11 @@ import {
 } from "./types";
 
 const categoryRouter = async (server: FastifyInstance) => {
+	interface FastifyRequest {
+		Querystring: {
+			orderBy: string;
+		};
+	}
 	server.get<{
 		Querystring: FastifyRequest["Querystring"];
 		Reply: CategoryType[];

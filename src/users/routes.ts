@@ -1,4 +1,4 @@
-import type { FastifyInstance, FastifyRequest } from "fastify";
+import type { FastifyInstance } from "fastify";
 import bcrypt from "fastify-bcrypt";
 import { ParamsIdType, ErrorType } from "../commons/types";
 import {
@@ -22,6 +22,17 @@ import {
 import { User, UserType, UserUpdate, UserUpdateType } from "./types";
 
 const userRouter = async (server: FastifyInstance) => {
+	interface FastifyRequest {
+		Querystring: {
+			id_role: number;
+			email: string;
+			username: string;
+			firstname: string;
+			lastname: string;
+			phone_number: string;
+			orderBy: string;
+		};
+	}
 	server.register(bcrypt);
 	//ajout middlware verif adminAccessOnly
 	// scroll infini
@@ -69,16 +80,10 @@ const userRouter = async (server: FastifyInstance) => {
 				};
 			}
 
-			// orderBy
-			const order = request.query.order;
-			const desc = request.query.desc;
-			if (order && desc) {
+			if (request.query.orderBy) {
 				orderBy = {
-					[order]: "desc",
-				};
-			} else if (order) {
-				orderBy = {
-					[order]: "asc",
+					[request.query.orderBy.split("-")[0]]:
+						request.query.orderBy.split("-")[1],
 				};
 			} else {
 				orderBy = {

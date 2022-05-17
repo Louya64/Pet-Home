@@ -1,7 +1,7 @@
 import prisma from "../database";
 import { type CategoryType, CategoryUpdateType } from "./types";
 
-export const findAllCategories = async (orderBy: any) => {
+export const findAllCategories = async (orderBy: object) => {
 	return await prisma.categories.findMany({
 		orderBy: orderBy,
 	});

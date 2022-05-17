@@ -1,7 +1,7 @@
 import prisma from "../database";
 import { type OfferType, OfferUpdateType } from "./types";
 
-export const findAllOffers = async (filterArray: any) => {
+export const findAllOffers = async (filterArray: any, orderBy: object) => {
 	const entries = new Map(filterArray);
 	const obj = Object.fromEntries(entries);
 
@@ -48,6 +48,7 @@ export const findAllOffers = async (filterArray: any) => {
 			disability: true,
 			description: true,
 		},
+		orderBy: orderBy,
 	});
 };
 

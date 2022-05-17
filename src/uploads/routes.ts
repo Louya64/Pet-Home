@@ -1,4 +1,4 @@
-import type { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
+import type { FastifyInstance } from "fastify";
 import multer from "fastify-multer";
 import { File, FilesObject } from "fastify-multer/lib/interfaces";
 import { createPhoto, findAllPhotos, updatePhoto, deletePhoto } from "./dao";
@@ -26,6 +26,11 @@ const storage = multer.diskStorage({
 const upload = multer({ storage: storage });
 
 const uploadsRouter = async (server: FastifyInstance) => {
+	interface FastifyRequest {
+		Querystring: {
+			id_offer: number;
+		};
+	}
 	server.get<{
 		Querystring: FastifyRequest["Querystring"];
 		Reply: PhotoType[];

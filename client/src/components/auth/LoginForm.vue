@@ -36,7 +36,7 @@
 					Mot de passe oublié?
 				</p>
 			</div>
-			<div class="pb-10 text-center text-red-400" id="requestResult"></div>
+			<RequestResult :resultMessage="resultMessage" :success="requestSuccess" />
 			<div class="flex justify-end">
 				<button class="btn btn-green">Se connecter</button>
 			</div>
@@ -45,28 +45,20 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, watch } from "vue";
+import { ref } from "vue";
+import type { ICredentials } from "../../interfaces/ICredentials";
+import RequestResult from "../../components/commons/RequestResult.vue";
+
+interface Props {
+	resultMessage: string;
+	requestSuccess: boolean;
+}
+
+defineProps<Props>();
 
 const email = ref("");
 const password = ref("");
 const showPassword = ref(false);
-let requestResult = document.getElementById("requestResult");
-
-onMounted(() => {
-	requestResult = document.getElementById("requestResult");
-});
-
-watch(email, () => {
-	if (requestResult) {
-		requestResult.textContent = "";
-	}
-});
-
-watch(password, () => {
-	if (requestResult) {
-		requestResult.textContent = "";
-	}
-});
 
 const toggleShowPassword = (elem: string) => {
 	const inputToToggle = document.getElementById(elem);
@@ -78,11 +70,6 @@ const toggleShowPassword = (elem: string) => {
 		showPassword.value = false;
 	}
 };
-
-interface ICredentials {
-	email: string;
-	password: string;
-}
 
 const emit = defineEmits<{
 	(e: "login", credentials: ICredentials): void;

@@ -21,7 +21,7 @@
 						class="hover:cursor-pointer hover:scale-105"
 						width="250"
 						:src="`${urlBack}/image/${photo.path}`"
-						:alt="offer.category.name"
+						:alt="offer?.category.name"
 					/>
 				</div>
 			</div>
@@ -63,40 +63,12 @@
 import axios from "axios";
 import { ref, onMounted, type Ref } from "vue";
 import { useRoute } from "vue-router";
-
-interface IOffer {
-	id: number;
-	creation_date: string;
-	adoption_date: string | null;
-	status: {
-		name: string;
-	};
-	animal_name: string;
-	age: number;
-	category: {
-		name: string;
-	};
-	race: {
-		name: string;
-	} | null;
-	zipcode: number;
-	city: string;
-	identified: boolean;
-	vaccinated: boolean;
-	disabled: boolean;
-	disability: string;
-	description: string;
-}
-interface IPhoto {
-	id: number;
-	id_offer: number;
-	main: boolean;
-	path: string;
-}
+import type { IOfferRes } from "../../interfaces/IOffer";
+import type { IPhoto } from "../../interfaces/IPhoto";
 
 const route = useRoute();
 const urlBack = import.meta.env.VITE_URL_BACK;
-const offer: Ref<IOffer | undefined> = ref();
+const offer: Ref<IOfferRes | undefined> = ref();
 const photos: Ref<IPhoto[] | undefined> = ref();
 const photosDisplayed = ref();
 let firstPhotoIndex = 0;
