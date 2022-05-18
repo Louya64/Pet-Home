@@ -14,6 +14,7 @@ import DashboardHome from "../views/dashboard/HomeView.vue";
 import DashboardOffersList from "../views/dashboard/OffersListView.vue";
 import DashboardOfferCreate from "@/views/dashboard/OfferCreateView.vue";
 import DashboardOfferUpdate from "@/views/dashboard/OfferUpdateView.vue";
+import DashboardCategories from "@/views/dashboard/CategoriesView.vue";
 
 import { createRouter, createWebHistory } from "vue-router";
 import jwt_decode from "jwt-decode";
@@ -80,6 +81,12 @@ const router = createRouter({
 			path: "/dashboard/offerCreate",
 			name: "dashboardOfferCreate",
 			component: DashboardOfferCreate,
+		},
+
+		{
+			path: "/dashboard/categories",
+			name: "dashboardCategories",
+			component: DashboardCategories,
 		},
 	],
 });

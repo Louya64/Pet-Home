@@ -8,7 +8,12 @@
 			</button>
 		</p>
 
-		<LoginForm @login="login" @forgotPassword="forgotPassword" />
+		<LoginForm
+			@login="login"
+			@forgotPassword="forgotPassword"
+			:resultMessage="resultMessage"
+			:requestSuccess="requestSuccess"
+		/>
 	</div>
 
 	<div v-else>
@@ -17,22 +22,19 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref } from "vue";
+import { ref } from "vue";
 import { useRouter } from "vue-router";
 import axios from "axios";
 import jwt_decode from "jwt-decode";
 import LoginForm from "@/components/auth/LoginForm.vue";
 import RegistrationForm from "@/components/auth/RegistrationForm.vue";
-import type { ICredentials } from "../../interfaces/ICredentials";
-import type { ITokenDecoded } from "../../interfaces/ITokenDecoded";
+import type { ICredentials } from "@/interfaces/ICredentials";
+import type { ITokenDecoded } from "@/interfaces/ITokenDecoded";
 
 const router = useRouter();
 const registered = ref(true);
-let requestResult = document.getElementById("requestResult");
-
-onMounted(() => {
-	requestResult = document.getElementById("requestResult");
-});
+const resultMessage = ref("");
+const requestSuccess = ref(false);
 
 const login = async (credentials: ICredentials) => {
 	await axios
@@ -54,9 +56,8 @@ const login = async (credentials: ICredentials) => {
 			}
 		})
 		.catch((err) => {
-			if (requestResult) {
-				requestResult.textContent = err.response.data.message;
-			}
+			requestSuccess.value = false;
+			resultMessage.value = err.response.data.message;
 		});
 };
 

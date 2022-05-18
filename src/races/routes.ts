@@ -1,6 +1,6 @@
-import type { FastifyInstance, FastifyRequest } from "fastify";
+import type { FastifyInstance } from "fastify";
 import { ParamsIdType, ErrorType } from "../commons/types";
-import { notFoundError, duplicateDataError } from "../commons/errorHelpers";
+import { duplicateDataError } from "../commons/errorHelpers";
 import {
 	findAllRaces,
 	findRaceById,
@@ -12,6 +12,11 @@ import {
 import { Race, RaceType, RaceUpdate, RaceUpdateType } from "./types";
 
 const raceRouter = async (server: FastifyInstance) => {
+	interface FastifyRequest {
+		Querystring: {
+			id_category: number;
+		};
+	}
 	server.get<{ Querystring: FastifyRequest["Querystring"]; Reply: RaceType[] }>(
 		"/",
 		async (request, reply) => {

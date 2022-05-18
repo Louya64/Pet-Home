@@ -62,7 +62,7 @@
 					icon="eye"
 				/>
 			</div>
-			<div class="pb-10 text-center" id="requestResult"></div>
+			<RequestResult :resultMessage="resultMessage" :success="requestSuccess" />
 			<div class="flex justify-end">
 				<button class="btn btn-green">Valider</button>
 			</div>
@@ -71,7 +71,15 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref, watch } from "vue";
+import { ref, watch } from "vue";
+import RequestResult from "@/components/commons/RequestResult.vue";
+
+interface Props {
+	resultMessage: string;
+	requestSuccess: boolean;
+}
+
+defineProps<Props>();
 
 const emit = defineEmits<{
 	(e: "changePassword", password: string, confirmedPassword: string): void;
@@ -82,16 +90,8 @@ const showPassword = ref(false);
 const confirmedPassword = ref("");
 const showConfirmedPassword = ref(false);
 const passwordIsConfirmed = ref(false);
-let requestResult = document.getElementById("requestResult");
-
-onMounted(() => {
-	requestResult = document.getElementById("requestResult");
-});
 
 watch(password, (newVal) => {
-	if (requestResult) {
-		requestResult.textContent = "";
-	}
 	if (newVal === confirmedPassword.value && confirmedPassword.value !== "") {
 		passwordIsConfirmed.value = true;
 	} else {
@@ -100,9 +100,6 @@ watch(password, (newVal) => {
 });
 
 watch(confirmedPassword, (newVal) => {
-	if (requestResult) {
-		requestResult.textContent = "";
-	}
 	if (newVal === password.value && password.value !== "") {
 		passwordIsConfirmed.value = true;
 	} else {

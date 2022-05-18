@@ -277,8 +277,8 @@ import axios from "axios";
 import SearchTag from "./SearchTag.vue";
 import SearchFieldHeader from "./SearchFieldHeader.vue";
 import OfferInput from "./OfferInput.vue";
-import type { ICategoryRes } from "../../interfaces/ICategory";
-import type { IRaceRes } from "../../interfaces/IRace";
+import type { ICategoryRes } from "@/interfaces/ICategory";
+import type { IRaceRes } from "@/interfaces/IRace";
 import { useRoute } from "vue-router";
 
 interface Props {

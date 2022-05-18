@@ -147,7 +147,10 @@
 						v-model="phone_number"
 					/>
 				</div>
-				<div class="pb-10 text-center" id="requestResult"></div>
+				<RequestResult
+					:resultMessage="resultMessage"
+					:success="requestSuccess"
+				/>
 				<div class="flex justify-end">
 					<button class="btn btn-green">Créer le compte</button>
 				</div>
@@ -157,10 +160,11 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, watch } from "vue";
+import { ref, watch } from "vue";
 import { useRouter } from "vue-router";
-import type { IUser } from "../../interfaces/IUser";
+import type { IUser } from "@/interfaces/IUser";
 import axios from "axios";
+import RequestResult from "@/components/commons/RequestResult.vue";
 
 const emit = defineEmits<{
 	(e: "alreadyRegistered"): void;
@@ -177,22 +181,10 @@ const username = ref("");
 const firstname = ref("");
 const lastname = ref("");
 const phone_number = ref("");
-let requestResult = document.getElementById("requestResult");
-
-onMounted(() => {
-	requestResult = document.getElementById("requestResult");
-});
-
-watch(email, () => {
-	if (requestResult) {
-		requestResult.textContent = "";
-	}
-});
+const resultMessage = ref("");
+const requestSuccess = ref(false);
 
 watch(password, (newVal) => {
-	if (requestResult) {
-		requestResult.textContent = "";
-	}
 	if (newVal === confirmedPassword.value && confirmedPassword.value !== "") {
 		passwordIsConfirmed.value = true;
 	} else {
@@ -201,9 +193,6 @@ watch(password, (newVal) => {
 });
 
 watch(confirmedPassword, (newVal) => {
-	if (requestResult) {
-		requestResult.textContent = "";
-	}
 	if (newVal === password.value && password.value !== "") {
 		passwordIsConfirmed.value = true;
 	} else {
@@ -212,37 +201,10 @@ watch(confirmedPassword, (newVal) => {
 });
 
 watch(confirmedPassword, (newVal) => {
-	if (requestResult) {
-		requestResult.textContent = "";
-	}
 	if (newVal === password.value && password.value !== "") {
 		passwordIsConfirmed.value = true;
 	} else {
 		passwordIsConfirmed.value = false;
-	}
-});
-
-watch(username, () => {
-	if (requestResult) {
-		requestResult.textContent = "";
-	}
-});
-
-watch(firstname, () => {
-	if (requestResult) {
-		requestResult.textContent = "";
-	}
-});
-
-watch(lastname, () => {
-	if (requestResult) {
-		requestResult.textContent = "";
-	}
-});
-
-watch(phone_number, () => {
-	if (requestResult) {
-		requestResult.textContent = "";
 	}
 });
 
@@ -269,12 +231,8 @@ const toggleShowPassword = (elem: string) => {
 
 const register = async (userData: IUser) => {
 	if (!passwordIsConfirmed.value) {
-		if (requestResult) {
-			requestResult?.classList.remove("text-green-400");
-			requestResult?.classList.add("text-red-400");
-			requestResult.textContent =
-				"Le mot de passe n'a pas été confirmé correctement";
-		}
+		requestSuccess.value = false;
+		resultMessage.value = "Le mot de passe n'a pas été confirmé correctement";
 	} else {
 		await axios
 			.request({
@@ -283,21 +241,15 @@ const register = async (userData: IUser) => {
 				data: userData,
 			})
 			.then((res) => {
-				if (requestResult) {
-					requestResult?.classList.add("text-green-400");
-					requestResult?.classList.remove("text-red-400");
-					requestResult.textContent = "Votre compte a bien été enregistré";
-				}
+				requestSuccess.value = true;
+				resultMessage.value = "Votre compte a bien été enregistré";
 				localStorage.setItem("token", res.data);
 				window.dispatchEvent(new Event("storage"));
 				router.push("/");
 			})
 			.catch((err) => {
-				if (requestResult) {
-					requestResult?.classList.remove("text-green-400");
-					requestResult?.classList.add("text-red-400");
-					requestResult.textContent = err.response.data.message;
-				}
+				requestSuccess.value = false;
+				resultMessage.value = err.response.data.message;
 			});
 	}
 };

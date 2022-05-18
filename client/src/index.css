@@ -51,7 +51,7 @@
 	}
 
 	.dashboardContainer {
-		@apply min-h-screen ml-60;
+		@apply min-h-screen ml-60 pb-60;
 	}
 
 	.siteContainer {

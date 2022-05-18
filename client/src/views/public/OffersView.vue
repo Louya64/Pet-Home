@@ -34,10 +34,10 @@
 <script setup lang="ts">
 import axios from "axios";
 import { onMounted, ref, type Ref } from "vue";
-import OfferCard from "../../components/offers/OfferCard.vue";
-import OfferFilters from "../../components/offers/OfferFilters.vue";
+import OfferCard from "@/components/offers/OfferCard.vue";
+import OfferFilters from "@/components/offers/OfferFilters.vue";
 import { useRoute } from "vue-router";
-import type { IOfferRes } from "../../interfaces/IOffer";
+import type { IOfferRes } from "@/interfaces/IOffer";
 
 const route = useRoute();
 let offersList: Ref<IOfferRes[]> = ref([]);

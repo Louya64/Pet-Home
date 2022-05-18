@@ -39,7 +39,7 @@
 
 <script setup lang="ts">
 import { ref, onMounted, type Ref, computed } from "vue";
-import type { IPhoto } from "../../interfaces/IPhoto";
+import type { IPhoto } from "@/interfaces/IPhoto";
 import axios from "axios";
 
 interface Props {
@@ -48,6 +48,9 @@ interface Props {
 }
 
 const props = defineProps<Props>();
+const emit = defineEmits<{
+	(e: "photosEmpty"): void;
+}>();
 const urlBack = import.meta.env.VITE_URL_BACK;
 const category = ref(props.offerCategory);
 const photos: Ref<IPhoto[] | undefined> = ref();
@@ -76,6 +79,8 @@ const getPhotos = () => {
 			if (res.data.length) {
 				photos.value = res.data;
 				mainPhotoId = res.data.filter((photo: IPhoto) => photo.main)[0].id;
+			} else {
+				emit("photosEmpty");
 			}
 		});
 };
