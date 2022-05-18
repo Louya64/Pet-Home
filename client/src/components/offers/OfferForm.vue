@@ -262,7 +262,11 @@ import axios from "axios";
 import Switch from "./Switch.vue";
 import PhotosDisplayed from "./PhotosDisplayed.vue";
 import RequestResult from "@/components/commons/RequestResult.vue";
-import type { IOfferRes, IOfferCreate } from "@/interfaces/IOffer";
+import type {
+	IOfferRes,
+	IOfferCreate,
+	IOfferCreateOrUpdate,
+} from "@/interfaces/IOffer";
 import type { ICategoryRes } from "@/interfaces/ICategory";
 import type { IRaceRes } from "@/interfaces/IRace";
 import type { IOfferStatusRes } from "@/interfaces/IOfferStatus";
@@ -293,7 +297,7 @@ const description = ref("");
 const noPhotos = ref(false);
 const resultMessage = ref("");
 const requestSuccess = ref(false);
-const images = ref();
+const images: Ref<FileList | null> = ref(null);
 const id_status = ref(1);
 
 if (props.offer) {
@@ -353,8 +357,8 @@ const resetRace = () => {
 	id_race.value = null;
 };
 
-const updateImages = (e: any) => {
-	images.value = e.target.files;
+const updateImages = (e: Event) => {
+	images.value = (<HTMLInputElement>e.target).files;
 };
 
 const submit = async (data: IOfferCreate) => {
@@ -362,19 +366,19 @@ const submit = async (data: IOfferCreate) => {
 
 	if (images.value) {
 		const arrayFiles = Array.from(images.value);
-		arrayFiles.map((file: any) => {
+		arrayFiles.map((file: File) => {
 			formData.append("photos", file);
 		});
 	}
 
-	let dataToSend: any = { ...data };
+	let dataToSend: IOfferCreateOrUpdate = { ...data };
 	if (props.offer) {
 		if (props.offer.id_status === 1 && id_status.value !== 1) {
 			dataToSend = { ...dataToSend, adoption_date: new Date() };
 		}
 	}
 
-	Object.entries(dataToSend).forEach(([k, v]: any[]) => {
+	Object.entries(dataToSend).forEach(([k, v]: [string, string | Blob]) => {
 		formData.append(k, v);
 	});
 

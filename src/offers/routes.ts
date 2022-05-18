@@ -10,7 +10,7 @@ import {
 	deleteOffer,
 } from "./dao";
 import { createPhoto, findAllPhotos } from "../uploads/dao";
-import { OfferType, OfferReplyType } from "./types";
+import { OfferType, OfferReplyType, OfferFromMulterType } from "./types";
 import { unlink } from "node:fs/promises";
 
 type FilesInRequest = FilesObject | Partial<File>[];
@@ -36,6 +36,7 @@ const upload = multer({ storage: storage });
 const offerRouter = async (server: FastifyInstance) => {
 	interface FastifyRequest {
 		Querystring: {
+			id_status: number;
 			id_category: number;
 			animal_name: string;
 			id_offer: number;
@@ -51,7 +52,6 @@ const offerRouter = async (server: FastifyInstance) => {
 		Querystring: FastifyRequest["Querystring"];
 		Reply: OfferReplyType[];
 	}>("/", async (request, reply) => {
-		let filterArray = [];
 		let orderBy = {};
 		if (request.query.orderBy) {
 			orderBy = {
@@ -63,6 +63,9 @@ const offerRouter = async (server: FastifyInstance) => {
 				id: "asc",
 			};
 		}
+
+		let filterArray: [string, string | number | Object][] = [];
+		const id_status = Number(request.query.id_status);
 		const animal_name = request.query.animal_name;
 		const id_category = Number(request.query.id_category);
 		const id_race = Number(request.query.id_race);
@@ -70,7 +73,11 @@ const offerRouter = async (server: FastifyInstance) => {
 		const city = request.query.city;
 		const age = request.query.age;
 
-		filterArray.push(["id_status", { not: 3 }]);
+		if (id_status) {
+			filterArray.push(["id_status", id_status]);
+		} else {
+			filterArray.push(["id_status", { not: 3 }]);
+		}
 
 		if (animal_name) {
 			filterArray.push(["animal_name", animal_name]);
@@ -107,14 +114,14 @@ const offerRouter = async (server: FastifyInstance) => {
 		}
 	);
 
-	server.post<{ Body: any; Reply: string | ErrorType }>(
+	server.post<{ Body: OfferFromMulterType; Reply: string | ErrorType }>(
 		"/",
 		{
 			preHandler: upload.array("photos", 25),
 		},
 		async (request, reply) => {
 			const { body: offer } = request;
-			const offerToCreate = {
+			const offerToCreate: OfferType = {
 				animal_name: offer.animal_name,
 				age: Number(offer.age),
 				id_category: Number(offer.id_category),
@@ -130,16 +137,18 @@ const offerRouter = async (server: FastifyInstance) => {
 			};
 			const offerCreated = await createOffer(offerToCreate);
 			const photos = request.files as Partial<File>[];
-			photos.map(async (photo: any, index) => {
+			photos.map(async (photo: Partial<File>, index) => {
 				let main = false;
 				if (index === 0) {
 					main = true;
 				}
-				await createPhoto({
-					id_offer: offerCreated.id,
-					path: photo.filename,
-					main: main,
-				});
+				if (photo.filename) {
+					await createPhoto({
+						id_offer: offerCreated.id,
+						path: photo.filename,
+						main: main,
+					});
+				}
 			});
 			reply.status(201).send("ok");
 		}
@@ -147,7 +156,7 @@ const offerRouter = async (server: FastifyInstance) => {
 
 	server.put<{
 		Params: ParamsIdType;
-		Body: any;
+		Body: OfferFromMulterType;
 		Reply: string | ErrorType;
 	}>(
 		"/:id",
@@ -177,18 +186,20 @@ const offerRouter = async (server: FastifyInstance) => {
 			);
 			const photos = request.files as Partial<File>[];
 			const offerAlreadyHasPhotos = await findAllPhotos([
-				{ id_offer: offerUpdated.id },
+				["id_offer", offerUpdated.id],
 			]);
-			photos.map(async (photo: any, index) => {
+			photos.map(async (photo: Partial<File>, index) => {
 				let main = false;
 				if (index === 0 && !offerAlreadyHasPhotos.length) {
 					main = true;
 				}
-				await createPhoto({
-					id_offer: offerUpdated.id,
-					path: photo.filename,
-					main: main,
-				});
+				if (photo.filename) {
+					await createPhoto({
+						id_offer: offerUpdated.id,
+						path: photo.filename,
+						main: main,
+					});
+				}
 			});
 			reply.status(200).send("ok");
 		}
@@ -198,7 +209,7 @@ const offerRouter = async (server: FastifyInstance) => {
 		"/:id",
 		async (request, reply) => {
 			const offerPhotos = await findAllPhotos([
-				{ id_offer: Number(request.params.id) },
+				["id_offer", Number(request.params.id)],
 			]);
 			await deleteOffer(Number(request.params.id));
 

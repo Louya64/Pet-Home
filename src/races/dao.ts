@@ -1,7 +1,10 @@
 import prisma from "../database";
 import { type RaceType, RaceUpdateType } from "./types";
 
-export const findAllRaces = async (filterArray: any) => {
+export const findAllRaces = async (
+	filterArray: [string, string | number | Object][],
+	orderBy: object
+) => {
 	const entries = new Map(filterArray);
 	const obj = Object.fromEntries(entries);
 
@@ -16,6 +19,7 @@ export const findAllRaces = async (filterArray: any) => {
 
 	return await prisma.races.findMany({
 		where: filters,
+		orderBy: orderBy,
 	});
 };
 

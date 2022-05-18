@@ -1,9 +1,23 @@
 import prisma from "../database";
 import { UserUpdateType } from "./types";
 
-export const findAllUsers = async (filter: any, orderBy: any) => {
+export const findAllUsers = async (
+	filterArray: [string, string | number | Object][],
+	orderBy: Object
+) => {
+	const entries = new Map(filterArray);
+	const obj = Object.fromEntries(entries);
+
+	let filters = {};
+	if (filterArray.length === 1) {
+		filters = obj;
+	} else if (filterArray.length > 1) {
+		filters = {
+			AND: obj,
+		};
+	}
 	return await prisma.users.findMany({
-		where: filter,
+		where: filters,
 		select: {
 			id: true,
 			id_role: true,
