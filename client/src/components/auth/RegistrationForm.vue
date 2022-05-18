@@ -162,9 +162,9 @@
 <script setup lang="ts">
 import { ref, watch } from "vue";
 import { useRouter } from "vue-router";
-import type { IUser } from "../../interfaces/IUser";
+import type { IUser } from "@/interfaces/IUser";
 import axios from "axios";
-import RequestResult from "../../components/commons/RequestResult.vue";
+import RequestResult from "@/components/commons/RequestResult.vue";
 
 const emit = defineEmits<{
 	(e: "alreadyRegistered"): void;

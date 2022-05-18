@@ -1,4 +1,6 @@
 import type { FastifyInstance } from "fastify";
+import multer from "fastify-multer";
+import { File, FilesObject } from "fastify-multer/lib/interfaces";
 import { ParamsIdType, ErrorType } from "../commons/types";
 import {
 	findAllOffers,
@@ -7,13 +9,29 @@ import {
 	updateOffer,
 	deleteOffer,
 } from "./dao";
-import {
-	Offer,
-	OfferType,
-	OfferUpdate,
-	OfferUpdateType,
-	OfferReplyType,
-} from "./types";
+import { createPhoto, findAllPhotos } from "../uploads/dao";
+import { OfferType, OfferReplyType } from "./types";
+import { unlink } from "node:fs/promises";
+
+type FilesInRequest = FilesObject | Partial<File>[];
+
+declare module "fastify" {
+	interface FastifyRequest {
+		file: File;
+		files: FilesInRequest;
+	}
+}
+
+const storage = multer.diskStorage({
+	destination: function (_req, _file, cb) {
+		cb(null, "./public/assets/");
+	},
+	filename: function (_req, file, cb) {
+		cb(null, Date.now() + file.originalname);
+	},
+});
+
+const upload = multer({ storage: storage });
 
 const offerRouter = async (server: FastifyInstance) => {
 	interface FastifyRequest {
@@ -28,6 +46,7 @@ const offerRouter = async (server: FastifyInstance) => {
 			orderBy: string;
 		};
 	}
+
 	server.get<{
 		Querystring: FastifyRequest["Querystring"];
 		Reply: OfferReplyType[];
@@ -88,48 +107,104 @@ const offerRouter = async (server: FastifyInstance) => {
 		}
 	);
 
-	server.post<{ Body: OfferType; Reply: OfferType | ErrorType }>(
+	server.post<{ Body: any; Reply: string | ErrorType }>(
 		"/",
 		{
-			schema: {
-				body: Offer,
-				response: {
-					200: Offer,
-				},
-			},
+			preHandler: upload.array("photos", 25),
 		},
 		async (request, reply) => {
 			const { body: offer } = request;
-			const offerCreated = await createOffer(offer);
-			reply.status(200).send(offerCreated);
+			const offerToCreate = {
+				animal_name: offer.animal_name,
+				age: Number(offer.age),
+				id_category: Number(offer.id_category),
+				id_race: offer.id_race === "null" ? null : Number(offer.id_race),
+				zipcode: Number(offer.zipcode),
+				city: offer.city,
+				identified: offer.identified === "true" ? true : false,
+				vaccinated: offer.vaccinated === "true" ? true : false,
+				disabled: offer.disabled === "true" ? true : false,
+				disability: offer.disability,
+				description: offer.description,
+				id_status: Number(offer.id_status),
+			};
+			const offerCreated = await createOffer(offerToCreate);
+			const photos = request.files as Partial<File>[];
+			photos.map(async (photo: any, index) => {
+				let main = false;
+				if (index === 0) {
+					main = true;
+				}
+				await createPhoto({
+					id_offer: offerCreated.id,
+					path: photo.filename,
+					main: main,
+				});
+			});
+			reply.status(201).send("ok");
 		}
 	);
 
 	server.put<{
 		Params: ParamsIdType;
-		Body: OfferUpdateType;
-		Reply: OfferType | ErrorType;
+		Body: any;
+		Reply: string | ErrorType;
 	}>(
 		"/:id",
 		{
-			schema: {
-				body: OfferUpdate,
-				response: {
-					200: Offer,
-				},
-			},
+			preHandler: upload.array("photos", 25),
 		},
 		async (request, reply) => {
 			const { body: offer } = request;
-			const offerUpdated = await updateOffer(Number(request.params.id), offer);
-			reply.status(200).send(offerUpdated);
+			const offerToUpdate = {
+				adoption_date: offer.adoption_date !== undefined ? new Date() : null,
+				id_status: Number(offer.id_status),
+				animal_name: offer.animal_name,
+				age: Number(offer.age),
+				id_category: Number(offer.id_category),
+				id_race: offer.id_race === "null" ? null : Number(offer.id_race),
+				zipcode: Number(offer.zipcode),
+				city: offer.city,
+				identified: offer.identified === "true" ? true : false,
+				vaccinated: offer.vaccinated === "true" ? true : false,
+				disabled: offer.disabled === "true" ? true : false,
+				disability: offer.disability,
+				description: offer.description,
+			};
+			const offerUpdated = await updateOffer(
+				Number(request.params.id),
+				offerToUpdate
+			);
+			const photos = request.files as Partial<File>[];
+			const offerAlreadyHasPhotos = await findAllPhotos([
+				{ id_offer: offerUpdated.id },
+			]);
+			photos.map(async (photo: any, index) => {
+				let main = false;
+				if (index === 0 && !offerAlreadyHasPhotos.length) {
+					main = true;
+				}
+				await createPhoto({
+					id_offer: offerUpdated.id,
+					path: photo.filename,
+					main: main,
+				});
+			});
+			reply.status(200).send("ok");
 		}
 	);
 
 	server.delete<{ Params: ParamsIdType; Reply: string }>(
 		"/:id",
 		async (request, reply) => {
+			const offerPhotos = await findAllPhotos([
+				{ id_offer: Number(request.params.id) },
+			]);
 			await deleteOffer(Number(request.params.id));
+
+			offerPhotos.map((photo) => {
+				unlink(`./public/assets/${photo.path}`);
+			});
 			reply.status(200).send(`Offre ${request.params.id} supprimée`);
 		}
 	);

@@ -1,8 +1,10 @@
 {
-  "extends": "@vue/tsconfig/tsconfig.node.json",
-  "include": ["vite.config.*"],
-  "compilerOptions": {
-    "composite": true,
-    "types": ["node"]
-  }
+	"extends": "@vue/tsconfig/tsconfig.node.json",
+	"include": ["vite.config.*"],
+	"compilerOptions": {
+		"composite": true,
+		"types": ["node"],
+		"target": "es2017",
+		"lib": ["es2017"]
+	}
 }

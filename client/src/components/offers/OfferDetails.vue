@@ -63,8 +63,8 @@
 import axios from "axios";
 import { ref, onMounted, type Ref } from "vue";
 import { useRoute } from "vue-router";
-import type { IOfferRes } from "../../interfaces/IOffer";
-import type { IPhoto } from "../../interfaces/IPhoto";
+import type { IOfferRes } from "@/interfaces/IOffer";
+import type { IPhoto } from "@/interfaces/IPhoto";
 
 const route = useRoute();
 const urlBack = import.meta.env.VITE_URL_BACK;

@@ -1,29 +1,8 @@
 import type { FastifyInstance } from "fastify";
-import multer from "fastify-multer";
-import { File, FilesObject } from "fastify-multer/lib/interfaces";
-import { createPhoto, findAllPhotos, updatePhoto, deletePhoto } from "./dao";
+import { findAllPhotos, updatePhoto, deletePhoto } from "./dao";
 import { PhotoType, Photo, PhotoUpdateType, PhotoUpdate } from "./types";
 import { ParamsIdType, ErrorType } from "../commons/types";
-
-type FilesInRequest = FilesObject | Partial<File>[];
-
-declare module "fastify" {
-	interface FastifyRequest {
-		file: File;
-		files: FilesInRequest;
-	}
-}
-
-const storage = multer.diskStorage({
-	destination: function (_req, _file, cb) {
-		cb(null, "./public/assets/");
-	},
-	filename: function (_req, file, cb) {
-		cb(null, Date.now() + file.originalname);
-	},
-});
-
-const upload = multer({ storage: storage });
+import { unlink } from "node:fs/promises";
 
 const uploadsRouter = async (server: FastifyInstance) => {
 	interface FastifyRequest {
@@ -44,38 +23,6 @@ const uploadsRouter = async (server: FastifyInstance) => {
 		const allPhotos = await findAllPhotos(filterArray);
 		reply.status(200).send(allPhotos);
 	});
-
-	server.post(
-		"/",
-		{
-			preHandler: upload.array("photos", 25),
-		},
-		async (request, reply) => {
-			const photos = request.files as Partial<File>[];
-			const photosPath: string[] = [];
-			photos.map((photo: any) => {
-				photosPath.push(photo.filename);
-			});
-			reply.status(200).send(photosPath);
-		}
-	);
-
-	server.post<{ Body: PhotoType; Reply: PhotoType | ErrorType }>(
-		"/store",
-		{
-			schema: {
-				body: Photo,
-				response: {
-					200: Photo,
-				},
-			},
-		},
-		async (request, reply) => {
-			const { body: photo } = request;
-			const photoCreated = await createPhoto(photo);
-			reply.status(200).send(photoCreated);
-		}
-	);
 
 	server.put<{
 		Params: ParamsIdType;
@@ -101,7 +48,22 @@ const uploadsRouter = async (server: FastifyInstance) => {
 	server.delete<{ Params: ParamsIdType; Reply: string }>(
 		"/:id",
 		async (request, reply) => {
-			await deletePhoto(Number(request.params.id));
+			const deletedPhoto = await deletePhoto(Number(request.params.id));
+			try {
+				await unlink(`./public/assets/${deletedPhoto.path}`);
+			} catch (error) {
+				console.log(error);
+			}
+
+			// if main is removed => set another main
+			if (deletedPhoto.main) {
+				const otherOfferPhotos = await findAllPhotos([
+					{ id_offer: deletedPhoto.id_offer },
+				]);
+				if (otherOfferPhotos.length) {
+					await updatePhoto(otherOfferPhotos[0].id, { main: true });
+				}
+			}
 			reply.status(200).send(`Photo ${request.params.id} supprimée`);
 		}
 	);

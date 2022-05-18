@@ -33,14 +33,10 @@
 <script setup lang="ts">
 import { ref } from "vue";
 import axios from "axios";
+import type { ICategoryRes } from "@/interfaces/ICategory";
 
 interface Props {
-	categoriesList: ICategory[];
-}
-interface ICategory {
-	id: number | null;
-	name: string;
-	id_parent_category: number | null;
+	categoriesList: ICategoryRes[];
 }
 
 defineProps<Props>();

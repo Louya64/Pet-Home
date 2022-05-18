@@ -19,7 +19,7 @@
 			})
 		"
 	>
-		<div class="w-1/4 px-10 mx-auto" v-if="id_status">
+		<div class="w-1/4 px-10 mx-auto" v-if="props.offer">
 			<div class="form-item" v-if="offerStatusList">
 				<label for="id_status">Changer le statut</label>
 				<select
@@ -183,6 +183,13 @@
 						type="number"
 						id="zipcode"
 						v-model="zipcode"
+						@input="
+							if (zipcode > 99999) {
+								zipcode = 99999;
+							} else if (zipcode < 0) {
+								zipcode = 0;
+							}
+						"
 					/>
 				</div>
 				<div class="form-item">
@@ -226,7 +233,7 @@
 		</div>
 
 		<PhotosDisplayed
-			v-if="props.offer"
+			v-if="props.offer && !noPhotos"
 			:offerId="props.offer.id"
 			:offerCategory="props.offer.category.name"
 			@photosEmpty="() => (noPhotos = true)"
@@ -255,14 +262,10 @@ import axios from "axios";
 import Switch from "./Switch.vue";
 import PhotosDisplayed from "./PhotosDisplayed.vue";
 import RequestResult from "@/components/commons/RequestResult.vue";
-import type {
-	IOfferRes,
-	IOfferCreate,
-	IOfferUpdate,
-} from "../../interfaces/IOffer";
-import type { ICategoryRes } from "../../interfaces/ICategory";
-import type { IRaceRes } from "../../interfaces/IRace";
-import type { IOfferStatusRes } from "../../interfaces/IOfferStatus";
+import type { IOfferRes, IOfferCreate } from "@/interfaces/IOffer";
+import type { ICategoryRes } from "@/interfaces/ICategory";
+import type { IRaceRes } from "@/interfaces/IRace";
+import type { IOfferStatusRes } from "@/interfaces/IOfferStatus";
 
 interface Props {
 	offer: IOfferRes | null;
@@ -291,7 +294,7 @@ const noPhotos = ref(false);
 const resultMessage = ref("");
 const requestSuccess = ref(false);
 const images = ref();
-const id_status = ref();
+const id_status = ref(1);
 
 if (props.offer) {
 	if (props.offer.animal_name) animal_name.value = props.offer.animal_name;
@@ -354,9 +357,7 @@ const updateImages = (e: any) => {
 	images.value = e.target.files;
 };
 
-const submit = async (data: IOfferUpdate | IOfferCreate) => {
-	let id_offer = 0;
-	let imagesPath: string[] = [];
+const submit = async (data: IOfferCreate) => {
 	const formData = new FormData();
 
 	if (images.value) {
@@ -366,96 +367,54 @@ const submit = async (data: IOfferUpdate | IOfferCreate) => {
 		});
 	}
 
-	await axios
-		.post(`${import.meta.env.VITE_URL_BACK}/uploads`, formData)
-		.then((res) => {
-			imagesPath = res.data;
-		});
+	let dataToSend: any = { ...data };
+	if (props.offer) {
+		if (props.offer.id_status === 1 && id_status.value !== 1) {
+			dataToSend = { ...dataToSend, adoption_date: new Date() };
+		}
+	}
+
+	Object.entries(dataToSend).forEach(([k, v]: any[]) => {
+		formData.append(k, v);
+	});
 
 	if (props.offer) {
 		await axios
-			.request({
-				method: "put",
-				url: `${import.meta.env.VITE_URL_BACK}/offers/${props.offer.id}`,
-				data:
-					(data as IOfferUpdate).id_status !== 2
-						? data
-						: { ...data, adoption_date: new Date() },
+			.put(
+				`${import.meta.env.VITE_URL_BACK}/offers/${props.offer.id}`,
+				formData
+			)
+			.then(() => {
+				requestSuccess.value = true;
+				resultMessage.value = "L'offre d'adoption a bien été modifiée";
 			})
+			.catch((err) => {
+				requestSuccess.value = false;
+				resultMessage.value = err.response.data.message;
+			});
+	} else {
+		await axios
+			.post(`${import.meta.env.VITE_URL_BACK}/offers`, formData)
 			.then(() => {
 				requestSuccess.value = true;
 				resultMessage.value = "L'offre d'adoption a bien été enregistrée";
+				animal_name.value = "";
+				ageMonth.value = 0;
+				ageYear.value = 0;
+				id_category.value = 0;
+				id_race.value = null;
+				zipcode.value = 0;
+				city.value = "";
+				identified.value = false;
+				vaccinated.value = false;
+				disabled.value = false;
+				disability.value = "";
+				description.value = "";
 			})
 			.catch((err) => {
 				requestSuccess.value = false;
 				resultMessage.value = err.response.data.message;
 			});
-		if (imagesPath.length) {
-			imagesPath.map((image, index) => {
-				if (index === 0 && noPhotos.value) {
-					axios.request({
-						method: "post",
-						url: `${import.meta.env.VITE_URL_BACK}/uploads/store`,
-						data: {
-							id_offer: props.offer?.id,
-							path: image,
-							main: true,
-						},
-					});
-				} else {
-					axios.request({
-						method: "post",
-						url: `${import.meta.env.VITE_URL_BACK}/uploads/store`,
-						data: {
-							id_offer: props.offer?.id,
-							path: image,
-							main: false,
-						},
-					});
-				}
-			});
-		}
-	} else {
-		await axios
-			.request({
-				method: "post",
-				url: `${import.meta.env.VITE_URL_BACK}/offers`,
-				data: { ...data, id_status: 1 },
-			})
-			.then((res) => {
-				id_offer = res.data.id;
-
-				requestSuccess.value = true;
-				resultMessage.value = "L'offre d'adoption a bien été enregistrée";
-			})
-			.catch((err) => {
-				requestSuccess.value = false;
-				resultMessage.value = err.response.data.message;
-			});
-
-		imagesPath.map((image, index) => {
-			if (index === 0) {
-				axios.request({
-					method: "post",
-					url: `${import.meta.env.VITE_URL_BACK}/uploads/store`,
-					data: {
-						id_offer: id_offer,
-						path: image,
-						main: true,
-					},
-				});
-			} else {
-				axios.request({
-					method: "post",
-					url: `${import.meta.env.VITE_URL_BACK}/uploads/store`,
-					data: {
-						id_offer: id_offer,
-						path: image,
-						main: false,
-					},
-				});
-			}
-		});
 	}
 };
 </script>

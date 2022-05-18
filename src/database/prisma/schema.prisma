@@ -83,7 +83,7 @@ model Races {
 
 model Photos {
   id                    Int                   @id @default(autoincrement())
-  offer                 Offers                @relation(fields: [id_offer], references: [id])
+  offer                 Offers                @relation(fields: [id_offer], references: [id], onUpdate: Cascade, onDelete: Cascade)
   id_offer              Int
   main                  Boolean               @db.TinyInt()
   path                  String                @db.VarChar(250)
@@ -91,7 +91,7 @@ model Photos {
 
 model Adoption_requests {
   id                    Int                   @id @default(autoincrement())
-  offer                 Offers                @relation(fields: [id_offer], references: [id])
+  offer                 Offers                @relation(fields: [id_offer], references: [id], onUpdate: Cascade, onDelete: Cascade)
   id_offer              Int
   creation_date         DateTime              @default(now())
   candidate_contact     String                @db.VarChar(150)

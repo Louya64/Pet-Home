@@ -110,7 +110,7 @@ export const updateOffer = async (id: number, data: OfferUpdateType) => {
 export const deleteOffer = async (id: number) => {
 	return await prisma.offers.delete({
 		where: {
-			id: Number(id),
+			id: id,
 		},
 	});
 };

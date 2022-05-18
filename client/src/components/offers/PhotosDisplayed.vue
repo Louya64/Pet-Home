@@ -39,7 +39,7 @@
 
 <script setup lang="ts">
 import { ref, onMounted, type Ref, computed } from "vue";
-import type { IPhoto } from "../../interfaces/IPhoto";
+import type { IPhoto } from "@/interfaces/IPhoto";
 import axios from "axios";
 
 interface Props {

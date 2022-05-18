@@ -28,8 +28,8 @@ import axios from "axios";
 import jwt_decode from "jwt-decode";
 import LoginForm from "@/components/auth/LoginForm.vue";
 import RegistrationForm from "@/components/auth/RegistrationForm.vue";
-import type { ICredentials } from "../../interfaces/ICredentials";
-import type { ITokenDecoded } from "../../interfaces/ITokenDecoded";
+import type { ICredentials } from "@/interfaces/ICredentials";
+import type { ITokenDecoded } from "@/interfaces/ITokenDecoded";
 
 const router = useRouter();
 const registered = ref(true);

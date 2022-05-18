@@ -46,8 +46,8 @@
 
 <script setup lang="ts">
 import { ref } from "vue";
-import type { ICredentials } from "../../interfaces/ICredentials";
-import RequestResult from "../../components/commons/RequestResult.vue";
+import type { ICredentials } from "@/interfaces/ICredentials";
+import RequestResult from "@/components/commons/RequestResult.vue";
 
 interface Props {
 	resultMessage: string;

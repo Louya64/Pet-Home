@@ -25,6 +25,7 @@ export interface IOfferRes {
 	description: string | null;
 }
 export interface IOfferCreate {
+	id_status: number;
 	animal_name: string | null;
 	age: number;
 	id_category: number;

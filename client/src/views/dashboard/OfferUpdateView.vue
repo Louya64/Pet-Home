@@ -15,8 +15,8 @@ import OfferForm from "@/components/offers/OfferForm.vue";
 import axios from "axios";
 import { ref, onMounted, type Ref } from "vue";
 import { useRoute } from "vue-router";
-import type { IOfferRes } from "../../interfaces/IOffer";
-import type { IPhoto } from "../../interfaces/IPhoto";
+import type { IOfferRes } from "@/interfaces/IOffer";
+import type { IPhoto } from "@/interfaces/IPhoto";
 
 const route = useRoute();
 const offer: Ref<IOfferRes | undefined> = ref();

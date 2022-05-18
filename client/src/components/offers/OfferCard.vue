@@ -44,8 +44,8 @@
 <script setup lang="ts">
 import axios from "axios";
 import { onBeforeMount, ref, onBeforeUpdate } from "vue";
-import type { IOfferRes } from "../../interfaces/IOffer";
-import type { IPhoto } from "../../interfaces/IPhoto";
+import type { IOfferRes } from "@/interfaces/IOffer";
+import type { IPhoto } from "@/interfaces/IPhoto";
 import { useRouter } from "vue-router";
 
 interface Props {

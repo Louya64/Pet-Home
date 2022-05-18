@@ -43,16 +43,11 @@
 <script setup lang="ts">
 import { ref } from "vue";
 import axios from "axios";
+import type { ICategoryRes } from "@/interfaces/ICategory";
 
 interface Props {
-	categoriesList: ICategory[];
-	category: ICategory;
-}
-interface ICategory {
-	[x: string]: any;
-	id: number;
-	name: string;
-	id_parent_category: number | null;
+	categoriesList: ICategoryRes[];
+	category: ICategoryRes;
 }
 
 defineProps<Props>();
@@ -62,7 +57,7 @@ const emit = defineEmits<{
 
 const updating = ref(false);
 
-const toggleUpdating = (category: ICategory) => {
+const toggleUpdating = (category: ICategoryRes) => {
 	if (!updating.value) {
 		updating.value = true;
 	} else {
@@ -86,7 +81,7 @@ const toggleUpdating = (category: ICategory) => {
 	}
 };
 
-const deleteCategory = (category: ICategory) => {
+const deleteCategory = (category: ICategoryRes) => {
 	axios
 		.delete(`${import.meta.env.VITE_URL_BACK}/categories/${category.id}`)
 		.then(() => {

@@ -50,15 +50,11 @@
 
 <script setup lang="ts">
 import CategoryTableRow from "./CategoryTableRow.vue";
-import OrderByArrow from "../commons/OrderByArrow.vue";
+import OrderByArrow from "@/components/commons/OrderByArrow.vue";
+import type { ICategoryRes } from "@/interfaces/ICategory";
 
 interface Props {
-	categoriesList: ICategory[];
-}
-interface ICategory {
-	id: number;
-	name: string;
-	id_parent_category: number | null;
+	categoriesList: ICategoryRes[];
 }
 
 defineProps<Props>();
