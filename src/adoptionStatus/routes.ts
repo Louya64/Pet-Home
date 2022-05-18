@@ -2,7 +2,7 @@ import type { FastifyInstance } from "fastify";
 import { ParamsIdType, ErrorType } from "../commons/types";
 import { notFoundError, duplicateDataError } from "../commons/errorHelpers";
 import {
-	findAllAdoptionStatuss,
+	findAllAdoptionStatus,
 	findAdoptionStatusById,
 	createAdoptionStatus,
 	updateAdoptionStatus,
@@ -12,8 +12,27 @@ import {
 import { AdoptionStatus, AdoptionStatusType } from "./types";
 
 const adoptionStatusRouter = async (server: FastifyInstance) => {
-	server.get<{ Reply: AdoptionStatusType[] }>("/", async (_request, reply) => {
-		const allAdoptionStatus = await findAllAdoptionStatuss();
+	interface FastifyRequest {
+		Querystring: {
+			orderBy: string;
+		};
+	}
+	server.get<{
+		Querystring: FastifyRequest["Querystring"];
+		Reply: AdoptionStatusType[];
+	}>("/", async (request, reply) => {
+		let orderBy = {};
+		if (request.query.orderBy) {
+			orderBy = {
+				[request.query.orderBy.split("-")[0]]:
+					request.query.orderBy.split("-")[1],
+			};
+		} else {
+			orderBy = {
+				id: "asc",
+			};
+		}
+		const allAdoptionStatus = await findAllAdoptionStatus(orderBy);
 		reply.status(200).send(allAdoptionStatus);
 	});
 

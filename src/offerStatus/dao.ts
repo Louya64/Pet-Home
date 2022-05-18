@@ -1,7 +1,7 @@
 import prisma from "../database";
 import { type OfferStatusType } from "./types";
 
-export const findAllOfferStatuss = async () => {
+export const findAllOfferStatus = async () => {
 	return await prisma.offer_status.findMany();
 };
 

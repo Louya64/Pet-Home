@@ -2,7 +2,7 @@ import type { FastifyInstance } from "fastify";
 import { ParamsIdType, ErrorType } from "../commons/types";
 import { notFoundError, duplicateDataError } from "../commons/errorHelpers";
 import {
-	findAllOfferStatuss,
+	findAllOfferStatus,
 	findOfferStatusById,
 	createOfferStatus,
 	updateOfferStatus,
@@ -13,7 +13,7 @@ import { OfferStatus, OfferStatusType } from "./types";
 
 const offerStatusRouter = async (server: FastifyInstance) => {
 	server.get<{ Reply: OfferStatusType[] }>("/", async (_request, reply) => {
-		const allOfferStatus = await findAllOfferStatuss();
+		const allOfferStatus = await findAllOfferStatus();
 		reply.status(200).send(allOfferStatus);
 	});
 
