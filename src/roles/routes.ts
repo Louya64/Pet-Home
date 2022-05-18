@@ -12,10 +12,30 @@ import {
 import { Role, RoleType } from "./types";
 
 const roleRouter = async (server: FastifyInstance) => {
-	server.get("/", async (_request, reply) => {
-		const allRoles = await findAllRoles();
-		reply.status(200).send(allRoles);
-	});
+	interface FastifyRequest {
+		Querystring: {
+			orderBy: string;
+		};
+	}
+
+	server.get<{ Querystring: FastifyRequest["Querystring"]; Reply: RoleType[] }>(
+		"/",
+		async (request, reply) => {
+			let orderBy = {};
+			if (request.query.orderBy) {
+				orderBy = {
+					[request.query.orderBy.split("-")[0]]:
+						request.query.orderBy.split("-")[1],
+				};
+			} else {
+				orderBy = {
+					id: "asc",
+				};
+			}
+			const allRoles = await findAllRoles(orderBy);
+			reply.status(200).send(allRoles);
+		}
+	);
 
 	server.get<{ Params: ParamsIdType; Reply: RoleType | ErrorType }>(
 		"/:id",
