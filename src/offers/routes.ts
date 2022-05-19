@@ -4,11 +4,14 @@ import { File, FilesObject } from "fastify-multer/lib/interfaces";
 import { ParamsIdType, ErrorType } from "../commons/types";
 import {
 	findAllOffers,
+	countOffers,
+	countAdopted,
 	findOfferById,
 	createOffer,
 	updateOffer,
 	deleteOffer,
 } from "./dao";
+// import { avgDailyAdoptionRequests } from "../adoptionRequests/dao";
 import { createPhoto, findAllPhotos } from "../uploads/dao";
 import { OfferType, OfferReplyType, OfferFromMulterType } from "./types";
 import { unlink } from "node:fs/promises";
@@ -45,6 +48,7 @@ const offerRouter = async (server: FastifyInstance) => {
 			city: string;
 			age: string;
 			orderBy: string;
+			limit: number;
 		};
 	}
 
@@ -72,6 +76,7 @@ const offerRouter = async (server: FastifyInstance) => {
 		const zipcode = Number(request.query.zipcode);
 		const city = request.query.city;
 		const age = request.query.age;
+		const limit = Number(request.query.limit) || 9999999;
 
 		if (id_status) {
 			filterArray.push(["id_status", id_status]);
@@ -100,8 +105,15 @@ const offerRouter = async (server: FastifyInstance) => {
 			filterArray.push(["age", { gte: minAge, lte: maxAge }]);
 		}
 
-		const allOffers = await findAllOffers(filterArray, orderBy);
+		const allOffers = await findAllOffers(filterArray, orderBy, limit);
 		reply.status(200).send(allOffers);
+	});
+
+	server.get("/stats", async (request, reply) => {
+		const nbOffers = await countOffers();
+		const nbAdopted = await countAdopted();
+		// const avgRequestsPerDay = await avgDailyAdoptionRequests();
+		reply.status(200).send({ nbOffers: nbOffers, nbAdopted: nbAdopted });
 	});
 
 	server.get<{ Params: ParamsIdType; Reply: OfferType | ErrorType }>(

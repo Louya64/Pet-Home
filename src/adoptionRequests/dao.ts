@@ -5,6 +5,12 @@ export const findAllAdoptionRequests = async () => {
 	return await prisma.adoption_requests.findMany();
 };
 
+// export const avgDailyAdoptionRequests = async () => {
+// 	return await prisma.adoption_requests.aggregate({
+// 		???
+// 	});
+// };
+
 export const findAdoptionRequestById = async (id: number) => {
 	return await prisma.adoption_requests.findUnique({
 		where: {
