@@ -4,6 +4,9 @@ import { File, FilesObject } from "fastify-multer/lib/interfaces";
 import { ParamsIdType, ErrorType } from "../commons/types";
 import {
 	findAllOffers,
+	countOffers,
+	countAdopted,
+	offersCreatePerDayList,
 	findOfferById,
 	createOffer,
 	updateOffer,
@@ -102,6 +105,16 @@ const offerRouter = async (server: FastifyInstance) => {
 
 		const allOffers = await findAllOffers(filterArray, orderBy);
 		reply.status(200).send(allOffers);
+	});
+
+	server.get("/stats", async (request, reply) => {
+		const nbOffers = await countOffers();
+		const nbAdopted = await countAdopted();
+		const grouped = await offersCreatePerDayList();
+		// const avgRequestsPerDay = await avgDailyAdoptionRequests();
+		reply
+			.status(200)
+			.send({ nbOffers: nbOffers, nbAdopted: nbAdopted, grouped: grouped });
 	});
 
 	server.get<{ Params: ParamsIdType; Reply: OfferType | ErrorType }>(

@@ -55,6 +55,29 @@ export const findAllOffers = async (
 	});
 };
 
+export const countOffers = async () => {
+	return prisma.offers.count();
+};
+
+export const countAdopted = async () => {
+	return prisma.offers.count({
+		where: {
+			adoption_date: {
+				not: null,
+			},
+		},
+	});
+};
+
+export const offersCreatePerDayList = async () => {
+	return prisma.offers.groupBy({
+		by: ["city"],
+		_count: {
+			city: true,
+		},
+	});
+};
+
 export const findOfferById = async (id: number) => {
 	return await prisma.offers.findUnique({
 		where: {
