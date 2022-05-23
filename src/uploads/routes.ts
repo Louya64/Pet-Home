@@ -16,7 +16,6 @@ const uploadsRouter = async (server: FastifyInstance) => {
 		Reply: PhotoType[];
 	}>("/", async (request, reply) => {
 		let filterArray: [string, string | number | Object][] = [];
-
 		const id_offer = Number(request.query.id_offer);
 		const main = request.query.main;
 		if (id_offer) {

@@ -16,6 +16,9 @@ import DashboardOfferCreate from "@/views/dashboard/OfferCreateView.vue";
 import DashboardOfferUpdate from "@/views/dashboard/OfferUpdateView.vue";
 import DashboardCategories from "@/views/dashboard/CategoriesView.vue";
 import DashboardRaces from "@/views/dashboard/RacesView.vue";
+import DashboardAdoptionStatus from "@/views/dashboard/AdoptionStatusView.vue";
+import DashboardUserRoles from "@/views/dashboard/UserRolesView.vue";
+import DashboardOfferStatus from "@/views/dashboard/OfferStatusView.vue";
 
 import { createRouter, createWebHistory } from "vue-router";
 import jwt_decode from "jwt-decode";
@@ -92,6 +95,21 @@ const router = createRouter({
 			path: "/dashboard/races",
 			name: "dashboardRaces",
 			component: DashboardRaces,
+		},
+		{
+			path: "/dashboard/adoptionStatus",
+			name: "dashboardAdoptionStatus",
+			component: DashboardAdoptionStatus,
+		},
+		{
+			path: "/dashboard/userRoles",
+			name: "dashboardUserRoles",
+			component: DashboardUserRoles,
+		},
+		{
+			path: "/dashboard/offerStatus",
+			name: "dashboardOfferStatus",
+			component: DashboardOfferStatus,
 		},
 	],
 });
