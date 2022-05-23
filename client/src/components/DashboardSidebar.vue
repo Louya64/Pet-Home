@@ -56,15 +56,12 @@
 import { ref, type Ref } from "vue";
 import { RouterLink, RouterView, useRouter } from "vue-router";
 const router = useRouter();
-
 const isAuthenticate: Ref<string | null> = ref(
 	localStorage.getItem("token") ? localStorage.getItem("token") : null
 );
-
 window.addEventListener("storage", () => {
 	isAuthenticate.value = localStorage.getItem("token");
 });
-
 const logout = () => {
 	localStorage.removeItem("token");
 	window.dispatchEvent(new Event("storage"));
