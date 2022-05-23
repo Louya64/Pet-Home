@@ -6,12 +6,17 @@ import {
 	findAllOffers,
 	countOffers,
 	countAdopted,
-	offersCreatePerDayList,
+	offersCreatePerDayCount,
+	offersAdoptedPerDayCount,
 	findOfferById,
 	createOffer,
 	updateOffer,
 	deleteOffer,
 } from "./dao";
+import {
+	adoptionRequestsPerDayCount,
+	countAdoptionRequests,
+} from "../adoptionRequests/dao";
 import { createPhoto, findAllPhotos } from "../uploads/dao";
 import { OfferType, OfferReplyType, OfferFromMulterType } from "./types";
 import { unlink } from "node:fs/promises";
@@ -110,11 +115,18 @@ const offerRouter = async (server: FastifyInstance) => {
 	server.get("/stats", async (request, reply) => {
 		const nbOffers = await countOffers();
 		const nbAdopted = await countAdopted();
-		const grouped = await offersCreatePerDayList();
-		// const avgRequestsPerDay = await avgDailyAdoptionRequests();
-		reply
-			.status(200)
-			.send({ nbOffers: nbOffers, nbAdopted: nbAdopted, grouped: grouped });
+		const nbAdoptionRequests = await countAdoptionRequests();
+		const nbOffersCreatedPerDay = await offersCreatePerDayCount();
+		const nbOffersAdoptedPerDay = await offersAdoptedPerDayCount();
+		const nbAdoptionRequestsPerDay = await adoptionRequestsPerDayCount();
+		reply.status(200).send({
+			nbOffers: nbOffers,
+			nbAdopted: nbAdopted,
+			nbAdoptionRequests: nbAdoptionRequests,
+			nbOffersCreatedPerDay: nbOffersCreatedPerDay,
+			nbOffersAdoptedPerDay: nbOffersAdoptedPerDay,
+			nbAdoptionRequestsPerDay: nbAdoptionRequestsPerDay,
+		});
 	});
 
 	server.get<{ Params: ParamsIdType; Reply: OfferType | ErrorType }>(
