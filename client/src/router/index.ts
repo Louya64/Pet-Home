@@ -16,6 +16,7 @@ import DashboardOfferCreate from "@/views/dashboard/OfferCreateView.vue";
 import DashboardOfferUpdate from "@/views/dashboard/OfferUpdateView.vue";
 import DashboardCategories from "@/views/dashboard/CategoriesView.vue";
 import DashboardRaces from "@/views/dashboard/RacesView.vue";
+import DashboardAdoptionStatus from "@/views/dashboard/AdoptionStatusView.vue";
 import DashboardUserRoles from "@/views/dashboard/UserRolesView.vue";
 import DashboardOfferStatus from "@/views/dashboard/OfferStatusView.vue";
 
@@ -94,6 +95,11 @@ const router = createRouter({
 			path: "/dashboard/races",
 			name: "dashboardRaces",
 			component: DashboardRaces,
+		},
+		{
+			path: "/dashboard/adoptionStatus",
+			name: "dashboardAdoptionStatus",
+			component: DashboardAdoptionStatus,
 		},
 		{
 			path: "/dashboard/userRoles",
