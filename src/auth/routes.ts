@@ -31,6 +31,7 @@ import {
 	checkPasswordFormat,
 } from "./helpers";
 import { userCreateValidateData } from "./middlewares";
+import { SentMessageInfo } from "nodemailer/lib/sendmail-transport";
 
 export interface FastifyMailerNamedInstance {
 	[namespace: string]: Transporter;
@@ -198,7 +199,7 @@ const authRouter = async (server: FastifyInstance) => {
 						text: "cliquez sur le lien",
 						html: `<a href=${server.config.URL_SITE}/changePassword?&token=${token}>lien pour changer le mot de passe</a>`,
 					},
-					(err: any, info: any) => {
+					(err: Error | null, info: SentMessageInfo) => {
 						if (err) {
 							console.log(err);
 						} else {

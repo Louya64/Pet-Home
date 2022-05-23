@@ -39,47 +39,7 @@ const userRouter = async (server: FastifyInstance) => {
 	server.get<{ Querystring: FastifyRequest["Querystring"]; Reply: UserType[] }>(
 		"/",
 		async (request, reply) => {
-			let filter = {};
 			let orderBy = {};
-
-			// filters
-			const id_role = Number(request.query.id_role);
-			const email = Number(request.query.email);
-			const username = Number(request.query.username);
-			const firstname = Number(request.query.firstname);
-			const lastname = Number(request.query.lastname);
-			const phone_number = Number(request.query.phone_number);
-			if (id_role) {
-				filter = {
-					id_role: id_role,
-				};
-			}
-			if (email) {
-				filter = {
-					email: email,
-				};
-			}
-			if (username) {
-				filter = {
-					username: username,
-				};
-			}
-			if (firstname) {
-				filter = {
-					firstname: firstname,
-				};
-			}
-			if (lastname) {
-				filter = {
-					lastname: lastname,
-				};
-			}
-			if (phone_number) {
-				filter = {
-					phone_number: phone_number,
-				};
-			}
-
 			if (request.query.orderBy) {
 				orderBy = {
 					[request.query.orderBy.split("-")[0]]:
@@ -91,7 +51,33 @@ const userRouter = async (server: FastifyInstance) => {
 				};
 			}
 
-			const allUsers = await findAllUsers(filter, orderBy);
+			let filterArray: [string, string | number | Object][] = [];
+			const id_role = Number(request.query.id_role);
+			const email = Number(request.query.email);
+			const username = Number(request.query.username);
+			const firstname = Number(request.query.firstname);
+			const lastname = Number(request.query.lastname);
+			const phone_number = Number(request.query.phone_number);
+			if (id_role) {
+				filterArray.push(["id_role", id_role]);
+			}
+			if (email) {
+				filterArray.push(["email", email]);
+			}
+			if (username) {
+				filterArray.push(["username", username]);
+			}
+			if (firstname) {
+				filterArray.push(["firstname", firstname]);
+			}
+			if (lastname) {
+				filterArray.push(["lastname", lastname]);
+			}
+			if (phone_number) {
+				filterArray.push(["phone_number", phone_number]);
+			}
+
+			const allUsers = await findAllUsers(filterArray, orderBy);
 			reply.status(200).send(allUsers);
 		}
 	);

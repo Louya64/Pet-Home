@@ -15,19 +15,32 @@ const raceRouter = async (server: FastifyInstance) => {
 	interface FastifyRequest {
 		Querystring: {
 			id_category: number;
+			orderBy: string;
 		};
 	}
 	server.get<{ Querystring: FastifyRequest["Querystring"]; Reply: RaceType[] }>(
 		"/",
 		async (request, reply) => {
-			let filterArray = [];
+			let orderBy = {};
+			if (request.query.orderBy) {
+				orderBy = {
+					[request.query.orderBy.split("-")[0]]:
+						request.query.orderBy.split("-")[1],
+				};
+			} else {
+				orderBy = {
+					id: "asc",
+				};
+			}
+
+			let filterArray: [string, string | number | Object][] = [];
 			const id_category = Number(request.query.id_category);
 
 			if (id_category) {
 				filterArray.push(["id_category", id_category]);
 			}
 
-			const allRaces = await findAllRaces(filterArray);
+			const allRaces = await findAllRaces(filterArray, orderBy);
 			reply.status(200).send(allRaces);
 		}
 	);
@@ -80,9 +93,12 @@ const raceRouter = async (server: FastifyInstance) => {
 		},
 		async (request, reply) => {
 			const { body: race } = request;
-			let raceNameAlreadyExists;
+			let raceNameAlreadyExists = false;
 			if (race.name) {
-				raceNameAlreadyExists = await findRaceByName(race.name);
+				const raceFound = await findRaceByName(race.name);
+				if (raceFound && raceFound.id !== race.id) {
+					raceNameAlreadyExists = true;
+				}
 			}
 			if (!raceNameAlreadyExists) {
 				const raceUpdated = await updateRace(Number(request.params.id), race);

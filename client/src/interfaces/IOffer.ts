@@ -38,10 +38,10 @@ export interface IOfferCreate {
 	disability: string | null;
 	description: string | null;
 }
-export interface IOfferUpdate {
-	id: number;
-	creation_date: string;
-	adoption_date: string | null;
+export interface IOfferCreateOrUpdate {
+	id?: number;
+	creation_date?: string;
+	adoption_date?: Date | null;
 	id_status: number;
 	animal_name: string | null;
 	age: number;

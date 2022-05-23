@@ -1,5 +1,6 @@
 import { FastifyInstance } from "fastify";
 import { findUserByEmail, findUserByUsername } from "../users/dao";
+import { UserType } from "../users/types";
 
 // password regex
 const checkPasswordFormat = (password: string) => {
@@ -43,7 +44,7 @@ const duplicatedData = async (username: string, email: string) => {
 };
 
 //jwt -> create token
-const createToken = (server: FastifyInstance, user: any) => {
+const createToken = (server: FastifyInstance, user: UserType) => {
 	return server.jwt.sign({
 		id: user.id,
 		role: user.id_role,

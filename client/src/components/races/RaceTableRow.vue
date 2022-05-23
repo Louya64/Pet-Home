@@ -1,12 +1,12 @@
 <template>
 	<tr>
-		<td>{{ category.id }}</td>
+		<td>{{ race.id }}</td>
 		<td>
 			<input
 				:class="[updating ? 'bg-slate-600 text-white' : 'bg-transparent']"
 				class="w-full p-1"
 				type="text"
-				v-model="category.name"
+				v-model="race.name"
 				:disabled="!updating"
 			/>
 		</td>
@@ -14,7 +14,7 @@
 			<select
 				:class="[updating ? 'bg-slate-600' : 'bg-transparent']"
 				class="w-full p-1"
-				v-model="category.id_parent_category"
+				v-model="race.id_category"
 				:disabled="!updating"
 			>
 				<option :value="null"></option>
@@ -25,14 +25,14 @@
 		</td>
 		<td>
 			<div class="flex justify-center">
-				<button @click="toggleUpdating(category)" class="btn btn-green">
+				<button @click="toggleUpdating(race)" class="btn btn-green">
 					{{ updating ? "Valider" : "Modifier" }}
 				</button>
 			</div>
 		</td>
 		<td>
 			<div class="flex justify-center">
-				<button @click="confirmDelete(category)" class="btn btn-red">
+				<button @click="confirmDelete(race)" class="btn btn-red">
 					Supprimer
 				</button>
 			</div>
@@ -43,11 +43,12 @@
 <script setup lang="ts">
 import { ref } from "vue";
 import axios from "axios";
+import type { IRaceRes } from "@/interfaces/IRace";
 import type { ICategoryRes } from "@/interfaces/ICategory";
 
 interface Props {
 	categoriesList: ICategoryRes[];
-	category: ICategoryRes;
+	race: IRaceRes;
 }
 
 defineProps<Props>();
@@ -57,7 +58,7 @@ const emit = defineEmits<{
 
 const updating = ref(false);
 
-const toggleUpdating = (category: ICategoryRes) => {
+const toggleUpdating = (race: IRaceRes) => {
 	if (!updating.value) {
 		updating.value = true;
 	} else {
@@ -65,14 +66,14 @@ const toggleUpdating = (category: ICategoryRes) => {
 		axios
 			.request({
 				method: "put",
-				url: `${import.meta.env.VITE_URL_BACK}/categories/${category.id}`,
-				data: category,
+				url: `${import.meta.env.VITE_URL_BACK}/races/${race.id}`,
+				data: race,
 			})
 			.then((res) => {
 				emit(
 					"requestResult",
 					true,
-					`La catégorie ${category.name} a bien été mise à jour`
+					`La race ${race.name} a bien été mise à jour`
 				);
 			})
 			.catch((err) => {
@@ -81,24 +82,20 @@ const toggleUpdating = (category: ICategoryRes) => {
 	}
 };
 
-const confirmDelete = (category: ICategoryRes) => {
+const confirmDelete = (race: IRaceRes) => {
 	const confirmed = confirm(
-		`Voulez-vous vraiment supprimer la race ${category.name} ?`
+		`Voulez-vous vraiment supprimer la race ${race.name} ?`
 	);
 	if (confirmed) {
-		deleteCategory(category);
+		deleteRace(race);
 	}
 };
 
-const deleteCategory = (category: ICategoryRes) => {
+const deleteRace = (race: IRaceRes) => {
 	axios
-		.delete(`${import.meta.env.VITE_URL_BACK}/categories/${category.id}`)
+		.delete(`${import.meta.env.VITE_URL_BACK}/races/${race.id}`)
 		.then(() => {
-			emit(
-				"requestResult",
-				true,
-				`La catégorie ${category.name} a bien été supprimée`
-			);
+			emit("requestResult", true, `La race ${race.name} a bien été supprimée`);
 		})
 		.catch((err) => {
 			emit("requestResult", false, err.response.data.message);

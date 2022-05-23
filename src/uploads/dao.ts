@@ -1,9 +1,22 @@
 import prisma from "../database";
-import { PhotoType, Photo, PhotoUpdateType, PhotoUpdate } from "./types";
+import { PhotoType, PhotoUpdateType } from "./types";
 
-export const findAllPhotos = async (filterArray: any) => {
+export const findAllPhotos = async (
+	filterArray: [string, string | number | Object][]
+) => {
+	const entries = new Map(filterArray);
+	const obj = Object.fromEntries(entries);
+
+	let filters = {};
+	if (filterArray.length === 1) {
+		filters = obj;
+	} else if (filterArray.length > 1) {
+		filters = {
+			AND: obj,
+		};
+	}
 	return await prisma.photos.findMany({
-		where: filterArray[0],
+		where: filters,
 	});
 };
 

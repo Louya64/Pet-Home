@@ -34,6 +34,36 @@ const Offer = {
 } as const;
 type OfferType = FromSchema<typeof Offer>;
 
+const OfferFromMulter = {
+	type: "object",
+	properties: {
+		id: { type: "string" },
+		id_status: { type: "string" },
+		animal_name: { type: ["string", "null"] },
+		age: { type: "string" },
+		id_category: { type: "string" },
+		id_race: { type: ["string", "null"] },
+		zipcode: { type: "string" },
+		city: { type: "string" },
+		identified: { type: "string" },
+		vaccinated: { type: "string" },
+		disabled: { type: "string" },
+		disability: { type: ["string", "null"] },
+		description: { type: ["string", "null"] },
+	},
+	required: [
+		"id_status",
+		"age",
+		"id_category",
+		"zipcode",
+		"city",
+		"identified",
+		"vaccinated",
+		"disabled",
+	],
+} as const;
+type OfferFromMulterType = FromSchema<typeof OfferFromMulter>;
+
 const OfferReply = {
 	type: "object",
 	properties: {
@@ -85,7 +115,7 @@ const OfferUpdate = {
 	properties: {
 		// adoption_date
 		id_status: { type: "number" },
-		animal_name: { type: "string" },
+		animal_name: { type: ["string", "null"] },
 		age: { type: "number" },
 		id_category: { type: "number" },
 		id_race: { type: ["number", "null"] },
@@ -94,8 +124,8 @@ const OfferUpdate = {
 		identified: { type: "boolean" },
 		vaccinated: { type: "boolean" },
 		disabled: { type: "boolean" },
-		disability: { type: "string" },
-		description: { type: "string" },
+		disability: { type: ["string", "null"] },
+		description: { type: ["string", "null"] },
 	},
 	required: [],
 } as const;
@@ -108,4 +138,6 @@ export {
 	OfferUpdateType,
 	OfferReply,
 	OfferReplyType,
+	OfferFromMulter,
+	OfferFromMulterType,
 };

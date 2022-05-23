@@ -14,10 +14,10 @@ const uploadsRouter = async (server: FastifyInstance) => {
 		Querystring: FastifyRequest["Querystring"];
 		Reply: PhotoType[];
 	}>("/", async (request, reply) => {
-		let filterArray = [];
+		let filterArray: [string, string | number | Object][] = [];
 		const id_offer = Number(request.query.id_offer);
 		if (id_offer) {
-			filterArray.push({ id_offer: id_offer });
+			filterArray.push(["id_offer", id_offer]);
 		}
 
 		const allPhotos = await findAllPhotos(filterArray);
@@ -58,7 +58,7 @@ const uploadsRouter = async (server: FastifyInstance) => {
 			// if main is removed => set another main
 			if (deletedPhoto.main) {
 				const otherOfferPhotos = await findAllPhotos([
-					{ id_offer: deletedPhoto.id_offer },
+					["id_offer", deletedPhoto.id_offer],
 				]);
 				if (otherOfferPhotos.length) {
 					await updatePhoto(otherOfferPhotos[0].id, { main: true });
