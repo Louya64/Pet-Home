@@ -1,8 +1,10 @@
 import prisma from "../database";
 import { type OfferStatusType } from "./types";
 
-export const findAllOfferStatus = async () => {
-	return await prisma.offer_status.findMany();
+export const findAllOfferStatus = async (orderBy: object) => {
+	return await prisma.offer_status.findMany({
+		orderBy: orderBy,
+	});
 };
 
 export const findOfferStatusById = async (id: number) => {

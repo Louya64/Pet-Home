@@ -12,8 +12,27 @@ import {
 import { OfferStatus, OfferStatusType } from "./types";
 
 const offerStatusRouter = async (server: FastifyInstance) => {
-	server.get<{ Reply: OfferStatusType[] }>("/", async (_request, reply) => {
-		const allOfferStatus = await findAllOfferStatus();
+	interface FastifyRequest {
+		Querystring: {
+			orderBy: string;
+		};
+	}
+	server.get<{
+		Querystring: FastifyRequest["Querystring"];
+		Reply: OfferStatusType[];
+	}>("/", async (request, reply) => {
+		let orderBy = {};
+		if (request.query.orderBy) {
+			orderBy = {
+				[request.query.orderBy.split("-")[0]]:
+					request.query.orderBy.split("-")[1],
+			};
+		} else {
+			orderBy = {
+				id: "asc",
+			};
+		}
+		const allOfferStatus = await findAllOfferStatus(orderBy);
 		reply.status(200).send(allOfferStatus);
 	});
 
