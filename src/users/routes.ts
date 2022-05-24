@@ -5,11 +5,14 @@ import {
 	notFoundError,
 	duplicateDataError,
 	invalidDataError,
+	unauthorizedError,
 } from "../commons/errorHelpers";
 import {
 	hashPassword,
 	checkPasswordFormat,
 	confirmPassword,
+	duplicatedData,
+	verifyPassword,
 } from "../auth/helpers";
 import {
 	findAllUsers,
@@ -119,67 +122,59 @@ const userRouter = async (server: FastifyInstance) => {
 		},
 		async (request, reply) => {
 			const { body: user } = request;
-			let userEmailAlreadyExists;
-			let usernameAlreadyExists;
-			if (user.email) {
-				userEmailAlreadyExists = await findUserByEmail(user.email);
-			}
-			if (user.username) {
-				usernameAlreadyExists = await findUserByUsername(user.username);
-			}
+			let newPassword = "";
 
-			if (
-				userEmailAlreadyExists &&
-				userEmailAlreadyExists.id !== request.params.id &&
-				usernameAlreadyExists &&
-				usernameAlreadyExists.id !== request.params.id
-			) {
-				reply
-					.status(409)
-					.send(duplicateDataError(`Cet email et ce pseudonyme existent déjà`));
-			} else if (
-				userEmailAlreadyExists &&
-				userEmailAlreadyExists.id !== request.params.id
-			) {
-				reply.status(409).send(duplicateDataError(`Cet email existe déjà`));
-			} else if (
-				usernameAlreadyExists &&
-				usernameAlreadyExists.id !== request.params.id
-			) {
-				reply.status(409).send(duplicateDataError(`Ce pseudonyme existe déjà`));
-			} else {
-				let userToUpdate = user;
-				if (user.password) {
-					if (
-						!user.confirmedPassword ||
-						!confirmPassword(user.password, user.confirmedPassword)
-					) {
+			// check pass // login if user.lastPassword
+			if (user.lastPassword && user.password && user.confirmedPassword) {
+				const userFound = await findUserByEmail(user.email);
+				if (!userFound) {
+					reply
+						.status(401)
+						.send(unauthorizedError(`Email ou mot de passe incorrect`));
+				}
+				if (userFound) {
+					const passwordOk = await verifyPassword(
+						server,
+						user.lastPassword,
+						userFound.password as string
+					);
+					if (!passwordOk) {
 						reply
-							.status(422)
-							.send(
-								invalidDataError(
-									`Le mot de passe n'a pas été confirmé correctement`
-								)
-							);
-					} else {
-						if (!checkPasswordFormat(user.password)) {
-							reply
-								.status(422)
-								.send(
-									invalidDataError(
-										`Le mot de passe ne respecte pas le modèle(au moins 8 caractères dont 1 nombre, 1 minuscule, 1 majuscule, et 1 caractère spécial parmis *.!@#$%^&(){}[:;<>,.?/~_+-=|)`
-									)
-								);
-						} else {
-							const hashedPassword = await hashPassword(server, user.password);
-							userToUpdate = {
-								...user,
-								password: hashedPassword,
-							};
-							delete userToUpdate.confirmedPassword;
+							.status(401)
+							.send(unauthorizedError(`Email ou mot de passe incorrect`));
+					}
+					if (passwordOk) {
+						const newPasswordFormatOk = checkPasswordFormat(user.password);
+						const confirmPasswordOk = confirmPassword(
+							user.password,
+							user.confirmedPassword
+						);
+						if (newPasswordFormatOk && confirmPasswordOk) {
+							newPassword = await hashPassword(server, user.password);
 						}
 					}
 				}
+			}
+
+			const duplicateDataErrorMessage = await duplicatedData(
+				user.username,
+				user.email,
+				Number(request.params.id)
+			);
+
+			if (duplicateDataErrorMessage) {
+				reply.status(409).send(duplicateDataError(duplicateDataErrorMessage));
+			} else {
+				let userToUpdate = user;
+				if (newPassword) {
+					userToUpdate = {
+						...user,
+						password: newPassword,
+					};
+					delete userToUpdate.confirmedPassword;
+					delete userToUpdate.lastPassword;
+				}
+
 				const userUpdated = await updateUser(
 					Number(request.params.id),
 					userToUpdate

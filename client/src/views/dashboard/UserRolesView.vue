@@ -23,7 +23,6 @@ let userRolesList: Ref<IUserRoleRes[]> = ref([]);
 const orderBy = ref("");
 const resultMessage = ref("");
 const requestSuccess = ref(false);
-console.log(userRolesList);
 
 const displayRequestResult = (success: boolean, message: string) => {
 	requestSuccess.value = success;

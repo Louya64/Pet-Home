@@ -30,13 +30,14 @@ const UserUpdate = {
 		email: { type: "string" },
 		password: { type: "string" },
 		confirmedPassword: { type: "string" },
+		lastPassword: { type: "string" },
 		facebook_token: { type: "string" },
 		username: { type: "string" },
 		firstname: { type: "string" },
 		lastname: { type: "string" },
 		phone_number: { type: "string" },
 	},
-	required: [],
+	required: ["id_role", "email", "username", "firstname"],
 } as const;
 type UserUpdateType = FromSchema<typeof UserUpdate>;
 

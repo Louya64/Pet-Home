@@ -88,52 +88,50 @@ const authRouter = async (server: FastifyInstance) => {
 		}
 	);
 
-	// create a user (admin or not) from dashboard
+	// create a user (admin) from dashboard
 	server.post<{ Body: UserCreateFromDashboardType; Reply: string | ErrorType }>(
 		"/dashboard/auth/register",
 		{
 			schema: {
 				body: UserCreateFromDashboard,
 			},
+			preHandler: [userCreateValidateData],
 		},
 		async (request, reply) => {
 			const { body: user } = request;
 
-			const userEmailAlreadyExists = await findUserByEmail(user.email);
-			let usernameAlreadyExists;
-			if (user.username) {
-				usernameAlreadyExists = await findUserByUsername(user.username);
+			const hashedPassword = await hashPassword(server, user.password);
+			const userToCreate: UserCreateType = {
+				id_role: user.id_role,
+				email: user.email,
+				password: hashedPassword,
+				username: user.username,
+				firstname: user.firstname,
+				lastname: user.lastname,
+				phone_number: user.phone_number,
+			};
+			const userCreated = await createUser(userToCreate);
+			if (userCreated) {
+				const { mailer } = server;
+				mailer.sendMail(
+					{
+						from: server.config.SMTP_EMAIL,
+						to: userCreated.email,
+						subject: "Pet'Home - Votre compte est crée",
+						text: `Votre mot de passe est : "${user.password}". Vous pouvez vous connecter à votre profil afin de le modifier`,
+					},
+					(err: Error | null, info: SentMessageInfo) => {
+						if (err) {
+							console.log(err);
+						} else {
+							console.log(info);
+						}
+					}
+				);
 			}
-
-			if (userEmailAlreadyExists && usernameAlreadyExists) {
-				reply
-					.status(409)
-					.send(duplicateDataError(`Cet email et ce pseudonyme existent déjà`));
-			} else if (userEmailAlreadyExists) {
-				reply.status(409).send(duplicateDataError(`Cet email existe déjà`));
-			} else if (usernameAlreadyExists) {
-				reply.status(409).send(duplicateDataError(`Ce pseudonyme existe déjà`));
-			} else {
-				if (!checkPasswordFormat(user.password)) {
-					reply
-						.status(422)
-						.send(
-							invalidDataError(
-								`Le mot de passe ne respecte pas le modèle(au moins 8 caractères dont 1 nombre, 1 minuscule, 1 majuscule, et 1 caractère spécial parmis *.!@#$%^&(){}[:;<>,.?/~_+-=|)`
-							)
-						);
-				} else {
-					const hashedPassword = await hashPassword(server, user.password);
-					const userToCreate: UserCreateType = {
-						...user,
-						password: hashedPassword,
-					};
-					const userCreated = await createUser(userToCreate);
-					reply
-						.status(201)
-						.send(`L'utilisateur ${userCreated.id} a bien été enregistré`);
-				}
-			}
+			reply
+				.status(201)
+				.send(`L'utilisateur ${userCreated.id} a bien été enregistré`);
 		}
 	);
 

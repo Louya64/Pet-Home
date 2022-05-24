@@ -20,6 +20,12 @@ export const findAllUsers = async (
 		where: filters,
 		select: {
 			id: true,
+			creation_date: true,
+			role: {
+				select: {
+					name: true,
+				},
+			},
 			id_role: true,
 			email: true,
 			username: true,
@@ -38,6 +44,12 @@ export const findUserById = async (id: number) => {
 		},
 		select: {
 			id: true,
+			creation_date: true,
+			role: {
+				select: {
+					name: true,
+				},
+			},
 			id_role: true,
 			email: true,
 			username: true,

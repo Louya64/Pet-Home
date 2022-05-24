@@ -30,15 +30,26 @@ const confirmPassword = (password: string, confirmedPassword: string) => {
 };
 
 // check duplicateData
-const duplicatedData = async (username: string, email: string) => {
-	const usernameAlreadyExists = await findUserByUsername(username);
-	const userEmailAlreadyExists = await findUserByEmail(email);
+const duplicatedData = async (
+	username: string | undefined,
+	email: string | undefined,
+	id: number = 0
+) => {
+	const usernameAlreadyExists = username
+		? await findUserByUsername(username)
+		: false;
+	const userEmailAlreadyExists = email ? await findUserByEmail(email) : false;
 
-	if (userEmailAlreadyExists && usernameAlreadyExists) {
+	if (
+		userEmailAlreadyExists &&
+		userEmailAlreadyExists.id !== id &&
+		usernameAlreadyExists &&
+		usernameAlreadyExists.id !== id
+	) {
 		return `Cet email et ce pseudonyme existent déjà`;
-	} else if (userEmailAlreadyExists) {
+	} else if (userEmailAlreadyExists && userEmailAlreadyExists.id !== id) {
 		return `Cet email existe déjà`;
-	} else if (usernameAlreadyExists) {
+	} else if (usernameAlreadyExists && usernameAlreadyExists.id !== id) {
 		return `Ce pseudonyme existe déjà`;
 	} else return false;
 };

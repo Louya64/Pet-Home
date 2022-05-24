@@ -45,11 +45,16 @@ const login = async (credentials: ICredentials) => {
 		})
 		.then((res) => {
 			const token = res.data;
-			const tokenDecoded: ITokenDecoded = jwt_decode(token);
-			const userRole = tokenDecoded.role;
+			const user: ITokenDecoded = jwt_decode(token);
+			const userRole = user.role;
+			const userId = user.id;
 			localStorage.setItem("token", token);
+			localStorage.setItem("userId", userId.toString());
+			localStorage.setItem("userRole", userRole.toString());
 			window.dispatchEvent(new Event("storage"));
 			if (userRole === 1 || userRole === 2) {
+				if (userRole === 1) {
+				}
 				router.push("/dashboard");
 			} else {
 				router.push("/");
