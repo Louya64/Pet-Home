@@ -129,6 +129,7 @@ const userAuthenticatedId: Ref<string | null> = ref(
 
 window.addEventListener("storage", () => {
 	isAuthenticate.value = localStorage.getItem("token");
+	userAuthenticatedId.value = localStorage.getItem("userId");
 });
 
 const logout = () => {

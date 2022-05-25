@@ -1,6 +1,6 @@
 <template>
 	<form
-		class="form"
+		class="form relative"
 		@submit.prevent="
 			submit({
 				id_role,
@@ -15,6 +15,11 @@
 			})
 		"
 	>
+		<div v-if="props.user" class="absolute right-28 -top-0">
+			<button @click.prevent="confirmDelete" class="btn btn-red">
+				Supprimer mon profil
+			</button>
+		</div>
 		<div class="flex">
 			<div class="w-1/2 p-10">
 				<div class="form-item">
@@ -198,6 +203,7 @@
 
 <script setup lang="ts">
 import { ref, watch } from "vue";
+import { useRouter } from "vue-router";
 import axios from "axios";
 import RequestResult from "@/components/commons/RequestResult.vue";
 import type { IUserRes, IUserCreateOrUpdate } from "@/interfaces/IUser";
@@ -207,6 +213,7 @@ interface Props {
 }
 
 const props = defineProps<Props>();
+const router = useRouter();
 const id_role = ref(2);
 const username = ref("");
 const lastname = ref("");
@@ -290,6 +297,29 @@ const generatePassword = () => {
 		pass += str.charAt(char);
 	}
 	password.value = pass;
+};
+
+const confirmDelete = () => {
+	const confirmed = confirm(`Voulez-vous vraiment supprimer votre profil ?`);
+	if (confirmed) {
+		props.user && deleteUser(props.user.id);
+	}
+};
+
+const deleteUser = (id: number) => {
+	axios
+		.delete(`${import.meta.env.VITE_URL_BACK}/users/${id}`)
+		.then(() => {
+			requestSuccess.value = true;
+			resultMessage.value = `Votre profil a bien été supprimé, vous allez être redirigé vers la page de connection`;
+			setTimeout(() => {
+				router.push("/auth");
+			}, 3000);
+		})
+		.catch((err) => {
+			requestSuccess.value = false;
+			resultMessage.value = err.response.data.message;
+		});
 };
 
 const submit = async (data: IUserCreateOrUpdate) => {

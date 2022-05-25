@@ -20,8 +20,6 @@ export interface IUserRes {
 	firstname: string;
 	lastname: string;
 	phone_number: string;
-	// nb adoption request + id to link
-	// + messages liés
 }
 
 export interface IUserCreateOrUpdate {
