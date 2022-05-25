@@ -21,7 +21,9 @@
 						<RouterLink v-if="isSuperAdmin" to="/dashboard/userCreate"
 							>Créer un admin</RouterLink
 						>
-						<RouterLink to="/dashboard/userRoles">Liste des rôles</RouterLink>
+						<RouterLink v-if="isSuperAdmin" to="/dashboard/userRoles"
+							>Liste des rôles</RouterLink
+						>
 					</div>
 				</div>
 				<div class="my-5">
@@ -35,7 +37,7 @@
 							>Liste des catégories</RouterLink
 						>
 						<RouterLink to="/dashboard/races">Liste des races</RouterLink>
-						<RouterLink to="/dashboard/offerStatus"
+						<RouterLink v-if="isSuperAdmin" to="/dashboard/offerStatus"
 							>Liste des status</RouterLink
 						>
 					</div>
@@ -46,7 +48,7 @@
 						<RouterLink to="/dashboard/adoptionRequestsList"
 							>Voir la liste</RouterLink
 						>
-						<RouterLink to="/dashboard/adoptionStatus"
+						<RouterLink v-if="isSuperAdmin" to="/dashboard/adoptionStatus"
 							>Liste des status</RouterLink
 						>
 					</div>

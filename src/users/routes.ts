@@ -27,18 +27,11 @@ import { User, UserType, UserUpdate, UserUpdateType } from "./types";
 const userRouter = async (server: FastifyInstance) => {
 	interface FastifyRequest {
 		Querystring: {
-			id_role: number;
-			email: string;
-			username: string;
-			firstname: string;
-			lastname: string;
-			phone_number: string;
 			orderBy: string;
+			search: string;
 		};
 	}
 	server.register(bcrypt);
-	//ajout middlware verif adminAccessOnly
-	// scroll infini
 	server.get<{ Querystring: FastifyRequest["Querystring"]; Reply: UserType[] }>(
 		"/",
 		async (request, reply) => {
@@ -55,37 +48,16 @@ const userRouter = async (server: FastifyInstance) => {
 			}
 
 			let filterArray: [string, string | number | Object][] = [];
-			const id_role = Number(request.query.id_role);
-			const email = Number(request.query.email);
-			const username = Number(request.query.username);
-			const firstname = Number(request.query.firstname);
-			const lastname = Number(request.query.lastname);
-			const phone_number = Number(request.query.phone_number);
-			if (id_role) {
-				filterArray.push(["id_role", id_role]);
-			}
-			if (email) {
-				filterArray.push(["email", email]);
-			}
-			if (username) {
-				filterArray.push(["username", username]);
-			}
-			if (firstname) {
-				filterArray.push(["firstname", firstname]);
-			}
-			if (lastname) {
-				filterArray.push(["lastname", lastname]);
-			}
-			if (phone_number) {
-				filterArray.push(["phone_number", phone_number]);
-			}
+			const search = request.query.search;
 
+			if (search) {
+				filterArray.push([search.split("-")[0], search.split("-")[1]]);
+			}
 			const allUsers = await findAllUsers(filterArray, orderBy);
 			reply.status(200).send(allUsers);
 		}
 	);
 
-	//ajout middlware verif adminOrOwnerAccessOnly
 	server.get<{ Params: ParamsIdType; Reply: UserType | ErrorType }>(
 		"/:id",
 		async (request, reply) => {
@@ -105,7 +77,6 @@ const userRouter = async (server: FastifyInstance) => {
 		}
 	);
 
-	//ajout middlware verif adminOrOwnerAccessOnly
 	server.put<{
 		Params: ParamsIdType;
 		Body: UserUpdateType;
@@ -184,7 +155,6 @@ const userRouter = async (server: FastifyInstance) => {
 		}
 	);
 
-	//ajout middlware verif adminOrOwnerAccessOnly
 	server.delete<{ Params: ParamsIdType; Reply: string }>(
 		"/:id",
 		async (request, reply) => {

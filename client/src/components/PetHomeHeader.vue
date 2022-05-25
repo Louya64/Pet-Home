@@ -137,7 +137,7 @@ const logout = () => {
 	localStorage.removeItem("userRole");
 	localStorage.removeItem("userId");
 	window.dispatchEvent(new Event("storage"));
-	router.push("/");
+	router.push("/auth");
 };
 
 const showCategories = ref(false);
