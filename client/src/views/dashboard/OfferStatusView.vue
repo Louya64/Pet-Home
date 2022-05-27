@@ -22,7 +22,6 @@ let offerStatusList: Ref<IOfferStatusRes[]> = ref([]);
 const orderBy = ref("");
 const resultMessage = ref("");
 const requestSuccess = ref(false);
-console.log(offerStatusList);
 const displayRequestResult = (success: boolean, message: string) => {
 	requestSuccess.value = success;
 	resultMessage.value = message;

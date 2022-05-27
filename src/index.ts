@@ -5,6 +5,8 @@ import fastifyEnv from "fastify-env";
 import multer from "fastify-multer";
 import path from "path";
 import fastifyStatic from "@fastify/static";
+import fastifySocketIo from "fastify-socket.io";
+import socketConnection from "./socketManager";
 
 import roleRouter from "./roles/routes";
 import userRouter from "./users/routes";
@@ -16,6 +18,7 @@ import adoptionStatusRouter from "./adoptionStatus/routes";
 import offerRouter from "./offers/routes";
 import uploadsRouter from "./uploads/routes";
 import adoptionRequestRouter from "./adoptionRequests/routes";
+import messageRouter from "./messages/routes";
 
 // dotenv
 declare module "fastify" {
@@ -110,6 +113,12 @@ async function createServer() {
 		root: path.join(__dirname.slice(0, -8), "public/assets"),
 		prefix: "/image/",
 	});
+	server.register(fastifySocketIo, {
+		cors: { origin: "http://localhost:3000" },
+	});
+	server.ready().then(() => {
+		socketConnection.start(server.io);
+	});
 
 	server.register(roleRouter, { prefix: "/roles" });
 	server.register(userRouter, { prefix: "/users" });
@@ -121,6 +130,7 @@ async function createServer() {
 	server.register(offerRouter, { prefix: "/offers" });
 	server.register(uploadsRouter, { prefix: "/uploads" });
 	server.register(adoptionRequestRouter, { prefix: "/adoptionRequests" });
+	server.register(messageRouter, { prefix: "/messages" });
 
 	server.listen(8080, (err, address) => {
 		if (err) {

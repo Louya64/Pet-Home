@@ -1,5 +1,6 @@
 <template>
 	<div
+		title="Voir les détails de cette annonce"
 		v-if="offer.status.name !== 'Clos'"
 		@click="() => router.push('/offers/' + offer.id)"
 		class="w-1/4 m-5 p-3 flex flex-col justify-between shadow-md shadow-slate-700 hover:cursor-pointer hover:scale-105 transition duration-300 hover:shadow-2xl hover:shadow-slate-700"

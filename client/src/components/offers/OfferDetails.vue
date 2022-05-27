@@ -54,7 +54,12 @@
 			</p>
 		</div>
 		<div class="flex justify-end w-5/6 mx-auto">
-			<button class="btn btn-green">Candidature d'adoption</button>
+			<button
+				@click="() => router.push(`/adoptionRequest/${route.params.id}`)"
+				class="btn btn-green"
+			>
+				Candidature d'adoption
+			</button>
 		</div>
 	</div>
 </template>
@@ -62,11 +67,12 @@
 <script setup lang="ts">
 import axios from "axios";
 import { ref, onMounted, type Ref } from "vue";
-import { useRoute } from "vue-router";
+import { useRoute, useRouter } from "vue-router";
 import type { IOfferRes } from "@/interfaces/IOffer";
 import type { IPhoto } from "@/interfaces/IPhoto";
 
 const route = useRoute();
+const router = useRouter();
 const urlBack = import.meta.env.VITE_URL_BACK;
 const offer: Ref<IOfferRes | undefined> = ref();
 const photos: Ref<IPhoto[] | undefined> = ref();
@@ -75,6 +81,7 @@ let firstPhotoIndex = 0;
 
 const scrollPhotos = (nb: number) => {
 	if (photos.value) {
+		photosDisplayed.value = photos.value;
 		if (
 			firstPhotoIndex + nb + 4 > photos.value.length ||
 			firstPhotoIndex + nb < 0

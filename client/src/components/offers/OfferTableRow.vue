@@ -94,7 +94,7 @@
 
 		<td>
 			<button
-				@click="() => router.push(`/dashboard/offersList/${offer.id}`)"
+				@click="() => router.push(`/dashboard/offers/${offer.id}`)"
 				class="btn btn-green"
 			>
 				Voir / Modifier

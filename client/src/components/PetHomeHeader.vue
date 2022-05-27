@@ -66,7 +66,8 @@
 					<font-awesome-icon class="text-2xl" icon="user" />
 					<button>Profil</button>
 				</div>
-				<div
+				<RouterLink
+					to="/myAdoptionRequests"
 					class="w-1/3 flex flex-col justify-center items-center h-full hover:main-bg-color-darker hover:cursor-pointer"
 				>
 					<div class="relative">
@@ -79,7 +80,7 @@
 					</div>
 
 					<button>Messagerie</button>
-				</div>
+				</RouterLink>
 				<div
 					@click="logout"
 					class="w-1/3 flex flex-col justify-center items-center h-full hover:main-bg-color-darker hover:cursor-pointer"
@@ -120,15 +121,21 @@ const router = useRouter();
 const isAuthenticate: Ref<string | null> = ref(
 	localStorage.getItem("token") ? localStorage.getItem("token") : null
 );
+const userAuthenticatedId: Ref<string | null> = ref(
+	localStorage.getItem("userId") ? localStorage.getItem("userId") : null
+);
 
 window.addEventListener("storage", () => {
 	isAuthenticate.value = localStorage.getItem("token");
+	userAuthenticatedId.value = localStorage.getItem("userId");
 });
 
 const logout = () => {
 	localStorage.removeItem("token");
+	localStorage.removeItem("userRole");
+	localStorage.removeItem("userId");
 	window.dispatchEvent(new Event("storage"));
-	router.push("/");
+	router.push("/auth");
 };
 
 const showCategories = ref(false);

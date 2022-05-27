@@ -44,6 +44,7 @@ const offerRouter = async (server: FastifyInstance) => {
 			zipcode: number;
 			city: string;
 			age: string;
+			idIn: string;
 			orderBy: string;
 		};
 	}
@@ -72,6 +73,7 @@ const offerRouter = async (server: FastifyInstance) => {
 		const zipcode = Number(request.query.zipcode);
 		const city = request.query.city;
 		const age = request.query.age;
+		const idIn = request.query.idIn;
 
 		if (id_status) {
 			filterArray.push(["id_status", id_status]);
@@ -98,6 +100,10 @@ const offerRouter = async (server: FastifyInstance) => {
 			const minAge = Number(age.split("-")[0]);
 			const maxAge = Number(age.split("-")[1]);
 			filterArray.push(["age", { gte: minAge, lte: maxAge }]);
+		}
+		if (idIn) {
+			const idArray = idIn.split(",").map((el) => Number(el));
+			filterArray.push(["id", { in: idArray }]);
 		}
 
 		const allOffers = await findAllOffers(filterArray, orderBy);

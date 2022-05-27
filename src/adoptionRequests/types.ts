@@ -6,18 +6,36 @@ const AdoptionRequest = {
 		id: { type: "number" },
 		// creation_date
 		id_offer: { type: "number" },
-		candidate_contact: { type: "string" },
+		candidate_email: { type: "string" },
+		candidate_phone: { type: ["string", "null"] },
 		id_candidate: { type: ["number", "null"] },
 		id_adoption_status: { type: "number" },
 	},
-	required: ["id_offer", "candidate_contact", "id_adoption_status"],
+	required: ["id_offer", "candidate_email", "id_adoption_status"],
 } as const;
 type AdoptionRequestType = FromSchema<typeof AdoptionRequest>;
+
+const AdoptionRequestCreate = {
+	type: "object",
+	properties: {
+		id: { type: "number" },
+		// creation_date
+		id_offer: { type: "number" },
+		candidate_email: { type: "string" },
+		candidate_phone: { type: ["string", "null"] },
+		id_candidate: { type: ["number", "null"] },
+		id_adoption_status: { type: "number" },
+		message: { type: "string" },
+	},
+	required: ["id_offer", "candidate_email", "id_adoption_status", "message"],
+} as const;
+type AdoptionRequestCreateType = FromSchema<typeof AdoptionRequestCreate>;
 
 const AdoptionRequestUpdate = {
 	type: "object",
 	properties: {
-		candidate_contact: { type: "string" },
+		candidate_email: { type: "string" },
+		candidate_phone: { type: ["string", "null"] },
 		id_candidate: { type: "number" },
 		id_adoption_status: { type: "number" },
 	},
@@ -28,6 +46,8 @@ type AdoptionRequestUpdateType = FromSchema<typeof AdoptionRequestUpdate>;
 export {
 	AdoptionRequest,
 	AdoptionRequestType,
+	AdoptionRequestCreate,
+	AdoptionRequestCreateType,
 	AdoptionRequestUpdate,
 	AdoptionRequestUpdateType,
 };

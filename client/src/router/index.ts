@@ -3,6 +3,8 @@ import HomeView from "../views/public/HomeView.vue";
 import OffersView from "../views/public/OffersView.vue";
 import ContactView from "../views/public/ContactView.vue";
 import OfferDetails from "@/components/offers/OfferDetails.vue";
+import AdoptionRequestView from "@/views/public/AdoptionRequestView.vue";
+import MyAdoptionRequestsTrackView from "@/views/public/MyAdoptionRequestsTrackView.vue";
 
 // commons
 import LoginView from "@/views/commons/LoginView.vue";
@@ -19,6 +21,8 @@ import DashboardRaces from "@/views/dashboard/RacesView.vue";
 import DashboardAdoptionStatus from "@/views/dashboard/AdoptionStatusView.vue";
 import DashboardUserRoles from "@/views/dashboard/UserRolesView.vue";
 import DashboardOfferStatus from "@/views/dashboard/OfferStatusView.vue";
+import DashboardAdoptionRequestsList from "@/views/dashboard/AdoptionRequestsListView.vue";
+import DashboardAdoptionRequestTrack from "@/components/adoptionRequests/AdoptionRequestTrack.vue";
 
 import { createRouter, createWebHistory } from "vue-router";
 import jwt_decode from "jwt-decode";
@@ -61,6 +65,16 @@ const router = createRouter({
 			component: OfferDetails,
 		},
 		{
+			path: "/adoptionRequest/:idOffer",
+			name: "adoptionRequest",
+			component: AdoptionRequestView,
+		},
+		{
+			path: "/myAdoptionRequests",
+			name: "myAdoptionRequests",
+			component: MyAdoptionRequestsTrackView,
+		},
+		{
 			path: "/contact",
 			name: "contact",
 			component: ContactView,
@@ -72,12 +86,12 @@ const router = createRouter({
 			component: DashboardHome,
 		},
 		{
-			path: "/dashboard/offersList",
+			path: "/dashboard/offers",
 			name: "dashboardOffersList",
 			component: DashboardOffersList,
 		},
 		{
-			path: "/dashboard/offersList/:id",
+			path: "/dashboard/offers/:id",
 			name: "dashboardOfferUpdate",
 			component: DashboardOfferUpdate,
 		},
@@ -110,6 +124,16 @@ const router = createRouter({
 			path: "/dashboard/offerStatus",
 			name: "dashboardOfferStatus",
 			component: DashboardOfferStatus,
+		},
+		{
+			path: "/dashboard/adoptionRequests",
+			name: "dashboardAdoptionRequestsList",
+			component: DashboardAdoptionRequestsList,
+		},
+		{
+			path: "/dashboard/adoptionRequests/:id",
+			name: "dashboardAdoptionRequestTrack",
+			component: DashboardAdoptionRequestTrack,
 		},
 	],
 });
