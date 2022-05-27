@@ -5,11 +5,14 @@ import {
 	notFoundError,
 	duplicateDataError,
 	invalidDataError,
+	unauthorizedError,
 } from "../commons/errorHelpers";
 import {
 	hashPassword,
 	checkPasswordFormat,
 	confirmPassword,
+	duplicatedData,
+	verifyPassword,
 } from "../auth/helpers";
 import {
 	findAllUsers,
@@ -24,18 +27,11 @@ import { User, UserType, UserUpdate, UserUpdateType } from "./types";
 const userRouter = async (server: FastifyInstance) => {
 	interface FastifyRequest {
 		Querystring: {
-			id_role: number;
-			email: string;
-			username: string;
-			firstname: string;
-			lastname: string;
-			phone_number: string;
 			orderBy: string;
+			search: string;
 		};
 	}
 	server.register(bcrypt);
-	//ajout middlware verif adminAccessOnly
-	// scroll infini
 	server.get<{ Querystring: FastifyRequest["Querystring"]; Reply: UserType[] }>(
 		"/",
 		async (request, reply) => {
@@ -52,37 +48,16 @@ const userRouter = async (server: FastifyInstance) => {
 			}
 
 			let filterArray: [string, string | number | Object][] = [];
-			const id_role = Number(request.query.id_role);
-			const email = Number(request.query.email);
-			const username = Number(request.query.username);
-			const firstname = Number(request.query.firstname);
-			const lastname = Number(request.query.lastname);
-			const phone_number = Number(request.query.phone_number);
-			if (id_role) {
-				filterArray.push(["id_role", id_role]);
-			}
-			if (email) {
-				filterArray.push(["email", email]);
-			}
-			if (username) {
-				filterArray.push(["username", username]);
-			}
-			if (firstname) {
-				filterArray.push(["firstname", firstname]);
-			}
-			if (lastname) {
-				filterArray.push(["lastname", lastname]);
-			}
-			if (phone_number) {
-				filterArray.push(["phone_number", phone_number]);
-			}
+			const search = request.query.search;
 
+			if (search) {
+				filterArray.push([search.split("-")[0], search.split("-")[1]]);
+			}
 			const allUsers = await findAllUsers(filterArray, orderBy);
 			reply.status(200).send(allUsers);
 		}
 	);
 
-	//ajout middlware verif adminOrOwnerAccessOnly
 	server.get<{ Params: ParamsIdType; Reply: UserType | ErrorType }>(
 		"/:id",
 		async (request, reply) => {
@@ -102,7 +77,6 @@ const userRouter = async (server: FastifyInstance) => {
 		}
 	);
 
-	//ajout middlware verif adminOrOwnerAccessOnly
 	server.put<{
 		Params: ParamsIdType;
 		Body: UserUpdateType;
@@ -119,67 +93,59 @@ const userRouter = async (server: FastifyInstance) => {
 		},
 		async (request, reply) => {
 			const { body: user } = request;
-			let userEmailAlreadyExists;
-			let usernameAlreadyExists;
-			if (user.email) {
-				userEmailAlreadyExists = await findUserByEmail(user.email);
-			}
-			if (user.username) {
-				usernameAlreadyExists = await findUserByUsername(user.username);
-			}
+			let newPassword = "";
 
-			if (
-				userEmailAlreadyExists &&
-				userEmailAlreadyExists.id !== request.params.id &&
-				usernameAlreadyExists &&
-				usernameAlreadyExists.id !== request.params.id
-			) {
-				reply
-					.status(409)
-					.send(duplicateDataError(`Cet email et ce pseudonyme existent déjà`));
-			} else if (
-				userEmailAlreadyExists &&
-				userEmailAlreadyExists.id !== request.params.id
-			) {
-				reply.status(409).send(duplicateDataError(`Cet email existe déjà`));
-			} else if (
-				usernameAlreadyExists &&
-				usernameAlreadyExists.id !== request.params.id
-			) {
-				reply.status(409).send(duplicateDataError(`Ce pseudonyme existe déjà`));
-			} else {
-				let userToUpdate = user;
-				if (user.password) {
-					if (
-						!user.confirmedPassword ||
-						!confirmPassword(user.password, user.confirmedPassword)
-					) {
+			// check pass // login if user.lastPassword
+			if (user.lastPassword && user.password && user.confirmedPassword) {
+				const userFound = await findUserByEmail(user.email);
+				if (!userFound) {
+					reply
+						.status(401)
+						.send(unauthorizedError(`Email ou mot de passe incorrect`));
+				}
+				if (userFound) {
+					const passwordOk = await verifyPassword(
+						server,
+						user.lastPassword,
+						userFound.password as string
+					);
+					if (!passwordOk) {
 						reply
-							.status(422)
-							.send(
-								invalidDataError(
-									`Le mot de passe n'a pas été confirmé correctement`
-								)
-							);
-					} else {
-						if (!checkPasswordFormat(user.password)) {
-							reply
-								.status(422)
-								.send(
-									invalidDataError(
-										`Le mot de passe ne respecte pas le modèle(au moins 8 caractères dont 1 nombre, 1 minuscule, 1 majuscule, et 1 caractère spécial parmis *.!@#$%^&(){}[:;<>,.?/~_+-=|)`
-									)
-								);
-						} else {
-							const hashedPassword = await hashPassword(server, user.password);
-							userToUpdate = {
-								...user,
-								password: hashedPassword,
-							};
-							delete userToUpdate.confirmedPassword;
+							.status(401)
+							.send(unauthorizedError(`Email ou mot de passe incorrect`));
+					}
+					if (passwordOk) {
+						const newPasswordFormatOk = checkPasswordFormat(user.password);
+						const confirmPasswordOk = confirmPassword(
+							user.password,
+							user.confirmedPassword
+						);
+						if (newPasswordFormatOk && confirmPasswordOk) {
+							newPassword = await hashPassword(server, user.password);
 						}
 					}
 				}
+			}
+
+			const duplicateDataErrorMessage = await duplicatedData(
+				user.username,
+				user.email,
+				Number(request.params.id)
+			);
+
+			if (duplicateDataErrorMessage) {
+				reply.status(409).send(duplicateDataError(duplicateDataErrorMessage));
+			} else {
+				let userToUpdate = user;
+				if (newPassword) {
+					userToUpdate = {
+						...user,
+						password: newPassword,
+					};
+					delete userToUpdate.confirmedPassword;
+					delete userToUpdate.lastPassword;
+				}
+
 				const userUpdated = await updateUser(
 					Number(request.params.id),
 					userToUpdate
@@ -189,7 +155,6 @@ const userRouter = async (server: FastifyInstance) => {
 		}
 	);
 
-	//ajout middlware verif adminOrOwnerAccessOnly
 	server.delete<{ Params: ParamsIdType; Reply: string }>(
 		"/:id",
 		async (request, reply) => {

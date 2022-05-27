@@ -4,4 +4,4 @@ node_modules
 dist
 */.vscode
 resetDb.sql
-public
+public/assets

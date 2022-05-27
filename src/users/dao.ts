@@ -5,21 +5,24 @@ export const findAllUsers = async (
 	filterArray: [string, string | number | Object][],
 	orderBy: Object
 ) => {
-	const entries = new Map(filterArray);
-	const obj = Object.fromEntries(entries);
-
-	let filters = {};
-	if (filterArray.length === 1) {
-		filters = obj;
-	} else if (filterArray.length > 1) {
-		filters = {
-			AND: obj,
+	let search = {};
+	if (filterArray.length > 0) {
+		search = {
+			[filterArray[0][0]]: {
+				contains: filterArray[0][1],
+			},
 		};
 	}
 	return await prisma.users.findMany({
-		where: filters,
+		where: search,
 		select: {
 			id: true,
+			creation_date: true,
+			role: {
+				select: {
+					name: true,
+				},
+			},
 			id_role: true,
 			email: true,
 			username: true,
@@ -38,6 +41,12 @@ export const findUserById = async (id: number) => {
 		},
 		select: {
 			id: true,
+			creation_date: true,
+			role: {
+				select: {
+					name: true,
+				},
+			},
 			id_role: true,
 			email: true,
 			username: true,
