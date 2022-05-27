@@ -3,7 +3,8 @@ import { type OfferType, OfferUpdateType } from "./types";
 
 export const findAllOffers = async (
 	filterArray: [string, string | number | Object][],
-	orderBy: object
+	orderBy: object,
+	limit: number
 ) => {
 	const entries = new Map(filterArray);
 	const obj = Object.fromEntries(entries);
@@ -18,6 +19,7 @@ export const findAllOffers = async (
 	}
 
 	return await prisma.offers.findMany({
+		take: limit,
 		where: filters,
 		select: {
 			id: true,

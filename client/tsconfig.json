@@ -6,8 +6,9 @@
 		"paths": {
 			"@/*": ["./src/*"]
 		},
-		"target": "es2017",
-		"lib": ["es2017"]
+		"lib": ["esnext"],
+		"allowJs": true,
+		"noImplicitAny": false
 	},
 
 	"references": [

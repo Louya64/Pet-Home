@@ -1,8 +1,10 @@
 import prisma from "../database";
 import { type RoleType } from "./types";
 
-export const findAllRoles = async () => {
-	return await prisma.roles.findMany();
+export const findAllRoles = async (orderBy: object) => {
+	return await prisma.roles.findMany({
+		orderBy: orderBy,
+	});
 };
 
 export const findRoleById = async (id: number) => {
