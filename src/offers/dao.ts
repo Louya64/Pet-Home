@@ -71,6 +71,18 @@ export const countAdopted = async () => {
 	});
 };
 
+export const offersCreatePerDayCount = async () => {
+	return prisma.$queryRaw`SELECT DATE_FORMAT(offers.creation_date, '%Y-%m-%d') "date", COUNT(offers.id) "count"
+  FROM offers
+  GROUP BY DATE_FORMAT(offers.creation_date, '%Y-%m-%d')`;
+};
+
+export const offersAdoptedPerDayCount = async () => {
+	return prisma.$queryRaw`SELECT DATE_FORMAT(offers.adoption_date, '%Y-%m-%d') "date", COUNT(offers.id) "count"
+  FROM offers
+  GROUP BY DATE_FORMAT(offers.adoption_date, '%Y-%m-%d')`;
+};
+
 export const findOfferById = async (id: number) => {
 	return await prisma.offers.findUnique({
 		where: {
