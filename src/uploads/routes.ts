@@ -8,6 +8,7 @@ const uploadsRouter = async (server: FastifyInstance) => {
 	interface FastifyRequest {
 		Querystring: {
 			id_offer: number;
+			main: string;
 		};
 	}
 	server.get<{
@@ -16,8 +17,16 @@ const uploadsRouter = async (server: FastifyInstance) => {
 	}>("/", async (request, reply) => {
 		let filterArray: [string, string | number | Object][] = [];
 		const id_offer = Number(request.query.id_offer);
+		const main = request.query.main;
 		if (id_offer) {
 			filterArray.push(["id_offer", id_offer]);
+		}
+		if (main) {
+			if (main === "true") {
+				filterArray.push(["main", true]);
+			} else {
+				filterArray.push(["main", false]);
+			}
 		}
 
 		const allPhotos = await findAllPhotos(filterArray);

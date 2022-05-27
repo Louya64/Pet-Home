@@ -55,6 +55,6 @@
 	}
 
 	.siteContainer {
-		@apply pt-[15vh] min-h-screen;
+		@apply pt-[10vh] min-h-screen;
 	}
 }
