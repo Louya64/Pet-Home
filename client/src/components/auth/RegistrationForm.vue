@@ -1,5 +1,5 @@
 <template>
-	<div class="pt-[15vh] min-h-screen">
+	<div class="siteContainer">
 		<h1 class="text-center sm:text-2xl mb-10">Création d'un compte</h1>
 		<p class="text-center mb-10">
 			Déjà inscrit?
