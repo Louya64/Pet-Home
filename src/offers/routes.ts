@@ -4,11 +4,19 @@ import { File, FilesObject } from "fastify-multer/lib/interfaces";
 import { ParamsIdType, ErrorType } from "../commons/types";
 import {
 	findAllOffers,
+	countOffers,
+	countAdopted,
+	offersCreatePerDayCount,
+	offersAdoptedPerDayCount,
 	findOfferById,
 	createOffer,
 	updateOffer,
 	deleteOffer,
 } from "./dao";
+import {
+	adoptionRequestsPerDayCount,
+	countAdoptionRequests,
+} from "../adoptionRequests/dao";
 import { createPhoto, findAllPhotos } from "../uploads/dao";
 import { OfferType, OfferReplyType, OfferFromMulterType } from "./types";
 import { unlink } from "node:fs/promises";
@@ -46,6 +54,7 @@ const offerRouter = async (server: FastifyInstance) => {
 			age: string;
 			idIn: string;
 			orderBy: string;
+			limit: number;
 		};
 	}
 
@@ -74,6 +83,7 @@ const offerRouter = async (server: FastifyInstance) => {
 		const city = request.query.city;
 		const age = request.query.age;
 		const idIn = request.query.idIn;
+		const limit = Number(request.query.limit) || 9999999;
 
 		if (id_status) {
 			filterArray.push(["id_status", id_status]);
@@ -106,8 +116,25 @@ const offerRouter = async (server: FastifyInstance) => {
 			filterArray.push(["id", { in: idArray }]);
 		}
 
-		const allOffers = await findAllOffers(filterArray, orderBy);
+		const allOffers = await findAllOffers(filterArray, orderBy, limit);
 		reply.status(200).send(allOffers);
+	});
+
+	server.get("/stats", async (request, reply) => {
+		const nbOffers = await countOffers();
+		const nbAdopted = await countAdopted();
+		const nbAdoptionRequests = await countAdoptionRequests();
+		const nbOffersCreatedPerDay = await offersCreatePerDayCount();
+		const nbOffersAdoptedPerDay = await offersAdoptedPerDayCount();
+		const nbAdoptionRequestsPerDay = await adoptionRequestsPerDayCount();
+		reply.status(200).send({
+			nbOffers: nbOffers,
+			nbAdopted: nbAdopted,
+			nbAdoptionRequests: nbAdoptionRequests,
+			nbOffersCreatedPerDay: nbOffersCreatedPerDay,
+			nbOffersAdoptedPerDay: nbOffersAdoptedPerDay,
+			nbAdoptionRequestsPerDay: nbAdoptionRequestsPerDay,
+		});
 	});
 
 	server.get<{ Params: ParamsIdType; Reply: OfferType | ErrorType }>(

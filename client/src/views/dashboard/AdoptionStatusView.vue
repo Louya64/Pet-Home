@@ -1,6 +1,6 @@
 <template>
 	<div class="dashboardContainer">
-		<h1>Les statuts des annonces</h1>
+		<h1>Les statuts des candidatures</h1>
 		<AdoptionStatusCreateForm @requestResult="displayRequestResult" />
 		<RequestResult :resultMessage="resultMessage" :success="requestSuccess" />
 		<AdoptionStatusTable

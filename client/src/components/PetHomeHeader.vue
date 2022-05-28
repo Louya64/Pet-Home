@@ -47,7 +47,6 @@
 			<RouterLink to="/contact">Contactez-nous</RouterLink>
 		</nav>
 		<div class="flex justify-around items-center w-1/5">
-			<!-- v-if !auth -->
 			<RouterLink
 				v-if="!isAuthenticate"
 				to="/auth"
@@ -58,14 +57,17 @@
 					Créer un compte
 				</button>
 			</RouterLink>
-			<!-- v-else -->
 			<div v-else class="w-full h-full flex">
-				<div
+				<RouterLink
 					class="w-1/3 flex flex-col justify-center items-center h-full hover:main-bg-color-darker hover:cursor-pointer"
+					:to="{
+						name: 'userProfile',
+						params: { id: userAuthenticatedId },
+					}"
 				>
 					<font-awesome-icon class="text-2xl" icon="user" />
 					<button>Profil</button>
-				</div>
+				</RouterLink>
 				<RouterLink
 					to="/myAdoptionRequests"
 					class="w-1/3 flex flex-col justify-center items-center h-full hover:main-bg-color-darker hover:cursor-pointer"
@@ -92,7 +94,6 @@
 		</div>
 	</header>
 
-	<!-- <RouterView /> -->
 	<router-view v-slot="{ Component, route }">
 		<transition name="fade">
 			<component :is="Component" :key="route.query" />

@@ -5,6 +5,7 @@ import ContactView from "../views/public/ContactView.vue";
 import OfferDetails from "@/components/offers/OfferDetails.vue";
 import AdoptionRequestView from "@/views/public/AdoptionRequestView.vue";
 import MyAdoptionRequestsTrackView from "@/views/public/MyAdoptionRequestsTrackView.vue";
+import UserProfileView from "@/views/public/UserProfileView.vue";
 
 // commons
 import LoginView from "@/views/commons/LoginView.vue";
@@ -23,6 +24,9 @@ import DashboardUserRoles from "@/views/dashboard/UserRolesView.vue";
 import DashboardOfferStatus from "@/views/dashboard/OfferStatusView.vue";
 import DashboardAdoptionRequestsList from "@/views/dashboard/AdoptionRequestsListView.vue";
 import DashboardAdoptionRequestTrack from "@/components/adoptionRequests/AdoptionRequestTrack.vue";
+import DashboardUsersList from "@/views/dashboard/UsersListView.vue";
+import DashboardUserCreate from "@/views/dashboard/UserCreateView.vue";
+import DashboardUserUpdate from "@/views/dashboard/UserUpdateView.vue";
 
 import { createRouter, createWebHistory } from "vue-router";
 import jwt_decode from "jwt-decode";
@@ -40,6 +44,11 @@ const router = createRouter({
 			path: "/auth",
 			name: "auth",
 			component: LoginView,
+		},
+		{
+			path: "/users/:id",
+			name: "userProfile",
+			component: UserProfileView,
 		},
 		{
 			path: "/forgotPasswordConfirm",
@@ -134,6 +143,21 @@ const router = createRouter({
 			path: "/dashboard/adoptionRequests/:id",
 			name: "dashboardAdoptionRequestTrack",
 			component: DashboardAdoptionRequestTrack,
+		},
+		{
+			path: "/dashboard/usersList",
+			name: "dashboardUsersList",
+			component: DashboardUsersList,
+		},
+		{
+			path: "/dashboard/UsersList/:id",
+			name: "dashboardUserUpdate",
+			component: DashboardUserUpdate,
+		},
+		{
+			path: "/dashboard/UserCreate",
+			name: "dashboardUserCreate",
+			component: DashboardUserCreate,
 		},
 	],
 });

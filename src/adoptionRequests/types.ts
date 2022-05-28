@@ -4,7 +4,6 @@ const AdoptionRequest = {
 	type: "object",
 	properties: {
 		id: { type: "number" },
-		// creation_date
 		id_offer: { type: "number" },
 		candidate_email: { type: "string" },
 		candidate_phone: { type: ["string", "null"] },

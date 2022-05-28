@@ -53,6 +53,8 @@ const login = async (credentials: ICredentials) => {
 			localStorage.setItem("userRole", userRole.toString());
 			window.dispatchEvent(new Event("storage"));
 			if (userRole === 1 || userRole === 2) {
+				if (userRole === 1) {
+				}
 				router.push("/dashboard");
 			} else {
 				router.push("/");
