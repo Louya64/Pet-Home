@@ -315,11 +315,11 @@ const namesListFiltered = computed(() => {
 });
 
 const searchByCategory = ref(false);
-let categoriesList: Ref<ICategoryRes[]> = ref([]);
+const categoriesList: Ref<ICategoryRes[]> = ref([]);
 
 const searchByRace = ref(false);
-let racesList: Ref<IRaceRes[]> = ref([]);
-let racesListFitered: Ref<IRaceRes[]> = ref([]);
+const racesList: Ref<IRaceRes[]> = ref([]);
+const racesListFitered: Ref<IRaceRes[]> = ref([]);
 const updateRaces = (categoryId: number | null) => {
 	if (categoryId !== null) {
 		racesListFitered.value = racesList.value.filter(

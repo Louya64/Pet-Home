@@ -29,7 +29,7 @@
 				<div class="my-5">
 					<h2 class="text-2xl">Annonces</h2>
 					<div class="pl-5 flex flex-col">
-						<RouterLink to="/dashboard/offersList">Voir la liste</RouterLink>
+						<RouterLink to="/dashboard/offers">Voir la liste</RouterLink>
 						<RouterLink to="/dashboard/offerCreate"
 							>Ajouter une annonce</RouterLink
 						>
@@ -45,7 +45,7 @@
 				<div class="my-5">
 					<h2 class="text-2xl">Candidatures</h2>
 					<div class="pl-5 flex flex-col">
-						<RouterLink to="/dashboard/adoptionRequestsList"
+						<RouterLink to="/dashboard/adoptionRequests"
 							>Voir la liste</RouterLink
 						>
 						<RouterLink v-if="isSuperAdmin" to="/dashboard/adoptionStatus"
@@ -87,6 +87,7 @@ const logout = () => {
 	localStorage.removeItem("token");
 	localStorage.removeItem("userRole");
 	localStorage.removeItem("userId");
+	localStorage.removeItem("userUsername");
 	window.dispatchEvent(new Event("storage"));
 	router.push("/auth");
 };

@@ -17,7 +17,7 @@ import OfferTable from "@/components/offers/OfferTable.vue";
 import RequestResult from "@/components/commons/RequestResult.vue";
 import type { IOfferRes } from "@/interfaces/IOffer";
 
-let offersList: Ref<IOfferRes[]> = ref([]);
+const offersList: Ref<IOfferRes[]> = ref([]);
 const orderBy = ref("");
 const resultMessage = ref("");
 const requestSuccess = ref(false);

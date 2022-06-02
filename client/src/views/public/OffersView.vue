@@ -40,8 +40,8 @@ import { useRoute } from "vue-router";
 import type { IOfferRes } from "@/interfaces/IOffer";
 
 const route = useRoute();
-let offersList: Ref<IOfferRes[]> = ref([]);
-let namesList: Ref<string[]> = ref([]);
+const offersList: Ref<IOfferRes[]> = ref([]);
+const namesList: Ref<string[]> = ref([]);
 let filterSelected: string[] = [];
 const nameSelected = ref("");
 const categorySelected = ref("");

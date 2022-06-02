@@ -66,10 +66,10 @@
 					}"
 				>
 					<font-awesome-icon class="text-2xl" icon="user" />
-					Mon profil
+					<button>Profil</button>
 				</RouterLink>
-
-				<div
+				<RouterLink
+					to="/myAdoptionRequests"
 					class="w-1/3 flex flex-col justify-center items-center h-full hover:main-bg-color-darker hover:cursor-pointer"
 				>
 					<div class="relative">
@@ -82,7 +82,7 @@
 					</div>
 
 					<button>Messagerie</button>
-				</div>
+				</RouterLink>
 				<div
 					@click="logout"
 					class="w-1/3 flex flex-col justify-center items-center h-full hover:main-bg-color-darker hover:cursor-pointer"
@@ -105,6 +105,7 @@
 import { ref, type Ref, onMounted } from "vue";
 import { RouterLink, RouterView, useRouter } from "vue-router";
 import type { ICategoryRes } from "../interfaces/ICategory";
+import type { IAdoptionRequestRes } from "@/interfaces/IAdoptionRequest";
 import axios from "axios";
 
 if (
@@ -117,31 +118,68 @@ if (
 	document.documentElement.classList.remove("dark");
 }
 
-const newMessage = ref(false);
 const router = useRouter();
 const isAuthenticate: Ref<string | null> = ref(
 	localStorage.getItem("token") ? localStorage.getItem("token") : null
 );
-
 const userAuthenticatedId: Ref<string | null> = ref(
 	localStorage.getItem("userId") ? localStorage.getItem("userId") : null
 );
+const newMessage: Ref<string | null> = ref(
+	localStorage.getItem("newMessage") ? localStorage.getItem("newMessage") : null
+);
+
+const getUnredMessages = async () => {
+	if (userAuthenticatedId.value) {
+		await axios
+			.get(
+				`${import.meta.env.VITE_URL_BACK}/adoptionRequests?userId=${
+					userAuthenticatedId.value
+				}`
+			)
+			.then((res) => {
+				const idReqArray = res.data.map(
+					(adoptionReq: IAdoptionRequestRes) => adoptionReq.id
+				);
+				axios
+					.get(
+						`${
+							import.meta.env.VITE_URL_BACK
+						}/messages?idReqIn=${idReqArray}&authorRole=!3&seen=false`
+					)
+					.then((res) => {
+						if (res.data.length) {
+							localStorage.setItem("newMessage", "yes");
+							newMessage.value = localStorage.getItem("newMessage");
+						} else {
+							localStorage.removeItem("newMessage");
+							newMessage.value = null;
+						}
+					});
+			});
+	}
+};
+getUnredMessages();
 
 window.addEventListener("storage", () => {
 	isAuthenticate.value = localStorage.getItem("token");
 	userAuthenticatedId.value = localStorage.getItem("userId");
+	newMessage.value = localStorage.getItem("newMessage");
+	getUnredMessages();
 });
 
 const logout = () => {
 	localStorage.removeItem("token");
 	localStorage.removeItem("userRole");
 	localStorage.removeItem("userId");
+	localStorage.removeItem("userUsername");
+	localStorage.removeItem("newMessage");
 	window.dispatchEvent(new Event("storage"));
 	router.push("/auth");
 };
 
 const showCategories = ref(false);
-let categoriesList: Ref<ICategoryRes[]> = ref([]);
+const categoriesList: Ref<ICategoryRes[]> = ref([]);
 onMounted(() => {
 	axios.get(`${import.meta.env.VITE_URL_BACK}/categories`).then((res) => {
 		categoriesList.value = res.data;

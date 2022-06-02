@@ -59,6 +59,7 @@ const createToken = (server: FastifyInstance, user: UserType) => {
 	return server.jwt.sign({
 		id: user.id,
 		role: user.id_role,
+		username: user.username,
 	});
 };
 

@@ -94,7 +94,8 @@ model Adoption_requests {
   offer                 Offers                @relation(fields: [id_offer], references: [id], onUpdate: Cascade, onDelete: Cascade)
   id_offer              Int
   creation_date         DateTime              @default(now())
-  candidate_contact     String                @db.VarChar(150)
+  candidate_email       String                @db.VarChar(150)
+  candidate_phone       String?               @db.VarChar(15)
   candidate             Users?                @relation(fields: [id_candidate], references: [id])
   id_candidate          Int?
   status                Adoption_status?      @relation(fields: [id_adoption_status], references: [id])
@@ -116,4 +117,5 @@ model Messages {
   author                Users?                @relation(fields: [id_author], references: [id])
   id_author             Int?
   text                  String                @db.LongText
+  seen                  Boolean               @db.TinyInt() @default(false)
 }

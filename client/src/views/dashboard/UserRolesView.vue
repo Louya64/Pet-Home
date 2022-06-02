@@ -19,7 +19,7 @@ import RequestResult from "@/components/commons/RequestResult.vue";
 import UserRoleTable from "@/components/userRoles/UserRoleTable.vue";
 import type { IUserRoleRes } from "@/interfaces/IUserRole";
 
-let userRolesList: Ref<IUserRoleRes[]> = ref([]);
+const userRolesList: Ref<IUserRoleRes[]> = ref([]);
 const orderBy = ref("");
 const resultMessage = ref("");
 const requestSuccess = ref(false);

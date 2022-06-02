@@ -4,8 +4,6 @@ const Offer = {
 	type: "object",
 	properties: {
 		id: { type: "number" },
-		// creation_date
-		// adoption_date
 		id_status: { type: "number" },
 		animal_name: { type: ["string", "null"] },
 		age: { type: "number" },
@@ -19,8 +17,6 @@ const Offer = {
 		disability: { type: ["string", "null"] },
 		description: { type: ["string", "null"] },
 	},
-	// creation_date
-	// adoption_date
 	required: [
 		"id_status",
 		"age",
@@ -68,8 +64,6 @@ const OfferReply = {
 	type: "object",
 	properties: {
 		id: { type: "number" },
-		// creation_date
-		// adoption_date
 		status: {
 			type: "object",
 			properties: {
@@ -95,8 +89,6 @@ const OfferReply = {
 		disability: { type: ["string", "null"] },
 		description: { type: ["string", "null"] },
 	},
-	// creation_date
-	// adoption_date
 	required: [
 		"id_status",
 		"age",
@@ -113,7 +105,6 @@ type OfferReplyType = FromSchema<typeof OfferReply>;
 const OfferUpdate = {
 	type: "object",
 	properties: {
-		// adoption_date
 		id_status: { type: "number" },
 		animal_name: { type: ["string", "null"] },
 		age: { type: "number" },

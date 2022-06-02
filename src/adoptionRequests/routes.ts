@@ -11,13 +11,47 @@ import {
 import {
 	AdoptionRequest,
 	AdoptionRequestType,
+	AdoptionRequestCreate,
+	AdoptionRequestCreateType,
 	AdoptionRequestUpdate,
 	AdoptionRequestUpdateType,
 } from "./types";
+import { createMessage } from "../messages/dao";
 
 const adoptionRequestRouter = async (server: FastifyInstance) => {
-	server.get<{ Reply: AdoptionRequestType[] }>("/", async (_request, reply) => {
-		const allAdoptionRequests = await findAllAdoptionRequests();
+	interface FastifyRequest {
+		Querystring: {
+			userId: string;
+			orderBy: string;
+		};
+	}
+	server.get<{
+		Querystring: FastifyRequest["Querystring"];
+		Reply: AdoptionRequestType[];
+	}>("/", async (request, reply) => {
+		let orderBy = {};
+		if (request.query.orderBy) {
+			orderBy = {
+				[request.query.orderBy.split("-")[0]]:
+					request.query.orderBy.split("-")[1],
+			};
+		} else {
+			orderBy = {
+				creation_date: "desc",
+			};
+		}
+
+		let filterArray: [string, string | number | Object][] = [];
+		const userId = Number(request.query.userId);
+
+		if (userId) {
+			filterArray.push(["id_candidate", userId]);
+		}
+
+		const allAdoptionRequests = await findAllAdoptionRequests(
+			filterArray,
+			orderBy
+		);
 		reply.status(200).send(allAdoptionRequests);
 	});
 
@@ -34,13 +68,13 @@ const adoptionRequestRouter = async (server: FastifyInstance) => {
 	);
 
 	server.post<{
-		Body: AdoptionRequestType;
+		Body: AdoptionRequestCreateType;
 		Reply: AdoptionRequestType | ErrorType;
 	}>(
 		"/",
 		{
 			schema: {
-				body: AdoptionRequest,
+				body: AdoptionRequestCreate,
 				response: {
 					200: AdoptionRequest,
 				},
@@ -48,10 +82,20 @@ const adoptionRequestRouter = async (server: FastifyInstance) => {
 		},
 		async (request, reply) => {
 			const { body: adoptionRequest } = request;
+			const bodyMessage = adoptionRequest.message;
 
+			const adoptionRequestToCreate: AdoptionRequestType = adoptionRequest;
+			delete adoptionRequestToCreate.message;
 			const adoptionRequestCreated = await createAdoptionRequest(
-				adoptionRequest
+				adoptionRequestToCreate
 			);
+
+			await createMessage({
+				id_adoption_request: adoptionRequestCreated.id,
+				id_author: adoptionRequest.id_candidate || null,
+				text: bodyMessage,
+			});
+
 			reply.status(200).send(adoptionRequestCreated);
 		}
 	);

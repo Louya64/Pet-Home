@@ -37,7 +37,6 @@ const invalidDataError = (message: string) => {
 		message: message,
 	};
 };
-//  forbidden 403, bad request 400
 
 export {
 	notFoundError,

@@ -276,9 +276,9 @@ interface Props {
 }
 
 const props = defineProps<Props>();
-let categoriesList: Ref<ICategoryRes[]> = ref([]);
-let racesList: Ref<IRaceRes[]> = ref([]);
-let offerStatusList: Ref<IOfferStatusRes[]> = ref([]);
+const categoriesList: Ref<ICategoryRes[]> = ref([]);
+const racesList: Ref<IRaceRes[]> = ref([]);
+const offerStatusList: Ref<IOfferStatusRes[]> = ref([]);
 const animal_name = ref("");
 const ageMonth = ref(0);
 const ageYear = ref(0);

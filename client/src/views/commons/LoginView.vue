@@ -48,9 +48,11 @@ const login = async (credentials: ICredentials) => {
 			const user: ITokenDecoded = jwt_decode(token);
 			const userRole = user.role;
 			const userId = user.id;
+			const userUsername = user.username;
 			localStorage.setItem("token", token);
 			localStorage.setItem("userId", userId.toString());
 			localStorage.setItem("userRole", userRole.toString());
+			localStorage.setItem("userUsername", userUsername);
 			window.dispatchEvent(new Event("storage"));
 			if (userRole === 1 || userRole === 2) {
 				if (userRole === 1) {

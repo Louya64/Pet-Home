@@ -24,8 +24,8 @@ import RaceTable from "@/components/races/RaceTable.vue";
 import type { IRaceRes } from "@/interfaces/IRace";
 import type { ICategoryRes } from "@/interfaces/ICategory";
 
-let racesList: Ref<IRaceRes[]> = ref([]);
-let categoriesList: Ref<ICategoryRes[]> = ref([]);
+const racesList: Ref<IRaceRes[]> = ref([]);
+const categoriesList: Ref<ICategoryRes[]> = ref([]);
 const orderBy = ref("");
 const resultMessage = ref("");
 const requestSuccess = ref(false);
