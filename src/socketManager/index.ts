@@ -1,18 +1,27 @@
 import { FastifyInstance } from "fastify";
+import { SocketMessageType } from "../messages/types";
 
 export default {
 	start: function (io: FastifyInstance["io"]) {
 		io.on("connection", function (socket: any) {
-			io.emit("confirmConnection", "connection ok");
-
-			socket.on("message de l'admin", (message: any) => {
-				console.log(message);
-				io.to(socket.id).emit("message du back", "reçu mess admin");
+			socket.on("joinRoom", (room: string) => {
+				if (socket.data.roomJoined) {
+					socket.leave(socket.data.roomJoined);
+				}
+				socket.join(room);
+				socket.data.roomJoined = room;
 			});
 
-			socket.on("message du site", (message: any) => {
-				console.log(message);
-				io.to(socket.id).emit("message du back", "reçu mess user");
+			socket.on("leave", () => {
+				if (socket.data.roomJoined) {
+					socket.leave(socket.data.roomJoined);
+					socket.data.roomJoined = "";
+				}
+			});
+
+			socket.on("newMessage", (message: SocketMessageType, room: string) => {
+				const newMessage = { ...message, creation_date: new Date() };
+				io.to(room).emit("updateMessages", newMessage);
 			});
 		});
 	},

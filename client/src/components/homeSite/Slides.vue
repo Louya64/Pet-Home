@@ -19,15 +19,13 @@ import { onMounted, ref, type Ref } from "vue";
 import axios from "axios";
 import type { IPhoto } from "../../interfaces/IPhoto";
 
-let photosList: Ref<IPhoto[]> = ref([]);
+const photosList: Ref<IPhoto[]> = ref([]);
 const urlBack = import.meta.env.VITE_URL_BACK;
 
 const getPhotosList = () => {
 	axios
 		.get(`${import.meta.env.VITE_URL_BACK}/uploads?main=true`)
 		.then((res) => {
-			// if res.data.length > 5 => slice ?
-
 			photosList.value = res.data;
 		});
 };

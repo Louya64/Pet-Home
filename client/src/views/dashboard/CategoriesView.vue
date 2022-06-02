@@ -22,7 +22,7 @@ import RequestResult from "@/components/commons/RequestResult.vue";
 import CategoryTable from "@/components/categories/CategoryTable.vue";
 import type { ICategoryRes } from "@/interfaces/ICategory";
 
-let categoriesList: Ref<ICategoryRes[]> = ref([]);
+const categoriesList: Ref<ICategoryRes[]> = ref([]);
 const orderBy = ref("");
 const resultMessage = ref("");
 const requestSuccess = ref(false);

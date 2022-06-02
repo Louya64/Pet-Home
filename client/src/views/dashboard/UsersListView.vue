@@ -22,7 +22,7 @@ import UserFilters from "@/components/users/UserFilters.vue";
 import RequestResult from "@/components/commons/RequestResult.vue";
 import type { IUserRes } from "@/interfaces/IUser";
 
-let usersList: Ref<IUserRes[]> = ref([]);
+const usersList: Ref<IUserRes[]> = ref([]);
 const orderBy = ref("");
 const search = ref("");
 const resultMessage = ref("");

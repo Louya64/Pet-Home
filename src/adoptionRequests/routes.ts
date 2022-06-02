@@ -90,22 +90,12 @@ const adoptionRequestRouter = async (server: FastifyInstance) => {
 				adoptionRequestToCreate
 			);
 
-			const messageCreated = await createMessage({
+			await createMessage({
 				id_adoption_request: adoptionRequestCreated.id,
 				id_author: adoptionRequest.id_candidate || null,
 				text: bodyMessage,
 			});
 
-			// => create message
-			// id_adoption_request = adoptionRequestCreated.id
-			// id_author = adoptionRequest.id_candidate || null
-			// text = adoptionRequest.message
-
-			// si candidate_id !== null => créer conv sinon qquoi ?
-			// comment créer un échange dans dashbord qui passe soit que par les mails, soit mails + conv
-			// comment afficher les mails reçus et envoyés dans dashbord...
-			// est-ce que depuis une boite mail, on peut envoyer du contenu sur dashboard (genre rediriger)?
-			// si + conv... pas en double...
 			reply.status(200).send(adoptionRequestCreated);
 		}
 	);

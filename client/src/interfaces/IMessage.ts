@@ -15,6 +15,15 @@ export interface IMessageRes {
 	text: string;
 }
 
+export interface IMessageSocketRes {
+	creation_date: string;
+	author: {
+		username: string;
+		id_role: number;
+	};
+	text: string;
+}
+
 export interface IMessageCreate {
 	id_adoption_request: number;
 	id_author: number | null;

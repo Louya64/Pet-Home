@@ -1,5 +1,5 @@
 import prisma from "../database";
-import { type MessageType } from "./types";
+import { type MessageType, MessageUpdateType } from "./types";
 
 export const findAllMessages = async (
 	filterArray: [string, string | number | Object][],
@@ -39,37 +39,22 @@ export const findAllMessages = async (
 				},
 			},
 			text: true,
+			seen: true,
 		},
 	});
 };
-
-// export const findMessageById = async (id: number) => {
-// 	return await prisma.messages.findUnique({
-// 		where: {
-// 			id: Number(id),
-// 		},
-// 	});
-// };
 
 export const createMessage = async (data: MessageType) => {
 	return await prisma.messages.create({ data });
 };
 
-// export const updateMessage = async (id: number, data: MessageUpdateType) => {
-// 	return await prisma.messages.update({
-// 		where: {
-// 			id: Number(id),
-// 		},
-// 		data: {
-// 			...data,
-// 		},
-// 	});
-// };
-
-// export const deleteMessage = async (id: number) => {
-// 	return await prisma.messages.delete({
-// 		where: {
-// 			id: Number(id),
-// 		},
-// 	});
-// };
+export const updateMessage = async (id: number, data: MessageUpdateType) => {
+	return await prisma.messages.update({
+		where: {
+			id: Number(id),
+		},
+		data: {
+			...data,
+		},
+	});
+};

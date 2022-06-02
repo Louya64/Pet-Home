@@ -87,6 +87,7 @@ const logout = () => {
 	localStorage.removeItem("token");
 	localStorage.removeItem("userRole");
 	localStorage.removeItem("userId");
+	localStorage.removeItem("userUsername");
 	window.dispatchEvent(new Event("storage"));
 	router.push("/auth");
 };

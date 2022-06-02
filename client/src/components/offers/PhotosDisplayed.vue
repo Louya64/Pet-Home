@@ -54,7 +54,7 @@ const emit = defineEmits<{
 const urlBack = import.meta.env.VITE_URL_BACK;
 const category = ref(props.offerCategory);
 const photos: Ref<IPhoto[] | undefined> = ref();
-let firstPhotoIndex = ref(0);
+const firstPhotoIndex = ref(0);
 const nbPhotosDisplayed = 6;
 let mainPhotoId: null | number = null;
 

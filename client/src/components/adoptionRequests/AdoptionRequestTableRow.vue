@@ -28,7 +28,7 @@
 		<td>{{ adoptionRequest.candidate_phone }}</td>
 		<td>{{ adoptionRequest.id_candidate }}</td>
 		<td>
-			<div class="flex justify-center">
+			<div class="flex justify-center relative">
 				<button
 					@click="
 						() =>
@@ -38,6 +38,11 @@
 				>
 					Ouvrir
 				</button>
+				<font-awesome-icon
+					v-if="newMessage"
+					class="text-xs text-red-500 absolute top-0 right-0"
+					icon="circle"
+				/>
 			</div>
 		</td>
 	</tr>
@@ -45,13 +50,35 @@
 
 <script setup lang="ts">
 import type { IAdoptionRequestRes } from "@/interfaces/IAdoptionRequest";
+import axios from "axios";
+import { onMounted, ref } from "vue";
 import { useRouter } from "vue-router";
 
 interface Props {
 	adoptionRequest: IAdoptionRequestRes;
 }
 
-defineProps<Props>();
+const props = defineProps<Props>();
 
 const router = useRouter();
+const newMessage = ref(false);
+
+const getUnredMessages = () => {
+	axios
+		.get(
+			`${import.meta.env.VITE_URL_BACK}/messages?idReq=${
+				props.adoptionRequest.id
+			}&seen=false&authorRole=3`
+		)
+		.then((res) => {
+			if (res.data.length) {
+				newMessage.value = true;
+			}
+		});
+};
+
+onMounted(() => {
+	console.log("tablerow mounted");
+	getUnredMessages();
+});
 </script>

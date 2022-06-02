@@ -19,7 +19,7 @@ import RequestResult from "@/components/commons/RequestResult.vue";
 import AdoptionStatusTable from "@/components/adoptionStatus/AdoptionStatusTable.vue";
 import type { IAdoptionStatusRes } from "@/interfaces/IAdoptionStatus";
 
-let adoptionStatusList: Ref<IAdoptionStatusRes[]> = ref([]);
+const adoptionStatusList: Ref<IAdoptionStatusRes[]> = ref([]);
 const orderBy = ref("");
 const resultMessage = ref("");
 const requestSuccess = ref(false);

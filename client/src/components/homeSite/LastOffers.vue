@@ -13,7 +13,7 @@ import { onMounted, ref, type Ref } from "vue";
 import OfferCard from "../offers/OfferCard.vue";
 import type { IOfferRes } from "@/interfaces/IOffer";
 
-let LastOffersList: Ref<IOfferRes[]> = ref([]);
+const LastOffersList: Ref<IOfferRes[]> = ref([]);
 const query = ref(`?orderBy=creation_date-desc&limit=5`);
 
 const getLastOffersList = () => {

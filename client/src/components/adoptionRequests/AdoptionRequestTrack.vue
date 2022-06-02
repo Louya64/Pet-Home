@@ -27,10 +27,23 @@
 			</form>
 		</div>
 		<div class="mt-20 text-center">
-			<Messages :idReq="adoptionRequest.id" />
+			<Messages
+				:idReq="adoptionRequest.id"
+				:newMessage="newMessage"
+				:addMessageFromSocket="addMessageFromSocket"
+				@messageAdded="() => (addMessageFromSocket = false)"
+			/>
 		</div>
 		<div id="socketContainer" class="absolute bottom-0 left-0 right-0">
-			<Socket origin="de l'admin" />
+			<Socket
+				origin="de l'admin"
+				:idReq="adoptionRequest.id.toString()"
+				@newMessageReceived="
+					(message) => {
+						(newMessage = message), (addMessageFromSocket = true);
+					}
+				"
+			/>
 		</div>
 	</div>
 </template>
@@ -42,6 +55,7 @@ import { useRoute } from "vue-router";
 import type { IAdoptionRequestRes } from "@/interfaces/IAdoptionRequest";
 import type { IOfferRes } from "@/interfaces/IOffer";
 import type { IAdoptionStatusRes } from "@/interfaces/IAdoptionStatus";
+import type { IMessageRes, IMessageSocketRes } from "@/interfaces/IMessage";
 import OfferCard from "@/components/offers/OfferCard.vue";
 import Messages from "@/components/adoptionRequests/Messages.vue";
 import RequestResult from "../commons/RequestResult.vue";
@@ -52,6 +66,8 @@ const adoptionStatusList: Ref<IAdoptionStatusRes[]> = ref([]);
 const route = useRoute();
 const offer: Ref<IOfferRes | undefined> = ref();
 const statusId = ref();
+const newMessage: Ref<IMessageSocketRes | null> = ref(null);
+const addMessageFromSocket = ref(false);
 const resultMessage = ref("");
 const requestSuccess = ref(false);
 
@@ -91,6 +107,28 @@ const updateAdoptionStatus = () => {
 	}
 };
 
+const resetUnredMessages = () => {
+	axios
+		.get(
+			`${import.meta.env.VITE_URL_BACK}/messages?idReq=${
+				route.params.id
+			}&seen=false&authorRole=3`
+		)
+		.then((res) => {
+			if (res.data.length) {
+				res.data.map((message: IMessageRes) => {
+					updateMessage(message.id);
+				});
+			}
+		});
+};
+
+const updateMessage = async (id: number) => {
+	await axios.put(`${import.meta.env.VITE_URL_BACK}/messages/${id}`, {
+		seen: true,
+	});
+};
+
 onMounted(async () => {
 	axios
 		.get(`${import.meta.env.VITE_URL_BACK}/adoptionRequests/${route.params.id}`)
@@ -104,5 +142,6 @@ onMounted(async () => {
 			statusId.value = res.data.id_adoption_status;
 		});
 	getAdoptionStatusList();
+	resetUnredMessages();
 });
 </script>

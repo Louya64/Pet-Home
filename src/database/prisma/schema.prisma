@@ -117,4 +117,5 @@ model Messages {
   author                Users?                @relation(fields: [id_author], references: [id])
   id_author             Int?
   text                  String                @db.LongText
+  seen                  Boolean               @db.TinyInt() @default(false)
 }
