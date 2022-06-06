@@ -267,6 +267,11 @@
 					</ul>
 				</div>
 			</div>
+			<div class="flex justify-end">
+				<button @click="() => emit('updateOffersList')" class="btn btn-green">
+					Rechercher
+				</button>
+			</div>
 		</div>
 	</div>
 </template>
@@ -300,6 +305,7 @@ const emit = defineEmits<{
 	(e: "filterByZipcode", zipcode: string): void;
 	(e: "filterByCity", city: string): void;
 	(e: "filterByAge", ageName: string, minAge: number, maxAge: number): void;
+	(e: "updateOffersList"): void;
 }>();
 
 const props = defineProps<Props>();

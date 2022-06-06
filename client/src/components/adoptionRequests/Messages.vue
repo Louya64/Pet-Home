@@ -1,7 +1,5 @@
 <template>
-	<h2 class="text-xl text-center">
-		Historique des messages de la candidature {{ props.idReq }}
-	</h2>
+	<h1>Historique des messages de la candidature {{ props.idReq }}</h1>
 	<div v-if="messagesList">
 		<div
 			v-for="message in messagesList.slice().reverse()"
@@ -59,15 +57,27 @@ const emit = defineEmits<{
 
 const props = defineProps<Props>();
 const messagesList: Ref<(IMessageRes | IMessageSocketRes)[]> = ref([]);
+let offset = 0;
 
-const getMessagesList = () => {
+const getMessagesList = (firstReq: boolean) => {
+	if (firstReq) {
+		offset = 0;
+	}
+	const limit = `&limit=5&offset=${offset}`;
+
 	axios
-		.get(`${import.meta.env.VITE_URL_BACK}/messages?idReq=${props.idReq}`)
+		.get(
+			`${import.meta.env.VITE_URL_BACK}/messages?idReq=${props.idReq}${limit}`
+		)
 		.then((res) => {
-			messagesList.value = res.data;
-			setTimeout(() => {
-				window.scrollTo(0, document.body.scrollHeight);
-			});
+			if (firstReq) {
+				messagesList.value = res.data;
+				setTimeout(() => {
+					window.scrollTo(0, document.body.scrollHeight);
+				});
+			} else {
+				messagesList.value = [...messagesList.value, ...res.data];
+			}
 		});
 };
 
@@ -85,11 +95,29 @@ watch(props, () => {
 			window.scrollTo(0, document.body.scrollHeight);
 		}, 300);
 	} else {
-		getMessagesList();
+		getMessagesList(true);
 	}
 });
 
+const handleScroll = () => {
+	if (document.documentElement.scrollTop === 0) {
+		const documentHeight = document.body.clientHeight;
+		window.removeEventListener("scroll", handleScroll);
+		offset += 5;
+		getMessagesList(false);
+		setTimeout(() => {
+			window.addEventListener("scroll", handleScroll);
+			window.scrollTo(0, document.body.scrollHeight - documentHeight);
+		}, 500);
+	}
+};
+
 onMounted(() => {
-	getMessagesList();
+	getMessagesList(true);
+	window.addEventListener("scroll", handleScroll);
+});
+
+onUnmounted(() => {
+	window.removeEventListener("scroll", handleScroll);
 });
 </script>

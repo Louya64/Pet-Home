@@ -29,6 +29,8 @@ const userRouter = async (server: FastifyInstance) => {
 		Querystring: {
 			orderBy: string;
 			search: string;
+			limit: string;
+			offset: string;
 		};
 	}
 	server.register(bcrypt);
@@ -49,11 +51,13 @@ const userRouter = async (server: FastifyInstance) => {
 
 			let filterArray: [string, string | number | Object][] = [];
 			const search = request.query.search;
+			const limit = Number(request.query.limit) || 99;
+			const offset = Number(request.query.offset) || 0;
 
 			if (search) {
 				filterArray.push([search.split("-")[0], search.split("-")[1]]);
 			}
-			const allUsers = await findAllUsers(filterArray, orderBy);
+			const allUsers = await findAllUsers(filterArray, orderBy, limit, offset);
 			reply.status(200).send(allUsers);
 		}
 	);

@@ -15,7 +15,7 @@
 			})
 		"
 	>
-		<div v-if="props.user" class="absolute right-28 -top-0">
+		<div v-if="props.user && !readOnly" class="absolute right-28 -top-0">
 			<button @click.prevent="confirmDelete" class="btn btn-red">
 				Supprimer mon profil
 			</button>
@@ -24,13 +24,18 @@
 			<div class="w-1/2 p-10">
 				<div class="form-item">
 					<label for="username"
-						><font-awesome-icon class="text-red-500 text-xs" icon="asterisk" />
+						><font-awesome-icon
+							v-if="!readOnly"
+							class="text-red-500 text-xs"
+							icon="asterisk"
+						/>
 						Pseudonyme
 						{{
 							id_role === 2 ? "(prénom + un espace + 1ère lettre du nom)" : ""
 						}}</label
 					>
 					<input
+						:disabled="readOnly"
 						required
 						class="form-item-input"
 						type="text"
@@ -40,10 +45,15 @@
 				</div>
 				<div class="form-item">
 					<label for="email"
-						><font-awesome-icon class="text-red-500 text-xs" icon="asterisk" />
+						><font-awesome-icon
+							v-if="!readOnly"
+							class="text-red-500 text-xs"
+							icon="asterisk"
+						/>
 						Email</label
 					>
 					<input
+						:disabled="readOnly"
 						required
 						class="form-item-input"
 						type="email"
@@ -52,7 +62,7 @@
 					/>
 				</div>
 
-				<div>
+				<div v-if="!readOnly">
 					<div class="form-item relative" v-if="props.user">
 						<label class="flex items-center" for="lastPassword">
 							Ancien mot de passe
@@ -163,6 +173,7 @@
 						Nom de famille</label
 					>
 					<input
+						:disabled="readOnly"
 						:required="id_role === 2"
 						class="form-item-input"
 						type="text"
@@ -172,10 +183,15 @@
 				</div>
 				<div class="form-item">
 					<label for="firstname"
-						><font-awesome-icon class="text-red-500 text-xs" icon="asterisk" />
+						><font-awesome-icon
+							v-if="!readOnly"
+							class="text-red-500 text-xs"
+							icon="asterisk"
+						/>
 						Prénom</label
 					>
 					<input
+						:disabled="readOnly"
 						required
 						class="form-item-input"
 						type="text"
@@ -186,6 +202,7 @@
 				<div class="form-item">
 					<label for="phone">N° de téléphone</label>
 					<input
+						:disabled="readOnly"
 						class="form-item-input"
 						type="text"
 						id="phone"
@@ -195,14 +212,14 @@
 			</div>
 		</div>
 		<RequestResult :resultMessage="resultMessage" :success="requestSuccess" />
-		<div class="flex justify-end">
+		<div class="flex justify-end" v-if="!readOnly">
 			<button class="btn btn-green">Enregistrer</button>
 		</div>
 	</form>
 </template>
 
 <script setup lang="ts">
-import { ref, watch } from "vue";
+import { computed, ref, watch, type Ref } from "vue";
 import { useRouter } from "vue-router";
 import axios from "axios";
 import RequestResult from "@/components/commons/RequestResult.vue";
@@ -214,6 +231,16 @@ interface Props {
 
 const props = defineProps<Props>();
 const router = useRouter();
+const watcherId: Ref<string | null> = ref(
+	localStorage.getItem("userId") ? localStorage.getItem("userId") : null
+);
+const readOnly = computed(() => {
+	if (props.user) {
+		return Number(watcherId.value) !== props.user.id;
+	} else {
+		return false;
+	}
+});
 const id_role = ref(2);
 const username = ref("");
 const lastname = ref("");

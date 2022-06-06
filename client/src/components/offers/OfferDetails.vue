@@ -11,31 +11,12 @@
 		</h1>
 		<h2 class="text-center mb-10">Statut: {{ offer.status.name }}</h2>
 
-		<div v-if="photosDisplayed" class="overflow-hidden relative px-10">
-			<div class="flex h-[150px]">
-				<div
-					v-for="photo in photosDisplayed"
-					class="max-w-[250px] flex justify-center items-center p-5"
-				>
-					<img
-						class="hover:cursor-pointer hover:scale-105"
-						width="250"
-						:src="`${urlBack}/image/${photo.path}`"
-						:alt="offer?.category.name"
-					/>
-				</div>
-			</div>
-			<font-awesome-icon
-				class="mt-1 bg-slate-500/75 rounded-full py-3 px-4 hover:cursor-pointer absolute right-0 top-[50px] text-white text-2xl"
-				icon="chevron-right"
-				@click="scrollPhotos(1)"
-			/>
-			<font-awesome-icon
-				class="mt-1 bg-slate-500/75 rounded-full py-3 px-4 hover:cursor-pointer absolute left-0 top-[50px] text-white text-2xl"
-				icon="chevron-left"
-				@click="scrollPhotos(-1)"
-			/>
-		</div>
+		<PhotosDisplayed
+			v-if="offer && !noPhotos"
+			:offerId="offer.id"
+			:offerCategory="offer.category.name"
+			@photosEmpty="() => (noPhotos = true)"
+		/>
 
 		<div class="my-10">
 			<p>Localisation : {{ offer.zipcode }} {{ offer.city }}</p>
@@ -70,6 +51,7 @@ import { ref, onMounted, type Ref } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import type { IOfferRes } from "@/interfaces/IOffer";
 import type { IPhoto } from "@/interfaces/IPhoto";
+import PhotosDisplayed from "./PhotosDisplayed.vue";
 
 const route = useRoute();
 const router = useRouter();
@@ -78,6 +60,7 @@ const offer: Ref<IOfferRes | undefined> = ref();
 const photos: Ref<IPhoto[] | undefined> = ref();
 const photosDisplayed = ref();
 let firstPhotoIndex = 0;
+const noPhotos = ref(false);
 
 const scrollPhotos = (nb: number) => {
 	if (photos.value) {

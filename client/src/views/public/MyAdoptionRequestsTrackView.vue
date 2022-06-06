@@ -6,6 +6,7 @@
 				<li
 					v-for="adoptionRequest in myAdoptionRequestsList"
 					class="flex items-center"
+					:class="[currentIdReq === adoptionRequest.id ? 'bg-slate-700' : '']"
 				>
 					<OfferCard
 						class="w-[100%]"
@@ -88,7 +89,7 @@ const getMyAdoptionRequestsList = () => {
 			await axios
 				.get(`${import.meta.env.VITE_URL_BACK}/offers?idIn=${idOffersArray}`)
 				.then((res) => {
-					myOffersList.value = res.data;
+					myOffersList.value = res.data.offers;
 				});
 
 			myAdoptionRequestsList.value = res.data;

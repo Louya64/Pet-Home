@@ -3,6 +3,7 @@ import multer from "fastify-multer";
 import { File, FilesObject } from "fastify-multer/lib/interfaces";
 import { ParamsIdType, ErrorType } from "../commons/types";
 import {
+	countMatchingOffers,
 	findAllOffers,
 	countOffers,
 	countAdopted,
@@ -44,23 +45,24 @@ const upload = multer({ storage: storage });
 const offerRouter = async (server: FastifyInstance) => {
 	interface FastifyRequest {
 		Querystring: {
-			id_status: number;
-			id_category: number;
+			id_status: string;
+			id_category: string;
 			animal_name: string;
-			id_offer: number;
-			id_race: number;
-			zipcode: number;
+			id_offer: string;
+			id_race: string;
+			zipcode: string;
 			city: string;
 			age: string;
 			idIn: string;
 			orderBy: string;
-			limit: number;
+			limit: string;
+			offset: string;
 		};
 	}
 
 	server.get<{
 		Querystring: FastifyRequest["Querystring"];
-		Reply: OfferReplyType[];
+		Reply: { offers: OfferReplyType[]; count: number };
 	}>("/", async (request, reply) => {
 		let orderBy = {};
 		if (request.query.orderBy) {
@@ -75,7 +77,7 @@ const offerRouter = async (server: FastifyInstance) => {
 		}
 
 		let filterArray: [string, string | number | Object][] = [];
-		const id_status = Number(request.query.id_status);
+		const id_status = request.query.id_status;
 		const animal_name = request.query.animal_name;
 		const id_category = Number(request.query.id_category);
 		const id_race = Number(request.query.id_race);
@@ -83,12 +85,15 @@ const offerRouter = async (server: FastifyInstance) => {
 		const city = request.query.city;
 		const age = request.query.age;
 		const idIn = request.query.idIn;
-		const limit = Number(request.query.limit) || 9999999;
+		const limit = Number(request.query.limit) || 99;
+		const offset = Number(request.query.offset) || 0;
 
 		if (id_status) {
-			filterArray.push(["id_status", id_status]);
-		} else {
-			filterArray.push(["id_status", { not: 3 }]);
+			if (id_status[0] === "!") {
+				filterArray.push(["id_status", { not: Number(id_status[1]) }]);
+			} else {
+				filterArray.push(["id_status", Number(id_status)]);
+			}
 		}
 
 		if (animal_name) {
@@ -116,8 +121,9 @@ const offerRouter = async (server: FastifyInstance) => {
 			filterArray.push(["id", { in: idArray }]);
 		}
 
-		const allOffers = await findAllOffers(filterArray, orderBy, limit);
-		reply.status(200).send(allOffers);
+		const matchingOffersCount = await countMatchingOffers(filterArray);
+		const allOffers = await findAllOffers(filterArray, orderBy, limit, offset);
+		reply.status(200).send({ offers: allOffers, count: matchingOffersCount });
 	});
 
 	server.get("/stats", async (request, reply) => {
@@ -127,14 +133,23 @@ const offerRouter = async (server: FastifyInstance) => {
 		const nbOffersCreatedPerDay = await offersCreatePerDayCount();
 		const nbOffersAdoptedPerDay = await offersAdoptedPerDayCount();
 		const nbAdoptionRequestsPerDay = await adoptionRequestsPerDayCount();
-		reply.status(200).send({
-			nbOffers: nbOffers,
-			nbAdopted: nbAdopted,
-			nbAdoptionRequests: nbAdoptionRequests,
-			nbOffersCreatedPerDay: nbOffersCreatedPerDay,
-			nbOffersAdoptedPerDay: nbOffersAdoptedPerDay,
-			nbAdoptionRequestsPerDay: nbAdoptionRequestsPerDay,
-		});
+		reply.status(200).send([
+			{
+				title: "Nb annonce par jour",
+				sum: nbOffers,
+				array: nbOffersCreatedPerDay,
+			},
+			{
+				title: "Nb annonce par jour",
+				sum: nbAdopted,
+				array: nbOffersAdoptedPerDay,
+			},
+			{
+				title: "Nb demandes d'adoption par jour",
+				sum: nbAdoptionRequests,
+				array: nbAdoptionRequestsPerDay,
+			},
+		]);
 	});
 
 	server.get<{ Params: ParamsIdType; Reply: OfferType | ErrorType }>(

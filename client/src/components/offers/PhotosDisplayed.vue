@@ -4,17 +4,18 @@
 			<div
 				v-for="photo in photosDisplayed"
 				class="max-w-[250px] flex justify-center items-center p-5 relative"
-				:class="[photo.main ? 'border-amber-300 border-8' : '']"
+				:class="[photo.main && isAdmin ? 'border-amber-300 border-8' : '']"
 			>
 				<img
-					class="hover:cursor-pointer hover:scale-105"
+					:class="isAdmin ? 'hover:cursor-pointer hover:scale-105' : ''"
 					width="250"
 					:src="`${urlBack}/image/${photo.path}`"
 					:alt="category"
-					title="Choisir comme photo principale"
-					@click="updateMainPhoto(photo.id)"
+					:title="isAdmin ? 'Choisir comme photo principale' : ''"
+					@click="isAdmin ? updateMainPhoto(photo.id) : ''"
 				/>
 				<font-awesome-icon
+					v-if="isAdmin"
 					class="mt-1 bg-red-500/75 rounded-full px-1 hover:cursor-pointer absolute right-2 top-2 text-white text-sm"
 					icon="xmark"
 					title="Supprimer la photo"
@@ -57,6 +58,9 @@ const photos: Ref<IPhoto[] | undefined> = ref();
 const firstPhotoIndex = ref(0);
 const nbPhotosDisplayed = 6;
 let mainPhotoId: null | number = null;
+const isAdmin =
+	localStorage.getItem("userRole") === "1" ||
+	localStorage.getItem("userRole") === "2";
 
 const photosDisplayed = computed(() => {
 	if (photos.value) {
