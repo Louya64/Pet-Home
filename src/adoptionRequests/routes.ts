@@ -1,6 +1,5 @@
 import type { FastifyInstance } from "fastify";
 import { ParamsIdType, ErrorType } from "../commons/types";
-import { notFoundError, duplicateDataError } from "../commons/errorHelpers";
 import {
 	findAllAdoptionRequests,
 	findAdoptionRequestById,

@@ -37,6 +37,9 @@ const addAdoptionStatus = (adoptionStatusName: string) => {
 			data: {
 				name: adoptionStatusName,
 			},
+			headers: {
+				Authorization: `Bearer ${localStorage.getItem("token")}`,
+			},
 		})
 		.then(() => {
 			emit(

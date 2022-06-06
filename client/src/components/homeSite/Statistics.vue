@@ -18,8 +18,8 @@ const nbOffers = ref(0);
 
 const getOffersStats = () => {
 	axios.get(`${import.meta.env.VITE_URL_BACK}/offers/stats`).then((res) => {
-		nbAdopted.value = res.data.nbAdopted;
-		nbOffers.value = res.data.nbOffers;
+		nbAdopted.value = res.data[1].sum;
+		nbOffers.value = res.data[0].sum;
 	});
 };
 

@@ -10,6 +10,7 @@ import {
 	findRaceByName,
 } from "./dao";
 import { Race, RaceType, RaceUpdate, RaceUpdateType } from "./types";
+import { adminAccessOnly } from "../commons/accessMiddlewares";
 
 const raceRouter = async (server: FastifyInstance) => {
 	interface FastifyRequest {
@@ -64,6 +65,7 @@ const raceRouter = async (server: FastifyInstance) => {
 					200: Race,
 				},
 			},
+			preHandler: [adminAccessOnly],
 		},
 		async (request, reply) => {
 			const { body: race } = request;
@@ -90,6 +92,7 @@ const raceRouter = async (server: FastifyInstance) => {
 					200: Race,
 				},
 			},
+			preHandler: [adminAccessOnly],
 		},
 		async (request, reply) => {
 			const { body: race } = request;
@@ -111,6 +114,7 @@ const raceRouter = async (server: FastifyInstance) => {
 
 	server.delete<{ Params: ParamsIdType; Reply: string }>(
 		"/:id",
+		{ preHandler: [adminAccessOnly] },
 		async (request, reply) => {
 			await deleteRace(Number(request.params.id));
 			reply.status(200).send(`Race ${request.params.id} supprimée`);

@@ -1,6 +1,6 @@
 import type { FastifyInstance } from "fastify";
 import { ParamsIdType, ErrorType } from "../commons/types";
-import { notFoundError, duplicateDataError } from "../commons/errorHelpers";
+import { duplicateDataError } from "../commons/errorHelpers";
 import {
 	findAllOfferStatus,
 	findOfferStatusById,
@@ -10,6 +10,7 @@ import {
 	findOfferStatusByName,
 } from "./dao";
 import { OfferStatus, OfferStatusType } from "./types";
+import { superAdminAccessOnly } from "../commons/accessMiddlewares";
 
 const offerStatusRouter = async (server: FastifyInstance) => {
 	interface FastifyRequest {
@@ -55,6 +56,7 @@ const offerStatusRouter = async (server: FastifyInstance) => {
 					200: OfferStatus,
 				},
 			},
+			preHandler: [superAdminAccessOnly],
 		},
 		async (request, reply) => {
 			const { body: offerStatus } = request;
@@ -85,6 +87,7 @@ const offerStatusRouter = async (server: FastifyInstance) => {
 					200: OfferStatus,
 				},
 			},
+			preHandler: [superAdminAccessOnly],
 		},
 		async (request, reply) => {
 			const { body: offerStatus } = request;
@@ -110,6 +113,7 @@ const offerStatusRouter = async (server: FastifyInstance) => {
 
 	server.delete<{ Params: ParamsIdType; Reply: string }>(
 		"/:id",
+		{ preHandler: [superAdminAccessOnly] },
 		async (request, reply) => {
 			await deleteOfferStatus(Number(request.params.id));
 			reply.status(200).send(`Statut d'offre ${request.params.id} supprimé`);

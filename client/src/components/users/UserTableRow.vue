@@ -96,7 +96,11 @@ const confirmDelete = (id: number) => {
 
 const deleteUser = (id: number) => {
 	axios
-		.delete(`${import.meta.env.VITE_URL_BACK}/users/${id}`)
+		.delete(`${import.meta.env.VITE_URL_BACK}/users/${id}`, {
+			headers: {
+				Authorization: `Bearer ${localStorage.getItem("token")}`,
+			},
+		})
 		.then(() => {
 			emit("requestResult", true, `L'utilisateur ${id} a bien été supprimé`);
 		})

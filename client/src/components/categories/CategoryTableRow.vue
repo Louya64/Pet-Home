@@ -67,6 +67,9 @@ const toggleUpdating = (category: ICategoryRes) => {
 				method: "put",
 				url: `${import.meta.env.VITE_URL_BACK}/categories/${category.id}`,
 				data: category,
+				headers: {
+					Authorization: `Bearer ${localStorage.getItem("token")}`,
+				},
 			})
 			.then((res) => {
 				emit(
@@ -92,7 +95,11 @@ const confirmDelete = (category: ICategoryRes) => {
 
 const deleteCategory = (category: ICategoryRes) => {
 	axios
-		.delete(`${import.meta.env.VITE_URL_BACK}/categories/${category.id}`)
+		.delete(`${import.meta.env.VITE_URL_BACK}/categories/${category.id}`, {
+			headers: {
+				Authorization: `Bearer ${localStorage.getItem("token")}`,
+			},
+		})
 		.then(() => {
 			emit(
 				"requestResult",

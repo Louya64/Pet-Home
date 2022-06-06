@@ -40,6 +40,9 @@ const addUserRole = (userRoleName: string) => {
 			data: {
 				name: userRoleName,
 			},
+			headers: {
+				Authorization: `Bearer ${localStorage.getItem("token")}`,
+			},
 		})
 		.then(() => {
 			emit("requestResult", true, `Le rôle ${userRoleName} a bien été crée`);

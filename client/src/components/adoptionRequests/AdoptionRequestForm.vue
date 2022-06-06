@@ -66,7 +66,12 @@ onMounted(() => {
 			.get(
 				`${import.meta.env.VITE_URL_BACK}/users/${localStorage.getItem(
 					"userId"
-				)}`
+				)}`,
+				{
+					headers: {
+						Authorization: `Bearer ${localStorage.getItem("token")}`,
+					},
+				}
 			)
 			.then((res) => {
 				email.value = res.data.email;

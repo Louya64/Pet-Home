@@ -59,8 +59,11 @@ const addRace = (raceName: string, category: number) => {
 				name: raceName,
 				id_category: category,
 			},
+			headers: {
+				Authorization: `Bearer ${localStorage.getItem("token")}`,
+			},
 		})
-		.then((res) => {
+		.then(() => {
 			emit("requestResult", true, `La catégorie ${raceName} a bien été crée`);
 			createRaceName.value = "";
 			idCategory.value = null;

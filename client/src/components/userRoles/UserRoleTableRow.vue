@@ -53,6 +53,9 @@ const toggleUpdating = (userRole: IUserRoleRes) => {
 				method: "put",
 				url: `${import.meta.env.VITE_URL_BACK}/roles/${userRole.id}`,
 				data: userRole,
+				headers: {
+					Authorization: `Bearer ${localStorage.getItem("token")}`,
+				},
 			})
 			.then((res) => {
 				emit(
@@ -78,7 +81,11 @@ const confirmDelete = (userRole: IUserRoleRes) => {
 
 const deleteUserRole = (userRole: IUserRoleRes) => {
 	axios
-		.delete(`${import.meta.env.VITE_URL_BACK}/roles/${userRole.id}`)
+		.delete(`${import.meta.env.VITE_URL_BACK}/roles/${userRole.id}`, {
+			headers: {
+				Authorization: `Bearer ${localStorage.getItem("token")}`,
+			},
+		})
 		.then(() => {
 			emit(
 				"requestResult",

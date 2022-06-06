@@ -37,6 +37,9 @@ const addOfferStatus = (offerStatusName: string) => {
 			data: {
 				name: offerStatusName,
 			},
+			headers: {
+				Authorization: `Bearer ${localStorage.getItem("token")}`,
+			},
 		})
 		.then(() => {
 			emit(

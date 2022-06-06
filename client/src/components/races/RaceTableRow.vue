@@ -68,6 +68,9 @@ const toggleUpdating = (race: IRaceRes) => {
 				method: "put",
 				url: `${import.meta.env.VITE_URL_BACK}/races/${race.id}`,
 				data: race,
+				headers: {
+					Authorization: `Bearer ${localStorage.getItem("token")}`,
+				},
 			})
 			.then((res) => {
 				emit(
@@ -93,7 +96,11 @@ const confirmDelete = (race: IRaceRes) => {
 
 const deleteRace = (race: IRaceRes) => {
 	axios
-		.delete(`${import.meta.env.VITE_URL_BACK}/races/${race.id}`)
+		.delete(`${import.meta.env.VITE_URL_BACK}/races/${race.id}`, {
+			headers: {
+				Authorization: `Bearer ${localStorage.getItem("token")}`,
+			},
+		})
 		.then(() => {
 			emit("requestResult", true, `La race ${race.name} a bien été supprimée`);
 		})

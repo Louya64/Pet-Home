@@ -51,8 +51,11 @@ const toggleUpdating = (adoptionStatus: IAdoptionStatusRes) => {
 					adoptionStatus.id
 				}`,
 				data: adoptionStatus,
+				headers: {
+					Authorization: `Bearer ${localStorage.getItem("token")}`,
+				},
 			})
-			.then((res) => {
+			.then(() => {
 				emit(
 					"requestResult",
 					true,
@@ -75,7 +78,12 @@ const confirmDelete = (adoptionStatus: IAdoptionStatusRes) => {
 const deleteAdoptionStatus = (adoptionStatus: IAdoptionStatusRes) => {
 	axios
 		.delete(
-			`${import.meta.env.VITE_URL_BACK}/adoptionStatus/${adoptionStatus.id}`
+			`${import.meta.env.VITE_URL_BACK}/adoptionStatus/${adoptionStatus.id}`,
+			{
+				headers: {
+					Authorization: `Bearer ${localStorage.getItem("token")}`,
+				},
+			}
 		)
 		.then(() => {
 			emit(

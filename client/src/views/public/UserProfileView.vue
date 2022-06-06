@@ -17,7 +17,11 @@ const user: Ref<IUserRes | undefined> = ref();
 
 onMounted(() => {
 	axios
-		.get(`${import.meta.env.VITE_URL_BACK}/users/${route.params.id}`)
+		.get(`${import.meta.env.VITE_URL_BACK}/users/${route.params.id}`, {
+			headers: {
+				Authorization: `Bearer ${localStorage.getItem("token")}`,
+			},
+		})
 		.then((res) => {
 			user.value = res.data;
 		});

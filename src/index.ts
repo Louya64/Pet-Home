@@ -24,8 +24,7 @@ import messageRouter from "./messages/routes";
 declare module "fastify" {
 	interface FastifyInstance {
 		config: {
-			URL_SITE: string;
-			URL_DASHBOARD: string;
+			URL_FRONT: string;
 			URL_BACK: string;
 			SMTP_EMAIL: string;
 			SMTP_HOST: string;
@@ -42,8 +41,7 @@ declare module "fastify" {
 const schema = {
 	type: "object",
 	required: [
-		"URL_SITE",
-		"URL_DASHBOARD",
+		"URL_FRONT",
 		"URL_BACK",
 		"SMTP_EMAIL",
 		"SMTP_HOST",
@@ -55,10 +53,7 @@ const schema = {
 		"FACEBOOK_SECRET",
 	],
 	properties: {
-		URL_SITE: {
-			type: "string",
-		},
-		URL_DASHBOARD: {
+		URL_FRONT: {
 			type: "string",
 		},
 		URL_BACK: {
@@ -114,7 +109,7 @@ async function createServer() {
 		prefix: "/image/",
 	});
 	server.register(fastifySocketIo, {
-		cors: { origin: "http://localhost:3000" },
+		cors: { origin: server.config.URL_FRONT },
 	});
 	server.ready().then(() => {
 		socketConnection.start(server.io);
