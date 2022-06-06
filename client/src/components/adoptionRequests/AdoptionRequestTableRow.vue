@@ -78,7 +78,6 @@ const getUnredMessages = () => {
 };
 
 onMounted(() => {
-	console.log("tablerow mounted");
 	getUnredMessages();
 });
 </script>

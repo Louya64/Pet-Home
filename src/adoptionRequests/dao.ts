@@ -3,7 +3,9 @@ import { type AdoptionRequestType, AdoptionRequestUpdateType } from "./types";
 
 export const findAllAdoptionRequests = async (
 	filterArray: [string, string | number | Object][],
-	orderBy: object
+	orderBy: object,
+	limit: number,
+	offset: number
 ) => {
 	const entries = new Map(filterArray);
 	const obj = Object.fromEntries(entries);
@@ -18,6 +20,8 @@ export const findAllAdoptionRequests = async (
 	}
 
 	return await prisma.adoption_requests.findMany({
+		take: limit,
+		skip: offset,
 		where: filters,
 		orderBy: orderBy,
 		select: {

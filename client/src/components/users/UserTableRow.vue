@@ -44,7 +44,14 @@
 			}}
 		</td>
 		<td>{{ user.phone_number }}</td>
-
+		<td>
+			<button
+				@click="router.push(`/dashboard/usersList/${user.id}`)"
+				class="btn btn-green"
+			>
+				Détails
+			</button>
+		</td>
 		<td>
 			<button
 				v-if="isSuperAdmin || user.id_role === 3"
@@ -61,6 +68,7 @@
 import { ref } from "vue";
 import type { IUserRes } from "@/interfaces/IUser";
 import axios from "axios";
+import { useRouter } from "vue-router";
 
 interface Props {
 	user: IUserRes;
@@ -71,6 +79,7 @@ const emit = defineEmits<{
 	(e: "requestResult", success: boolean, message: string): void;
 }>();
 
+const router = useRouter();
 const isSuperAdmin = ref(false);
 if (localStorage.getItem("userRole") === "1") {
 	isSuperAdmin.value = true;

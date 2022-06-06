@@ -3,7 +3,9 @@ import { UserUpdateType } from "./types";
 
 export const findAllUsers = async (
 	filterArray: [string, string | number | Object][],
-	orderBy: Object
+	orderBy: Object,
+	limit: number,
+	offset: number
 ) => {
 	let search = {};
 	if (filterArray.length > 0) {
@@ -14,6 +16,8 @@ export const findAllUsers = async (
 		};
 	}
 	return await prisma.users.findMany({
+		take: limit,
+		skip: offset,
 		where: search,
 		select: {
 			id: true,

@@ -1,31 +1,59 @@
 <template>
 	<div class="dashboardContainer relative px-20" v-if="adoptionRequest">
-		<h1>Suivi de la candidature {{ adoptionRequest.id }}</h1>
-		<div class="flex justify-around mt-20">
-			<div>
-				<OfferCard v-if="offer" :offer="offer" class="w-[20vw]" />
+		<div class="fixed top-0 left-60 right-0 z-10">
+			<div
+				class="flex justify-end hover:cursor-pointer"
+				title="Détails de la candidature, modification du statut"
+				@click="() => (showMenu = true)"
+				v-if="!showMenu"
+			>
+				<div class="py-3 px-5 bg-black border-2 border-white">
+					<font-awesome-icon class="text-2xl" icon="bars" />
+				</div>
 			</div>
-			<div class="w-[30vw]">
-				mail : {{ adoptionRequest.candidate_email }} <br />
-				tel : {{ adoptionRequest.candidate_phone }} <br />
-				infos candidat dropdown (userCard si inscrit ? ou link ?)
+
+			<div v-if="showMenu" class="bg-slate-700">
+				<div
+					class="flex justify-end hover:cursor-pointer"
+					@click="() => (showMenu = false)"
+				>
+					<div class="py-3 px-5 bg-black border-2 border-white">
+						<font-awesome-icon class="text-2xl" icon="xmark" />
+					</div>
+				</div>
+				<div class="flex justify-around mt-20 px-20 w-full">
+					<div>
+						<OfferCard v-if="offer" :offer="offer" class="w-[20vw]" />
+					</div>
+					<div class="w-1/2 border-black border-2 p-5">
+						mail : {{ adoptionRequest.candidate_email }} <br />
+						tel : {{ adoptionRequest.candidate_phone }} <br />
+						<span class="underline hover:cursor-pointer">Voir le profil</span>
+						id : {{ adoptionRequest.id_candidate }} <br />
+						infos candidat dropdown (userCard si inscrit ? ou link ?)
+					</div>
+				</div>
+				<div class="text-center pb-20" v-if="adoptionStatusList">
+					<RequestResult
+						:resultMessage="resultMessage"
+						:success="requestSuccess"
+					/>
+					<form @submit.prevent="updateAdoptionStatus">
+						<label>Modifier le statut :</label>
+						<select v-model="statusId">
+							<option
+								v-for="adoptionStatus in adoptionStatusList"
+								:value="adoptionStatus.id"
+							>
+								{{ adoptionStatus.name }}
+							</option>
+						</select>
+						<button class="btn btn-green">Valider</button>
+					</form>
+				</div>
 			</div>
 		</div>
-		<div class="mt-20 text-center" v-if="adoptionStatusList">
-			<RequestResult :resultMessage="resultMessage" :success="requestSuccess" />
-			<form @submit.prevent="updateAdoptionStatus">
-				<label>Modifier le statut :</label>
-				<select v-model="statusId">
-					<option
-						v-for="adoptionStatus in adoptionStatusList"
-						:value="adoptionStatus.id"
-					>
-						{{ adoptionStatus.name }}
-					</option>
-				</select>
-				<button class="btn btn-green">Valider</button>
-			</form>
-		</div>
+
 		<div class="mt-20 text-center">
 			<Messages
 				:idReq="adoptionRequest.id"
@@ -70,6 +98,7 @@ const newMessage: Ref<IMessageSocketRes | null> = ref(null);
 const addMessageFromSocket = ref(false);
 const resultMessage = ref("");
 const requestSuccess = ref(false);
+const showMenu = ref(false);
 
 const getAdoptionStatusList = () => {
 	axios.get(`${import.meta.env.VITE_URL_BACK}/adoptionStatus`).then((res) => {

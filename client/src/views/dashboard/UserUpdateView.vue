@@ -1,6 +1,12 @@
 <template>
-	<div class="dashboardContainer">
-		<h1>Modifier mon profil</h1>
+	<div class="dashboardContainer" v-if="user">
+		<h1>
+			{{
+				user.id === Number(watcherId)
+					? "Modifier mon profil"
+					: `Détails du profil ${user.id}`
+			}}
+		</h1>
 		<UserForm v-if="user" :user="user" />
 	</div>
 </template>
@@ -14,6 +20,9 @@ import type { IUserRes } from "@/interfaces/IUser";
 
 const route = useRoute();
 const user: Ref<IUserRes | undefined> = ref();
+const watcherId: Ref<string | null> = ref(
+	localStorage.getItem("userId") ? localStorage.getItem("userId") : null
+);
 
 onMounted(() => {
 	axios

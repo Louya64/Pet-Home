@@ -23,6 +23,8 @@ const adoptionRequestRouter = async (server: FastifyInstance) => {
 		Querystring: {
 			userId: string;
 			orderBy: string;
+			limit: string;
+			offset: string;
 		};
 	}
 	server.get<{
@@ -43,6 +45,8 @@ const adoptionRequestRouter = async (server: FastifyInstance) => {
 
 		let filterArray: [string, string | number | Object][] = [];
 		const userId = Number(request.query.userId);
+		const limit = Number(request.query.limit) || 99;
+		const offset = Number(request.query.offset) || 0;
 
 		if (userId) {
 			filterArray.push(["id_candidate", userId]);
@@ -50,7 +54,9 @@ const adoptionRequestRouter = async (server: FastifyInstance) => {
 
 		const allAdoptionRequests = await findAllAdoptionRequests(
 			filterArray,
-			orderBy
+			orderBy,
+			limit,
+			offset
 		);
 		reply.status(200).send(allAdoptionRequests);
 	});

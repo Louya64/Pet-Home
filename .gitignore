@@ -3,5 +3,5 @@ node_modules
 .env
 dist
 */.vscode
-resetDb.sql
+brouillon.sql
 public/assets

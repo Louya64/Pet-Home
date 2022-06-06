@@ -54,7 +54,7 @@ const duplicatedData = async (
 	} else return false;
 };
 
-//jwt -> create token
+// jwt -> create token
 const createToken = (server: FastifyInstance, user: UserType) => {
 	return server.jwt.sign({
 		id: user.id,

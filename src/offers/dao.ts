@@ -1,10 +1,31 @@
 import prisma from "../database";
 import { type OfferType, OfferUpdateType } from "./types";
 
+export const countMatchingOffers = async (
+	filterArray: [string, string | number | Object][]
+) => {
+	const entries = new Map(filterArray);
+	const obj = Object.fromEntries(entries);
+
+	let filters = {};
+	if (filterArray.length === 1) {
+		filters = obj;
+	} else if (filterArray.length > 1) {
+		filters = {
+			AND: obj,
+		};
+	}
+
+	return await prisma.offers.count({
+		where: filters,
+	});
+};
+
 export const findAllOffers = async (
 	filterArray: [string, string | number | Object][],
 	orderBy: object,
-	limit: number
+	limit: number,
+	offset: number
 ) => {
 	const entries = new Map(filterArray);
 	const obj = Object.fromEntries(entries);
@@ -20,6 +41,7 @@ export const findAllOffers = async (
 
 	return await prisma.offers.findMany({
 		take: limit,
+		skip: offset,
 		where: filters,
 		select: {
 			id: true,
@@ -80,6 +102,7 @@ export const offersCreatePerDayCount = async () => {
 export const offersAdoptedPerDayCount = async () => {
 	return prisma.$queryRaw`SELECT DATE_FORMAT(offers.adoption_date, '%Y-%m-%d') "date", COUNT(offers.id) "count"
   FROM offers
+	WHERE offers.adoption_date IS NOT NULL
   GROUP BY DATE_FORMAT(offers.adoption_date, '%Y-%m-%d')`;
 };
 

@@ -16,6 +16,8 @@ const messageRouter = async (server: FastifyInstance) => {
 			idReqIn: string;
 			authorRole: string;
 			seen: string;
+			limit: string;
+			offset: string;
 		};
 	}
 	server.get<{
@@ -39,6 +41,8 @@ const messageRouter = async (server: FastifyInstance) => {
 		const idReqIn = request.query.idReqIn;
 		const authorRole = request.query.authorRole;
 		const seen = request.query.seen;
+		const limit = Number(request.query.limit) || 99;
+		const offset = Number(request.query.offset) || 0;
 
 		if (idReq) {
 			filterArray.push(["id_adoption_request", idReq]);
@@ -65,7 +69,12 @@ const messageRouter = async (server: FastifyInstance) => {
 			}
 		}
 
-		const allMessages = await findAllMessages(filterArray, orderBy);
+		const allMessages = await findAllMessages(
+			filterArray,
+			orderBy,
+			limit,
+			offset
+		);
 		reply.status(200).send(allMessages);
 	});
 

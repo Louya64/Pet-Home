@@ -21,6 +21,7 @@ import {
 	faArrowUpLong,
 	faArrowRightLong,
 	faMagnifyingGlass,
+	faBars,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 
@@ -41,7 +42,8 @@ library.add(
 	faArrowDownLong,
 	faArrowUpLong,
 	faArrowRightLong,
-	faMagnifyingGlass
+	faMagnifyingGlass,
+	faBars
 );
 
 const app = createApp(App);

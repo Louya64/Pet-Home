@@ -3,7 +3,9 @@ import { type MessageType, MessageUpdateType } from "./types";
 
 export const findAllMessages = async (
 	filterArray: [string, string | number | Object][],
-	orderBy: object
+	orderBy: object,
+	limit: number,
+	offset: number
 ) => {
 	const entries = new Map(filterArray);
 	const obj = Object.fromEntries(entries);
@@ -18,6 +20,8 @@ export const findAllMessages = async (
 	}
 
 	return await prisma.messages.findMany({
+		take: limit,
+		skip: offset,
 		where: filters,
 		orderBy: orderBy,
 		select: {
