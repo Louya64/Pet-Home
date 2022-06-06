@@ -10,6 +10,7 @@ import {
 	findRoleByName,
 } from "./dao";
 import { Role, RoleType } from "./types";
+import { superAdminAccessOnly } from "../commons/accessMiddlewares";
 
 const roleRouter = async (server: FastifyInstance) => {
 	interface FastifyRequest {
@@ -64,6 +65,7 @@ const roleRouter = async (server: FastifyInstance) => {
 					200: Role,
 				},
 			},
+			preHandler: [superAdminAccessOnly],
 		},
 		async (request, reply) => {
 			const { body: role } = request;
@@ -90,6 +92,7 @@ const roleRouter = async (server: FastifyInstance) => {
 					200: Role,
 				},
 			},
+			preHandler: [superAdminAccessOnly],
 		},
 		async (request, reply) => {
 			const { body: role } = request;
@@ -105,6 +108,7 @@ const roleRouter = async (server: FastifyInstance) => {
 
 	server.delete<{ Params: ParamsIdType; Reply: string }>(
 		"/:id",
+		{ preHandler: [superAdminAccessOnly] },
 		async (request, reply) => {
 			await deleteRole(Number(request.params.id));
 			reply.status(200).send(`Rôle ${request.params.id} supprimé`);

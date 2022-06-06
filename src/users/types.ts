@@ -41,4 +41,21 @@ const UserUpdate = {
 } as const;
 type UserUpdateType = FromSchema<typeof UserUpdate>;
 
-export { User, UserType, UserUpdate, UserUpdateType };
+const UserPasswordUpdate = {
+	type: "object",
+	properties: {
+		password: { type: "string" },
+		confirmedPassword: { type: "string" },
+	},
+	required: ["password", "confirmedPassword"],
+} as const;
+type UserPasswordUpdateType = FromSchema<typeof UserPasswordUpdate>;
+
+export {
+	User,
+	UserType,
+	UserUpdate,
+	UserUpdateType,
+	UserPasswordUpdate,
+	UserPasswordUpdateType,
+};

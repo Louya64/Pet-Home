@@ -20,6 +20,7 @@ import {
 } from "../adoptionRequests/dao";
 import { createPhoto, findAllPhotos } from "../uploads/dao";
 import { OfferType, OfferReplyType, OfferFromMulterType } from "./types";
+import { adminAccessOnly } from "../commons/accessMiddlewares";
 import { unlink } from "node:fs/promises";
 
 type FilesInRequest = FilesObject | Partial<File>[];
@@ -72,7 +73,7 @@ const offerRouter = async (server: FastifyInstance) => {
 			};
 		} else {
 			orderBy = {
-				id: "asc",
+				id: "desc",
 			};
 		}
 
@@ -126,7 +127,7 @@ const offerRouter = async (server: FastifyInstance) => {
 		reply.status(200).send({ offers: allOffers, count: matchingOffersCount });
 	});
 
-	server.get("/stats", async (request, reply) => {
+	server.get("/stats", async (_request, reply) => {
 		const nbOffers = await countOffers();
 		const nbAdopted = await countAdopted();
 		const nbAdoptionRequests = await countAdoptionRequests();
@@ -135,12 +136,12 @@ const offerRouter = async (server: FastifyInstance) => {
 		const nbAdoptionRequestsPerDay = await adoptionRequestsPerDayCount();
 		reply.status(200).send([
 			{
-				title: "Nb annonce par jour",
+				title: "Nb annonces par jour",
 				sum: nbOffers,
 				array: nbOffersCreatedPerDay,
 			},
 			{
-				title: "Nb annonce par jour",
+				title: "Nb d'adoptions par jour",
 				sum: nbAdopted,
 				array: nbOffersAdoptedPerDay,
 			},
@@ -165,7 +166,7 @@ const offerRouter = async (server: FastifyInstance) => {
 	server.post<{ Body: OfferFromMulterType; Reply: string | ErrorType }>(
 		"/",
 		{
-			preHandler: upload.array("photos", 25),
+			preHandler: [adminAccessOnly, upload.array("photos", 25)],
 		},
 		async (request, reply) => {
 			const { body: offer } = request;
@@ -209,7 +210,7 @@ const offerRouter = async (server: FastifyInstance) => {
 	}>(
 		"/:id",
 		{
-			preHandler: upload.array("photos", 25),
+			preHandler: [adminAccessOnly, upload.array("photos", 25)],
 		},
 		async (request, reply) => {
 			const { body: offer } = request;
@@ -255,6 +256,7 @@ const offerRouter = async (server: FastifyInstance) => {
 
 	server.delete<{ Params: ParamsIdType; Reply: string }>(
 		"/:id",
+		{ preHandler: [adminAccessOnly] },
 		async (request, reply) => {
 			const offerPhotos = await findAllPhotos([
 				["id_offer", Number(request.params.id)],

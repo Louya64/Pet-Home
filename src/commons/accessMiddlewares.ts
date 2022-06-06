@@ -1,13 +1,56 @@
-//superAdminAccessOnly ?
+import { unauthorizedError } from "./errorHelpers";
 
-const adminAccessOnly = () => {
-	// check token
-	// next?
+const superAdminAccessOnly = async (request: any, reply: any) => {
+	const user = await request.jwtVerify();
+	if (user.role !== 1) {
+		reply
+			.status(401)
+			.send(
+				unauthorizedError(`Vous n'êtes pas authorisé à accéder à ces données`)
+			);
+	}
 };
 
-const adminOrOwnerAccessOnly = () => {
-	// check token role admin | id token = request.params.id
-	// next?
+const adminAccessOnly = async (request: any, reply: any) => {
+	const user = await request.jwtVerify();
+	if (user.role !== 1 && user.role !== 2) {
+		reply
+			.status(401)
+			.send(
+				unauthorizedError(`Vous n'êtes pas authorisé à accéder à ces données`)
+			);
+	}
 };
 
-export { adminAccessOnly, adminOrOwnerAccessOnly };
+const ownerAccessOnly = async (request: any, reply: any) => {
+	const user = await request.jwtVerify();
+	if (user.id !== Number(request.params.id)) {
+		reply
+			.status(401)
+			.send(
+				unauthorizedError(`Vous n'êtes pas authorisé à accéder à ces données`)
+			);
+	}
+};
+
+const ownerOrAdminAccessOnly = async (request: any, reply: any) => {
+	const user = await request.jwtVerify();
+	if (
+		user.id !== Number(request.params.id) &&
+		user.role !== 1 &&
+		user.role !== 2
+	) {
+		reply
+			.status(401)
+			.send(
+				unauthorizedError(`Vous n'êtes pas authorisé à accéder à ces données`)
+			);
+	}
+};
+
+export {
+	superAdminAccessOnly,
+	adminAccessOnly,
+	ownerAccessOnly,
+	ownerOrAdminAccessOnly,
+};

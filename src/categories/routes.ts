@@ -1,6 +1,6 @@
-import type { FastifyInstance, FastifyRequest } from "fastify";
+import type { FastifyInstance } from "fastify";
 import { ParamsIdType, ErrorType } from "../commons/types";
-import { notFoundError, duplicateDataError } from "../commons/errorHelpers";
+import { duplicateDataError } from "../commons/errorHelpers";
 import {
 	findAllCategories,
 	findCategoryById,
@@ -15,6 +15,7 @@ import {
 	CategoryUpdate,
 	CategoryUpdateType,
 } from "./types";
+import { adminAccessOnly } from "../commons/accessMiddlewares";
 
 const categoryRouter = async (server: FastifyInstance) => {
 	interface FastifyRequest {
@@ -61,6 +62,7 @@ const categoryRouter = async (server: FastifyInstance) => {
 					200: Category,
 				},
 			},
+			preHandler: [adminAccessOnly],
 		},
 		async (request, reply) => {
 			const { body: category } = request;
@@ -89,6 +91,7 @@ const categoryRouter = async (server: FastifyInstance) => {
 					200: Category,
 				},
 			},
+			preHandler: [adminAccessOnly],
 		},
 		async (request, reply) => {
 			const { body: category } = request;
@@ -115,6 +118,7 @@ const categoryRouter = async (server: FastifyInstance) => {
 
 	server.delete<{ Params: ParamsIdType; Reply: string }>(
 		"/:id",
+		{ preHandler: [adminAccessOnly] },
 		async (request, reply) => {
 			await deleteCategory(Number(request.params.id));
 			reply.status(200).send(`Catégorie ${request.params.id} supprimée`);

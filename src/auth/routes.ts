@@ -1,12 +1,7 @@
 import type { FastifyInstance } from "fastify";
 import { ErrorType } from "../commons/types";
-import {
-	duplicateDataError,
-	unauthorizedError,
-	forbiddenError,
-	invalidDataError,
-} from "../commons/errorHelpers";
-import { findUserByEmail, findUserByUsername } from "../users/dao";
+import { unauthorizedError } from "../commons/errorHelpers";
+import { findUserByEmail } from "../users/dao";
 import { createUser } from "./dao";
 import {
 	UserCreateType,
@@ -24,13 +19,9 @@ import bcrypt from "fastify-bcrypt";
 // @ts-ignore
 import nodemailer from "fastify-mailer";
 import { Transporter } from "nodemailer";
-import {
-	hashPassword,
-	verifyPassword,
-	createToken,
-	checkPasswordFormat,
-} from "./helpers";
+import { hashPassword, verifyPassword, createToken } from "./helpers";
 import { userCreateValidateData } from "./middlewares";
+import { superAdminAccessOnly } from "../commons/accessMiddlewares";
 import { SentMessageInfo } from "nodemailer/lib/sendmail-transport";
 
 export interface FastifyMailerNamedInstance {
@@ -95,7 +86,7 @@ const authRouter = async (server: FastifyInstance) => {
 			schema: {
 				body: UserCreateFromDashboard,
 			},
-			preHandler: [userCreateValidateData],
+			preHandler: [superAdminAccessOnly, userCreateValidateData],
 		},
 		async (request, reply) => {
 			const { body: user } = request;
@@ -195,7 +186,7 @@ const authRouter = async (server: FastifyInstance) => {
 						to: userFound.email,
 						subject: "Pet'Home - Mot de pass oublié",
 						text: "cliquez sur le lien",
-						html: `<a href=${server.config.URL_SITE}/changePassword?&token=${token}>lien pour changer le mot de passe</a>`,
+						html: `<a href=${server.config.URL_FRONT}/changePassword?&token=${token}>lien pour changer le mot de passe</a>`,
 					},
 					(err: Error | null, info: SentMessageInfo) => {
 						if (err) {

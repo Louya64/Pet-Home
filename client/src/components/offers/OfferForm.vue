@@ -386,7 +386,12 @@ const submit = async (data: IOfferCreate) => {
 		await axios
 			.put(
 				`${import.meta.env.VITE_URL_BACK}/offers/${props.offer.id}`,
-				formData
+				formData,
+				{
+					headers: {
+						Authorization: `Bearer ${localStorage.getItem("token")}`,
+					},
+				}
 			)
 			.then(() => {
 				requestSuccess.value = true;
@@ -398,7 +403,11 @@ const submit = async (data: IOfferCreate) => {
 			});
 	} else {
 		await axios
-			.post(`${import.meta.env.VITE_URL_BACK}/offers`, formData)
+			.post(`${import.meta.env.VITE_URL_BACK}/offers`, formData, {
+				headers: {
+					Authorization: `Bearer ${localStorage.getItem("token")}`,
+				},
+			})
 			.then(() => {
 				requestSuccess.value = true;
 				resultMessage.value = "L'offre d'adoption a bien été enregistrée";

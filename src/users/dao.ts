@@ -1,5 +1,5 @@
 import prisma from "../database";
-import { UserUpdateType } from "./types";
+import { UserUpdateType, UserPasswordUpdateType } from "./types";
 
 export const findAllUsers = async (
 	filterArray: [string, string | number | Object][],
@@ -84,6 +84,17 @@ export const updateUser = async (id: number, data: UserUpdateType) => {
 		},
 		data: {
 			...data,
+		},
+	});
+};
+
+export const updatePassword = async (id: number, password: string) => {
+	return await prisma.users.update({
+		where: {
+			id: Number(id),
+		},
+		data: {
+			password: password,
 		},
 	});
 };

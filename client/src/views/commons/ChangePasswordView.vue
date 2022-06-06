@@ -32,8 +32,11 @@ const changePassword = (password: string, confirmedPassword: string) => {
 	axios
 		.request({
 			method: "put",
-			url: `${import.meta.env.VITE_URL_BACK}/users/${userId}`,
+			url: `${import.meta.env.VITE_URL_BACK}/users/${userId}/password`,
 			data: { password: password, confirmedPassword: confirmedPassword },
+			headers: {
+				Authorization: `Bearer ${route.query.token}`,
+			},
 		})
 		.then(() => {
 			requestSuccess.value = true;

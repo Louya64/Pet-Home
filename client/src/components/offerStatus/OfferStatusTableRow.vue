@@ -49,6 +49,9 @@ const toggleUpdating = (offerStatus: IOfferStatusRes) => {
 				method: "put",
 				url: `${import.meta.env.VITE_URL_BACK}/offerStatus/${offerStatus.id}`,
 				data: offerStatus,
+				headers: {
+					Authorization: `Bearer ${localStorage.getItem("token")}`,
+				},
 			})
 			.then((res) => {
 				emit(
@@ -72,7 +75,11 @@ const confirmDelete = (offerStatus: IOfferStatusRes) => {
 };
 const deleteOfferStatus = (offerStatus: IOfferStatusRes) => {
 	axios
-		.delete(`${import.meta.env.VITE_URL_BACK}/offerStatus/${offerStatus.id}`)
+		.delete(`${import.meta.env.VITE_URL_BACK}/offerStatus/${offerStatus.id}`, {
+			headers: {
+				Authorization: `Bearer ${localStorage.getItem("token")}`,
+			},
+		})
 		.then(() => {
 			emit(
 				"requestResult",

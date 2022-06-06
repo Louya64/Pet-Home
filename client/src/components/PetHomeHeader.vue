@@ -5,8 +5,12 @@
 		<nav
 			class="w-4/5 flex justify-evenly items-center border-r-2 border-slate-500"
 		>
-			<RouterLink to="/" title="Revenir à l'accueil"
-				><img width="100" src="/dog-1532627.svg" alt=""
+			<RouterLink to="/"
+				><img
+					width="100"
+					src="/dog-1532627.svg"
+					alt=""
+					title="Revenir à l'accueil"
 			/></RouterLink>
 			<div class="relative">
 				<div class="flex">

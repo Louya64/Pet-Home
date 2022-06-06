@@ -68,7 +68,12 @@ const getUsersList = (firstReq: boolean) => {
 		.get(
 			`${import.meta.env.VITE_URL_BACK}/users${orderBy.value}${
 				search.value
-			}${limit}`
+			}${limit}`,
+			{
+				headers: {
+					Authorization: `Bearer ${localStorage.getItem("token")}`,
+				},
+			}
 		)
 		.then((res) => {
 			if (firstReq) {

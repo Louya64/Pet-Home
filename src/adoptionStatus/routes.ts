@@ -1,6 +1,6 @@
 import type { FastifyInstance } from "fastify";
 import { ParamsIdType, ErrorType } from "../commons/types";
-import { notFoundError, duplicateDataError } from "../commons/errorHelpers";
+import { duplicateDataError } from "../commons/errorHelpers";
 import {
 	findAllAdoptionStatus,
 	findAdoptionStatusById,
@@ -10,6 +10,7 @@ import {
 	findAdoptionStatusByName,
 } from "./dao";
 import { AdoptionStatus, AdoptionStatusType } from "./types";
+import { superAdminAccessOnly } from "../commons/accessMiddlewares";
 
 const adoptionStatusRouter = async (server: FastifyInstance) => {
 	interface FastifyRequest {
@@ -60,6 +61,7 @@ const adoptionStatusRouter = async (server: FastifyInstance) => {
 					200: AdoptionStatus,
 				},
 			},
+			preHandler: [superAdminAccessOnly],
 		},
 		async (request, reply) => {
 			const { body: adoptionStatus } = request;
@@ -92,6 +94,7 @@ const adoptionStatusRouter = async (server: FastifyInstance) => {
 					200: AdoptionStatus,
 				},
 			},
+			preHandler: [superAdminAccessOnly],
 		},
 		async (request, reply) => {
 			const { body: adoptionStatus } = request;
@@ -117,6 +120,7 @@ const adoptionStatusRouter = async (server: FastifyInstance) => {
 
 	server.delete<{ Params: ParamsIdType; Reply: string }>(
 		"/:id",
+		{ preHandler: [superAdminAccessOnly] },
 		async (request, reply) => {
 			await deleteAdoptionStatus(Number(request.params.id));
 			reply.status(200).send(`Statut d'adoption ${request.params.id} supprimé`);

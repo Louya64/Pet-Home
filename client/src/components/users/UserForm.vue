@@ -335,7 +335,11 @@ const confirmDelete = () => {
 
 const deleteUser = (id: number) => {
 	axios
-		.delete(`${import.meta.env.VITE_URL_BACK}/users/${id}`)
+		.delete(`${import.meta.env.VITE_URL_BACK}/users/${id}`, {
+			headers: {
+				Authorization: `Bearer ${localStorage.getItem("token")}`,
+			},
+		})
 		.then(() => {
 			requestSuccess.value = true;
 			resultMessage.value = `Votre profil a bien été supprimé, vous allez être redirigé vers la page de connection`;
@@ -375,7 +379,12 @@ const submit = async (data: IUserCreateOrUpdate) => {
 		await axios
 			.put(
 				`${import.meta.env.VITE_URL_BACK}/users/${props.user.id}`,
-				userToUpdate
+				userToUpdate,
+				{
+					headers: {
+						Authorization: `Bearer ${localStorage.getItem("token")}`,
+					},
+				}
 			)
 			.then(() => {
 				requestSuccess.value = true;
@@ -392,7 +401,12 @@ const submit = async (data: IUserCreateOrUpdate) => {
 		await axios
 			.post(
 				`${import.meta.env.VITE_URL_BACK}/dashboard/auth/register`,
-				userToCreate
+				userToCreate,
+				{
+					headers: {
+						Authorization: `Bearer ${localStorage.getItem("token")}`,
+					},
+				}
 			)
 			.then(() => {
 				requestSuccess.value = true;

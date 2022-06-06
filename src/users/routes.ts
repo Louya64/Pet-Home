@@ -4,9 +4,13 @@ import { ParamsIdType, ErrorType } from "../commons/types";
 import {
 	notFoundError,
 	duplicateDataError,
-	invalidDataError,
 	unauthorizedError,
 } from "../commons/errorHelpers";
+import {
+	adminAccessOnly,
+	ownerAccessOnly,
+	ownerOrAdminAccessOnly,
+} from "../commons/accessMiddlewares";
 import {
 	hashPassword,
 	checkPasswordFormat,
@@ -18,11 +22,18 @@ import {
 	findAllUsers,
 	findUserById,
 	updateUser,
+	updatePassword,
 	deleteUser,
 	findUserByEmail,
-	findUserByUsername,
 } from "./dao";
-import { User, UserType, UserUpdate, UserUpdateType } from "./types";
+import {
+	User,
+	UserType,
+	UserUpdate,
+	UserUpdateType,
+	UserPasswordUpdate,
+	UserPasswordUpdateType,
+} from "./types";
 
 const userRouter = async (server: FastifyInstance) => {
 	interface FastifyRequest {
@@ -36,6 +47,7 @@ const userRouter = async (server: FastifyInstance) => {
 	server.register(bcrypt);
 	server.get<{ Querystring: FastifyRequest["Querystring"]; Reply: UserType[] }>(
 		"/",
+		{ preHandler: [adminAccessOnly] },
 		async (request, reply) => {
 			let orderBy = {};
 			if (request.query.orderBy) {
@@ -64,6 +76,7 @@ const userRouter = async (server: FastifyInstance) => {
 
 	server.get<{ Params: ParamsIdType; Reply: UserType | ErrorType }>(
 		"/:id",
+		{ preHandler: [ownerOrAdminAccessOnly] },
 		async (request, reply) => {
 			const user = await findUserById(Number(request.params.id));
 
@@ -94,12 +107,12 @@ const userRouter = async (server: FastifyInstance) => {
 					200: User,
 				},
 			},
+			preHandler: [ownerAccessOnly],
 		},
 		async (request, reply) => {
 			const { body: user } = request;
 			let newPassword = "";
 
-			// check pass // login if user.lastPassword
 			if (user.lastPassword && user.password && user.confirmedPassword) {
 				const userFound = await findUserByEmail(user.email);
 				if (!userFound) {
@@ -159,8 +172,42 @@ const userRouter = async (server: FastifyInstance) => {
 		}
 	);
 
+	server.put<{
+		Params: ParamsIdType;
+		Body: UserPasswordUpdateType;
+		Reply: string | ErrorType;
+	}>(
+		"/:id/password",
+		{
+			schema: {
+				body: UserPasswordUpdate,
+				response: {
+					200: User,
+				},
+			},
+			preHandler: [ownerAccessOnly],
+		},
+		async (request, reply) => {
+			const { body: passwords } = request;
+			let newPassword = "";
+
+			const newPasswordFormatOk = checkPasswordFormat(passwords.password);
+			const confirmPasswordOk = confirmPassword(
+				passwords.password,
+				passwords.confirmedPassword
+			);
+			if (newPasswordFormatOk && confirmPasswordOk) {
+				newPassword = await hashPassword(server, passwords.password);
+			}
+
+			await updatePassword(Number(request.params.id), newPassword);
+			reply.status(200).send("ok");
+		}
+	);
+
 	server.delete<{ Params: ParamsIdType; Reply: string }>(
 		"/:id",
+		{ preHandler: [ownerOrAdminAccessOnly] },
 		async (request, reply) => {
 			await deleteUser(Number(request.params.id));
 			reply.status(200).send(`Utilisateur ${request.params.id} supprimé`);

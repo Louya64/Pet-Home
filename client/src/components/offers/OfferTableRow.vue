@@ -135,7 +135,11 @@ const confirmDelete = (id: number) => {
 
 const deleteOffer = (id: number) => {
 	axios
-		.delete(`${import.meta.env.VITE_URL_BACK}/offers/${id}`)
+		.delete(`${import.meta.env.VITE_URL_BACK}/offers/${id}`, {
+			headers: {
+				Authorization: `Bearer ${localStorage.getItem("token")}`,
+			},
+		})
 		.then(() => {
 			emit("requestResult", true, `L'annonce ${id} a bien été supprimée`);
 		})

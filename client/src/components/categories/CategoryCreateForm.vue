@@ -56,6 +56,9 @@ const addCategory = (categoryName: string, categoryParent: number) => {
 				name: categoryName,
 				id_parent_category: categoryParent,
 			},
+			headers: {
+				Authorization: `Bearer ${localStorage.getItem("token")}`,
+			},
 		})
 		.then((res) => {
 			emit(
