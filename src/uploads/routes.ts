@@ -9,6 +9,7 @@ const uploadsRouter = async (server: FastifyInstance) => {
 		Querystring: {
 			id_offer: number;
 			main: string;
+			limit: string;
 		};
 	}
 	server.get<{
@@ -18,6 +19,7 @@ const uploadsRouter = async (server: FastifyInstance) => {
 		let filterArray: [string, string | number | Object][] = [];
 		const id_offer = Number(request.query.id_offer);
 		const main = request.query.main;
+		const limit = Number(request.query.limit) || 25;
 		if (id_offer) {
 			filterArray.push(["id_offer", id_offer]);
 		}
@@ -29,7 +31,7 @@ const uploadsRouter = async (server: FastifyInstance) => {
 			}
 		}
 
-		const allPhotos = await findAllPhotos(filterArray);
+		const allPhotos = await findAllPhotos(filterArray, limit);
 		reply.status(200).send(allPhotos);
 	});
 
@@ -66,9 +68,10 @@ const uploadsRouter = async (server: FastifyInstance) => {
 
 			// if main is removed => set another main
 			if (deletedPhoto.main) {
-				const otherOfferPhotos = await findAllPhotos([
-					["id_offer", deletedPhoto.id_offer],
-				]);
+				const otherOfferPhotos = await findAllPhotos(
+					[["id_offer", deletedPhoto.id_offer]],
+					25
+				);
 				if (otherOfferPhotos.length) {
 					await updatePhoto(otherOfferPhotos[0].id, { main: true });
 				}

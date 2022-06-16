@@ -2,7 +2,7 @@
 	<carousel :autoplay="5000" :wrap-around="true">
 		<slide v-for="photo in photosList" :key="photo.id">
 			<div class="carousel__item w-full h-[70vh]">
-				<img :src="`${urlBack}/image/${photo.path}`" alt="" />
+				<img :src="`${urlBack}/image/${photo.path}`" alt="animals" />
 			</div>
 		</slide>
 
@@ -24,7 +24,7 @@ const urlBack = import.meta.env.VITE_URL_BACK;
 
 const getPhotosList = () => {
 	axios
-		.get(`${import.meta.env.VITE_URL_BACK}/uploads?main=true`)
+		.get(`${import.meta.env.VITE_URL_BACK}/uploads?main=true&limit=10`)
 		.then((res) => {
 			photosList.value = res.data;
 		});

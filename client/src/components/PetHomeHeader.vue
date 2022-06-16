@@ -9,7 +9,7 @@
 				><img
 					width="100"
 					src="/dog-1532627.svg"
-					alt=""
+					alt="logo"
 					title="Revenir à l'accueil"
 			/></RouterLink>
 			<div class="relative">
@@ -111,16 +111,6 @@ import { RouterLink, RouterView, useRouter } from "vue-router";
 import type { ICategoryRes } from "../interfaces/ICategory";
 import type { IAdoptionRequestRes } from "@/interfaces/IAdoptionRequest";
 import axios from "axios";
-
-if (
-	localStorage.theme === "dark" ||
-	(!("theme" in localStorage) &&
-		window.matchMedia("(prefers-color-scheme: dark)").matches)
-) {
-	document.documentElement.classList.add("dark");
-} else {
-	document.documentElement.classList.remove("dark");
-}
 
 const router = useRouter();
 const isAuthenticate: Ref<string | null> = ref(
