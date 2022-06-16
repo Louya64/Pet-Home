@@ -46,6 +46,8 @@ const upload = multer({ storage: storage });
 const offerRouter = async (server: FastifyInstance) => {
 	interface FastifyRequest {
 		Querystring: {
+			creation_date: string;
+			adoption_date: string;
 			id_status: string;
 			id_category: string;
 			animal_name: string;
@@ -54,6 +56,10 @@ const offerRouter = async (server: FastifyInstance) => {
 			zipcode: string;
 			city: string;
 			age: string;
+			identified: string;
+			vaccinated: string;
+			disabled: string;
+			search: string;
 			idIn: string;
 			orderBy: string;
 			limit: string;
@@ -78,6 +84,8 @@ const offerRouter = async (server: FastifyInstance) => {
 		}
 
 		let filterArray: [string, string | number | Object][] = [];
+		const creation_date = request.query.creation_date;
+		const adoption_date = request.query.adoption_date;
 		const id_status = request.query.id_status;
 		const animal_name = request.query.animal_name;
 		const id_category = Number(request.query.id_category);
@@ -85,10 +93,112 @@ const offerRouter = async (server: FastifyInstance) => {
 		const zipcode = Number(request.query.zipcode);
 		const city = request.query.city;
 		const age = request.query.age;
+		const identified = request.query.identified;
+		const vaccinated = request.query.vaccinated;
+		const disabled = request.query.disabled;
+		const search = request.query.search;
 		const idIn = request.query.idIn;
 		const limit = Number(request.query.limit) || 99;
 		const offset = Number(request.query.offset) || 0;
 
+		if (creation_date) {
+			if (creation_date.split("-")[0] === "lessThan") {
+				filterArray.push([
+					"creation_date",
+					{
+						lt: new Date(
+							`${creation_date.slice(
+								creation_date.indexOf("-") + 1
+							)}T00:00:00.000Z`
+						),
+					},
+				]);
+			} else if (creation_date.split("-")[0] === "equal") {
+				filterArray.push([
+					"creation_date",
+					{
+						gte: new Date(
+							`${creation_date.slice(
+								creation_date.indexOf("-") + 1
+							)}T00:00:00.000Z`
+						),
+						lte: new Date(
+							`${creation_date.slice(
+								creation_date.indexOf("-") + 1
+							)}T23:59:59.000Z`
+						),
+					},
+				]);
+			} else if (creation_date.split("-")[0] === "greaterThan") {
+				filterArray.push([
+					"creation_date",
+					{
+						gt: new Date(
+							`${creation_date.slice(
+								creation_date.indexOf("-") + 1
+							)}T23:59:59.000Z`
+						),
+					},
+				]);
+			} else {
+				filterArray.push([
+					"creation_date",
+					{
+						gte: new Date(`${creation_date.slice(0, 10)}T00:00:00.000Z`),
+						lte: new Date(`${creation_date.slice(11)}T23:59:59.000Z`),
+					},
+				]);
+			}
+		}
+		if (adoption_date) {
+			if (adoption_date.split("-")[0] === "lessThan") {
+				filterArray.push([
+					"adoption_date",
+					{
+						lt: new Date(
+							`${adoption_date.slice(
+								adoption_date.indexOf("-") + 1
+							)}T00:00:00.000Z`
+						),
+					},
+				]);
+			} else if (adoption_date.split("-")[0] === "equal") {
+				filterArray.push([
+					"adoption_date",
+					{
+						gte: new Date(
+							`${adoption_date.slice(
+								adoption_date.indexOf("-") + 1
+							)}T00:00:00.000Z`
+						),
+						lte: new Date(
+							`${adoption_date.slice(
+								adoption_date.indexOf("-") + 1
+							)}T23:59:59.000Z`
+						),
+					},
+				]);
+			} else if (adoption_date.split("-")[0] === "greaterThan") {
+				filterArray.push([
+					"adoption_date",
+					{
+						gt: new Date(
+							`${adoption_date.slice(
+								adoption_date.indexOf("-") + 1
+							)}T23:59:59.000Z`
+						),
+					},
+				]);
+			} else {
+				filterArray.push([
+					"adoption_date",
+					{
+						gte: new Date(`${adoption_date.slice(0, 10)}T00:00:00.000Z`),
+						lte: new Date(`${adoption_date.slice(11)}T23:59:59.000Z`),
+					},
+				]);
+			}
+		}
 		if (id_status) {
 			if (id_status[0] === "!") {
 				filterArray.push(["id_status", { not: Number(id_status[1]) }]);
@@ -96,7 +206,6 @@ const offerRouter = async (server: FastifyInstance) => {
 				filterArray.push(["id_status", Number(id_status)]);
 			}
 		}
-
 		if (animal_name) {
 			filterArray.push(["animal_name", animal_name]);
 		}
@@ -113,9 +222,46 @@ const offerRouter = async (server: FastifyInstance) => {
 			filterArray.push(["city", city]);
 		}
 		if (age) {
-			const minAge = Number(age.split("-")[0]);
-			const maxAge = Number(age.split("-")[1]);
-			filterArray.push(["age", { gte: minAge, lte: maxAge }]);
+			if (age.split("-")[0] === "lessThan") {
+				filterArray.push(["age", { lt: Number(age.split("-")[1]) }]);
+			} else if (age.split("-")[0] === "equal") {
+				filterArray.push(["age", Number(age.split("-")[1])]);
+			} else if (age.split("-")[0] === "greaterThan") {
+				filterArray.push(["age", { gt: Number(age.split("-")[1]) }]);
+			} else {
+				const minAge = Number(age.split("-")[0]);
+				const maxAge = Number(age.split("-")[1]);
+				filterArray.push(["age", { gte: minAge, lte: maxAge }]);
+			}
+		}
+		if (identified) {
+			if (identified === "true") {
+				filterArray.push(["identified", true]);
+			} else {
+				filterArray.push(["identified", false]);
+			}
+		}
+		if (vaccinated) {
+			if (vaccinated === "true") {
+				filterArray.push(["vaccinated", true]);
+			} else {
+				filterArray.push(["vaccinated", false]);
+			}
+		}
+		if (disabled) {
+			if (disabled === "true") {
+				filterArray.push(["disabled", true]);
+			} else {
+				filterArray.push(["disabled", false]);
+			}
+		}
+		if (search) {
+			filterArray.push([
+				search.split("-")[0],
+				{
+					contains: search.split("-")[1],
+				},
+			]);
 		}
 		if (idIn) {
 			const idArray = idIn.split(",").map((el) => Number(el));
@@ -234,9 +380,10 @@ const offerRouter = async (server: FastifyInstance) => {
 				offerToUpdate
 			);
 			const photos = request.files as Partial<File>[];
-			const offerAlreadyHasPhotos = await findAllPhotos([
-				["id_offer", offerUpdated.id],
-			]);
+			const offerAlreadyHasPhotos = await findAllPhotos(
+				[["id_offer", offerUpdated.id]],
+				25
+			);
 			photos.map(async (photo: Partial<File>, index) => {
 				let main = false;
 				if (index === 0 && !offerAlreadyHasPhotos.length) {
@@ -258,9 +405,10 @@ const offerRouter = async (server: FastifyInstance) => {
 		"/:id",
 		{ preHandler: [adminAccessOnly] },
 		async (request, reply) => {
-			const offerPhotos = await findAllPhotos([
-				["id_offer", Number(request.params.id)],
-			]);
+			const offerPhotos = await findAllPhotos(
+				[["id_offer", Number(request.params.id)]],
+				25
+			);
 			await deleteOffer(Number(request.params.id));
 
 			offerPhotos.map((photo) => {

@@ -6,7 +6,11 @@
 		class="w-1/4 m-5 p-3 flex flex-col justify-between shadow-md shadow-slate-700 hover:cursor-pointer hover:scale-105 transition duration-300 hover:shadow-2xl hover:shadow-slate-700"
 	>
 		<div v-if="photo">
-			<img class="w-2/3 mx-auto" :src="`${urlBack}/image/${photo}`" alt="" />
+			<img
+				class="w-2/3 mx-auto"
+				:src="`${urlBack}/image/${photo}`"
+				:alt="offer.category.name"
+			/>
 		</div>
 		<div>
 			<div class="flex justify-evenly text-xs">

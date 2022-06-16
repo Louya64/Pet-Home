@@ -10,6 +10,16 @@ import { ref } from "vue";
 import jwt_decode from "jwt-decode";
 import type { ITokenDecoded } from "./interfaces/ITokenDecoded";
 
+if (
+	localStorage.theme === "dark" ||
+	(!("theme" in localStorage) &&
+		window.matchMedia("(prefers-color-scheme: dark)").matches)
+) {
+	document.documentElement.classList.add("dark");
+} else {
+	document.documentElement.classList.remove("dark");
+}
+
 const isAdmin = ref(false);
 let token = localStorage.getItem("token");
 

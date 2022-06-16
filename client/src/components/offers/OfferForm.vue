@@ -53,59 +53,7 @@
 						><font-awesome-icon class="text-red-500 text-xs" icon="asterisk" />
 						Age</label
 					>
-					<div class="flex justify-between">
-						<div class="w-1/3 flex items-center">
-							<select
-								class="form-item-input flex-1 mx-1"
-								id="ageYear"
-								v-model="ageYear"
-							>
-								<option value="0">0</option>
-								<option value="12">1</option>
-								<option value="24">2</option>
-								<option value="36">3</option>
-								<option value="48">4</option>
-								<option value="60">5</option>
-								<option value="72">6</option>
-								<option value="84">7</option>
-								<option value="96">8</option>
-								<option value="108">9</option>
-								<option value="120">10</option>
-								<option value="132">11</option>
-								<option value="144">12</option>
-								<option value="156">13</option>
-								<option value="168">14</option>
-								<option value="180">15</option>
-								<option value="192">16</option>
-								<option value="204">17</option>
-								<option value="216">18</option>
-								<option value="228">19</option>
-								<option value="240">20</option>
-							</select>
-							<label for="ageYear"> ans</label>
-						</div>
-						<div class="w-1/3 flex items-center">
-							<select
-								class="form-item-input flex-1 mx-1"
-								id="ageMonth"
-								v-model="ageMonth"
-							>
-								<option value="0">0</option>
-								<option value="1">1</option>
-								<option value="2">2</option>
-								<option value="3">3</option>
-								<option value="4">4</option>
-								<option value="5">5</option>
-								<option value="6">6</option>
-								<option value="7">7</option>
-								<option value="8">8</option>
-								<option value="9">9</option>
-								<option value="10">10</option>
-								<option value="11">11</option>
-							</select>
-							<label for="ageMonth"> mois</label>
-						</div>
-					</div>
+					<AgeSelects :age="age" @setAge="(ageVal) => (age = ageVal)" />
 				</div>
 
 				<div class="form-item flex-row items-center h-[86px]">
@@ -262,6 +210,7 @@ import axios from "axios";
 import Switch from "./Switch.vue";
 import PhotosDisplayed from "./PhotosDisplayed.vue";
 import RequestResult from "@/components/commons/RequestResult.vue";
+import AgeSelects from "./AgeSelects.vue";
 import type {
 	IOfferRes,
 	IOfferCreate,
@@ -280,11 +229,7 @@ const categoriesList: Ref<ICategoryRes[]> = ref([]);
 const racesList: Ref<IRaceRes[]> = ref([]);
 const offerStatusList: Ref<IOfferStatusRes[]> = ref([]);
 const animal_name = ref("");
-const ageMonth = ref(0);
-const ageYear = ref(0);
-const age = computed(() => {
-	return Number(ageMonth.value) + Number(ageYear.value);
-});
+const age = ref(0);
 const id_category = ref(0);
 const id_race: Ref<null | number> = ref(null);
 const zipcode = ref(0);
@@ -302,8 +247,7 @@ const id_status = ref(1);
 
 if (props.offer) {
 	if (props.offer.animal_name) animal_name.value = props.offer.animal_name;
-	ageYear.value = Math.floor(props.offer.age / 12) * 12;
-	ageMonth.value = props.offer.age - ageYear.value;
+	age.value = props.offer.age;
 	id_category.value = props.offer.id_category;
 	id_race.value = props.offer.id_race;
 	zipcode.value = props.offer.zipcode;
@@ -412,8 +356,7 @@ const submit = async (data: IOfferCreate) => {
 				requestSuccess.value = true;
 				resultMessage.value = "L'offre d'adoption a bien été enregistrée";
 				animal_name.value = "";
-				ageMonth.value = 0;
-				ageYear.value = 0;
+				age.value = 0;
 				id_category.value = 0;
 				id_race.value = null;
 				zipcode.value = 0;
